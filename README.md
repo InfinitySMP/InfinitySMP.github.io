@@ -1,1 +1,0 @@
-# InfinitySMP.github.io
