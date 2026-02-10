@@ -49,7 +49,6 @@
       line-height: 1.5;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
-      overflow: hidden;
       position: relative;
     }
 
@@ -60,7 +59,7 @@
       top: -50%;
       left: -50%;
       width: 200%;
-      height: 200%;
+      height: 1%;
       background: radial-gradient(circle at 30% 50%, rgba(33, 150, 243, 0.1) 0%, transparent 50%),
                   radial-gradient(circle at 70% 50%, rgba(33, 150, 243, 0.05) 0%, transparent 50%);
       animation: float 20s ease-in-out infinite;
@@ -235,6 +234,10 @@
       animation: fadeInUp 0.6s ease-out 0.5s backwards;
     }
 
+    .card:nth-child(3) {
+      animation: fadeInUp 0.6s ease-out 0.6s backwards;
+    }
+
     .card-icon {
       width: 56px;
       height: 56px;
@@ -252,6 +255,17 @@
     .card:hover .card-icon {
       transform: scale(1.1) rotate(5deg);
       box-shadow: 0 8px 24px rgba(33, 150, 243, 0.5);
+    }
+
+    .card-icon-image {
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .card-icon-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
     .card-title {
@@ -297,7 +311,7 @@
       margin-top: 80px;
       padding-top: 32px;
       border-top: 1px solid var(--border);
-      animation: fadeIn 0.6s ease-out 0.6s backwards;
+      animation: fadeIn 0.6s ease-out 0.7s backwards;
     }
 
     .footer-text {
@@ -414,6 +428,18 @@
     </div>
 
     <div class="cards-grid">
+        
+              <a href="https://discord.gg/3FbYYN4cQS" class="card">
+        <div class="card-icon card-icon-image">
+          <img src="https://static.vecteezy.com/system/resources/previews/006/892/625/non_2x/discord-logo-icon-editorial-free-vector.jpg" alt="Community">
+        </div>
+        <h2 class="card-title">Discord Server</h2>
+        <p class="card-description">Hang out with our members! Get perks and giveaways, and have fun in public voicechat channels and text channels!</p>
+        <span class="card-link">
+          Join community (11/10 agree with us)<span class="arrow">→</span>
+        </span>
+      </a>
+        
       <a href="application-form.html" class="card">
         <div class="card-icon">📝</div>
         <h2 class="card-title">Apply for Staff</h2>
@@ -424,22 +450,18 @@
         </span>
       </a>
 
-      <a href="admin-dashboard.html" class="card">
-        <div class="card-icon">🛡️</div>
-        <h2 class="card-title">Admin Dashboard</h2>
-        <p class="card-description">Review and manage staff applications. View detailed submissions and take action.</p>
+      <a href="https://www.reddit.com/r/InfinitySmpEdu/" class="card">
+        <div class="card-icon card-icon-image">
+          <img src="https://cdn.brandfetch.io/idkKwm0IT0/w/400/h/400/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1768324678544" alt="Community">
+        </div>
+        <h2 class="card-title">Reddit</h2>
+        <p class="card-description">Join our public reddit to look at updates and changelog features!</p>
         <span class="card-link">
-          View Dashboard
-          <span class="arrow">→</span>
+          Join reddit community<span class="arrow">→</span>
         </span>
       </a>
     </div>
 
-    <div class="footer">
-      <p class="footer-text">
-        Powered by Firebase • Built with care for the Infinity SMP community
-      </p>
-    </div>
   </div>
 </body>
 </html>
