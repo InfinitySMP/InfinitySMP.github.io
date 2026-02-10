@@ -477,7 +477,6 @@
             ];
 
             const form = document.getElementById("applicationForm");
-            const feedback = document.getElementById("feedback");
 
             function createField(q, index) {
                 const group = document.createElement("div");
@@ -535,13 +534,21 @@
             reset.textContent = "Reset Form";
             reset.addEventListener("click", () => {
                 form.reset();
-                feedback.textContent = "";
-                feedback.className = "";
+                const feedback = document.getElementById("feedback");
+                if (feedback) {
+                    feedback.textContent = "";
+                    feedback.className = "";
+                }
             });
 
             controls.appendChild(submit);
             controls.appendChild(reset);
             form.appendChild(controls);
+
+            // Create the feedback element (THIS WAS MISSING!)
+            const feedback = document.createElement("div");
+            feedback.id = "feedback";
+            form.appendChild(feedback);
 
             form.addEventListener("submit", async (ev) => {
                 ev.preventDefault();
