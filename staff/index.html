@@ -1,0 +1,171 @@
+
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Infinity SMP — Staff Application</title>
+  <style>
+    :root { --bg: #071025; --card: #071428; --text: #e6eef8; --accent: #2563eb; }
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial; background: var(--bg); color: var(--text); margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; }
+    .container { width:100%; max-width:900px; }
+    .card { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02)); padding:20px; border-radius:12px; box-shadow: 0 6px 24px rgba(0,0,0,0.6); }
+    h1 { margin:0 0 12px 0; font-size:20px; }
+    p.desc { margin:0 0 18px 0; color:rgba(230,238,248,0.85); }
+    form label { display:block; margin-top:14px; font-weight:600; font-size:13px; }
+    input, select, textarea { display:block; width:100%; margin-top:6px; padding:10px 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.04); background: rgba(0,0,0,0.25); color:var(--text); font-size:14px; }
+    textarea { min-height:100px; resize:vertical; }
+    .controls { display:flex; gap:12px; margin-top:18px; }
+    button { flex:1; padding:10px 14px; border-radius:8px; border:none; background:var(--accent); color:white; font-weight:600; cursor:pointer; }
+    .small { font-size:13px; color:rgba(230,238,248,0.8); margin-top:10px; }
+    .success { color:#86efac; }
+    .error { color:#fb7185; }
+    @media (max-width:560px){ .controls{flex-direction:column;} }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>Infinity SMP — Staff Application</h1>
+      <p class="desc">Fill out this form to apply for staff. Questions are generated from a single array in the script — edit that array to add or remove fields.</p>
+
+      <form id="applicationForm" autocomplete="off"></form>
+
+      <div class="small">Submissions saved to Firestore collection: <code>staffApplications</code></div>
+      <div id="feedback" class="small" aria-live="polite"></div>
+    </div>
+  </div>
+
+  <script type="module">
+    // Firebase modular SDK (CDN imports)
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
+    import { getFirestore, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
+
+    // ----------------------------
+    // Firebase config (provided)
+    // ----------------------------
+    const firebaseConfig = {
+      apiKey: "AIzaSyBgV9PoUFut3FPc0iChFNm2-h6-Uc5z6s0",
+      authDomain: "infinity-service-b2f10.firebaseapp.com",
+      projectId: "infinity-service-b2f10",
+      storageBucket: "infinity-service-b2f10.firebasestorage.app",
+      messagingSenderId: "805770674259",
+      appId: "1:805770674259:web:bcc520979e6772fda5c6a6"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // =============================
+    // EDIT QUESTIONS HERE
+    // - Add / remove objects in this array only
+    // - Supported types: "text", "number", "email", "textarea", "select"
+    // - For select, provide an options: [] array
+    // - id must be a unique string used as the field name in Firestore
+    // =============================
+    const questions = [
+      { id: 'minecraftUsername', label: 'Minecraft Username', type: 'text', required: true },
+      { id: 'discord', label: 'Discord Username (example: Kai#1234)', type: 'text', required: true },
+      { id: 'age', label: 'Age', type: 'number', required: true },
+      { id: 'timezone', label: 'Timezone (e.g. AEST)', type: 'text', required: true },
+      { id: 'role', label: 'Which staff role are you applying for?', type: 'select', options: ['Moderator', 'Admin', 'Builder', 'Helper'], required: true },
+      { id: 'hours', label: 'Estimated hours per week you can moderate/help', type: 'number', required: true },
+      { id: 'experience', label: 'Previous staff experience (servers, roles, responsibilities)', type: 'textarea', required: true },
+      { id: 'why', label: 'Why do you want to join Infinity SMP staff?', type: 'textarea', required: true }
+    ];
+
+    // -----------------------------
+    // Form generation
+    // -----------------------------
+    const form = document.getElementById('applicationForm');
+    const feedback = document.getElementById('feedback');
+
+    function createField(q){
+      const label = document.createElement('label');
+      label.htmlFor = q.id;
+      label.textContent = q.label + (q.required ? ' *' : '');
+
+      let input;
+
+      if (q.type === 'textarea'){
+        input = document.createElement('textarea');
+      } else if (q.type === 'select'){
+        input = document.createElement('select');
+        (q.options || []).forEach(opt => {
+          const option = document.createElement('option');
+          option.value = opt;
+          option.textContent = opt;
+          input.appendChild(option);
+        });
+      } else {
+        input = document.createElement('input');
+        input.type = q.type || 'text';
+      }
+
+      input.id = q.id;
+      input.name = q.id;
+      if (q.required) input.required = true;
+
+      form.appendChild(label);
+      form.appendChild(input);
+    }
+
+    // Build the form
+    questions.forEach(createField);
+
+    // Buttons
+    const controls = document.createElement('div');
+    controls.className = 'controls';
+
+    const submit = document.createElement('button');
+    submit.type = 'submit';
+    submit.textContent = 'Submit Application';
+
+    const reset = document.createElement('button');
+    reset.type = 'button';
+    reset.textContent = 'Reset Form';
+    reset.addEventListener('click', () => { form.reset(); feedback.textContent = ''; feedback.className='small'; });
+
+    controls.appendChild(submit);
+    controls.appendChild(reset);
+    form.appendChild(controls);
+
+    // -----------------------------
+    // Submission handler
+    // -----------------------------
+    form.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      feedback.textContent = '';
+
+      // Collect values
+      const doc = {};
+      for (const q of questions){
+        const el = document.getElementById(q.id);
+        if (!el) continue;
+        // for numbers, convert to number when possible
+        if (q.type === 'number') {
+          const val = el.value.trim();
+          doc[q.id] = val === '' ? null : Number(val);
+        } else {
+          doc[q.id] = el.value.trim();
+        }
+      }
+
+      doc.submittedAt = serverTimestamp();
+
+      try {
+        await addDoc(collection(db, 'staffApplications'), doc);
+        feedback.textContent = 'Application submitted successfully.';
+        feedback.className = 'small success';
+        form.reset();
+      } catch (err) {
+        console.error('Submit error', err);
+        feedback.textContent = 'Failed to submit application. Check console for errors.';
+        feedback.className = 'small error';
+      }
+    });
+  </script>
+</body>
+</html>
