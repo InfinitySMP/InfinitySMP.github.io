@@ -371,17 +371,49 @@
                     width: 100%;
                 }
             }
+            
+.logo-container {
+    margin-bottom: 32px;
+    animation: fadeIn 0.6s ease-out;
+}
+
+.logo {
+    width: 96px;
+    height: 96px;
+    margin: 0 auto;
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    box-shadow: var(--shadow-glow), var(--shadow-lg);
+    background: var(--bg-secondary);
+    border: 2px solid var(--border);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    text-decoration: none; /* Removes underline from link */
+}
+
+.logo:hover {
+    transform: scale(1.05) translateY(-5px);
+    box-shadow: 0 0 60px rgba(33, 150, 243, 0.4), var(--shadow-lg);
+    border-color: var(--accent);
+}
+
+.logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
         </style>
     </head>
     <body>
-        <div class="container">
+<div class="container">
             <div class="header">
-                <div class="logo"><img src="logo.png" alt="Infinity SMP" /></div>
-                <h1>Staff Application</h1>
-                <p class="subtitle">
-                    Join the Infinity SMP team. Fill out the form below to apply for a staff position.
-                </p>
-            </div>
+                <div class="logo-container">
+                    <a href="https://infinitysmp.github.io/" class="logo">
+                        <img src="logo.png" alt="Infinity SMP" />
+                    </a>
+                </div>
 
             <div class="card">
                 <form id="applicationForm" autocomplete="off"></form>
