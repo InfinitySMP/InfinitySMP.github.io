@@ -444,6 +444,10 @@
                 font-family: "JetBrains Mono", monospace;
             }
 
+            .metric-value.live {
+                color: var(--status-operational);
+            }
+
             .footer {
                 text-align: center;
                 margin-top: 60px;
@@ -624,7 +628,7 @@
                     <div class="service-metrics">
                         <div class="metric">
                             <div class="metric-label">Uptime</div>
-                            <div class="metric-value" id="serverUptime">--</div>
+                            <div class="metric-value live" id="serverUptime">--</div>
                         </div>
                         <div class="metric">
                             <div class="metric-label">Response</div>
@@ -647,7 +651,7 @@
                     <div class="service-metrics">
                         <div class="metric">
                             <div class="metric-label">Uptime</div>
-                            <div class="metric-value" id="hostingUptime">--</div>
+                            <div class="metric-value live" id="hostingUptime">--</div>
                         </div>
                         <div class="metric">
                             <div class="metric-label">Response</div>
@@ -669,8 +673,8 @@
                     </div>
                     <div class="service-metrics">
                         <div class="metric">
-                            <div class="metric-label">Database</div>
-                            <div class="metric-value" id="firebaseDb">--</div>
+                            <div class="metric-label">Uptime</div>
+                            <div class="metric-value live" id="firebaseUptime">--</div>
                         </div>
                         <div class="metric">
                             <div class="metric-label">Response</div>
@@ -692,8 +696,8 @@
                     </div>
                     <div class="service-metrics">
                         <div class="metric">
-                            <div class="metric-label">Storage</div>
-                            <div class="metric-value" id="cloudinaryStorage">--</div>
+                            <div class="metric-label">Uptime</div>
+                            <div class="metric-value live" id="cloudinaryUptime">--</div>
                         </div>
                         <div class="metric">
                             <div class="metric-label">Response</div>
@@ -733,6 +737,53 @@
             const app = initializeApp(firebaseConfig);
             const database = getDatabase(app);
 
+            // Store uptime data for each service
+            const uptimeData = {
+                server: { startTime: null, status: "operational" },
+                hosting: { startTime: null, status: "operational" },
+                firebase: { startTime: null, status: "operational" },
+                cloudinary: { startTime: null, status: "operational" }
+            };
+
+            // Format uptime duration
+            function formatUptime(milliseconds) {
+                const seconds = Math.floor(milliseconds / 1000);
+                const minutes = Math.floor(seconds / 60);
+                const hours = Math.floor(minutes / 60);
+                const days = Math.floor(hours / 24);
+
+                if (days > 0) {
+                    return `${days}d ${hours % 24}h`;
+                } else if (hours > 0) {
+                    return `${hours}h ${minutes % 60}m`;
+                } else if (minutes > 0) {
+                    return `${minutes}m ${seconds % 60}s`;
+                } else {
+                    return `${seconds}s`;
+                }
+            }
+
+            // Update live uptime counters
+            function updateUptimeCounters() {
+                const now = Date.now();
+
+                Object.keys(uptimeData).forEach((service) => {
+                    const data = uptimeData[service];
+                    const element = document.getElementById(`${service}Uptime`);
+
+                    if (element && data.startTime && data.status === "operational") {
+                        const uptime = now - data.startTime;
+                        element.textContent = formatUptime(uptime);
+                        element.classList.add("live");
+                    } else if (element && data.status !== "operational") {
+                        element.classList.remove("live");
+                    }
+                });
+            }
+
+            // Start the uptime counter update interval
+            setInterval(updateUptimeCounters, 1000);
+
             function updateStatus(service, status, metrics = {}) {
                 const statusBadge = document.getElementById(`${service}Status`);
                 const card = document.getElementById(`${service}Card`);
@@ -743,10 +794,17 @@
                     ${status === "operational" ? "Operational" : status === "degraded" ? "Degraded" : status === "down" ? "Down" : "Checking..."}
                 `;
 
+                // Update uptime tracking based on status
+                if (status === "operational" && uptimeData[service].status !== "operational") {
+                    // Service just came back online
+                    uptimeData[service].startTime = Date.now();
+                }
+                uptimeData[service].status = status;
+
                 // Update metrics if provided
                 Object.keys(metrics).forEach((key) => {
                     const element = document.getElementById(`${service}${key.charAt(0).toUpperCase() + key.slice(1)}`);
-                    if (element) {
+                    if (element && key !== "uptime") {
                         element.textContent = metrics[key];
                     }
                 });
@@ -777,28 +835,39 @@
 
             function processStatusData(data) {
                 if (data) {
+                    // Update start times from Firebase
+                    if (data.serverStartTime) {
+                        uptimeData.server.startTime = data.serverStartTime;
+                    }
+                    if (data.hostingStartTime) {
+                        uptimeData.hosting.startTime = data.hostingStartTime;
+                    }
+                    if (data.firebaseStartTime) {
+                        uptimeData.firebase.startTime = data.firebaseStartTime;
+                    }
+                    if (data.cloudinaryStartTime) {
+                        uptimeData.cloudinary.startTime = data.cloudinaryStartTime;
+                    }
+
                     // Update all services based on Firebase data
                     updateStatus("server", data.serverStatus || "operational", {
-                        uptime: data.serverUptime || "99.9%",
                         response: data.serverResponse || "<100"
                     });
 
                     updateStatus("hosting", data.hostingStatus || "operational", {
-                        uptime: data.hostingUptime || "99.9%",
                         response: data.hostingResponse || "<50"
                     });
 
                     updateStatus("firebase", "operational", {
-                        db: "Online",
                         response: data.firebaseResponse || "<150"
                     });
 
                     updateStatus("cloudinary", data.cloudinaryStatus || "operational", {
-                        storage: data.cloudinaryStorage || "Active",
                         response: data.cloudinaryResponse || "<200"
                     });
 
                     updateOverallStatus(data);
+                    updateUptimeCounters();
                 } else {
                     setDefaultStatuses();
                 }
@@ -806,6 +875,15 @@
             }
 
             function setDefaultStatuses() {
+                const now = Date.now();
+
+                // Set default start times if not already set
+                Object.keys(uptimeData).forEach((service) => {
+                    if (!uptimeData[service].startTime) {
+                        uptimeData[service].startTime = now;
+                    }
+                });
+
                 const defaultData = {
                     serverStatus: "operational",
                     hostingStatus: "operational",
@@ -813,26 +891,23 @@
                 };
 
                 updateStatus("server", "operational", {
-                    uptime: "99.9%",
                     response: "<100"
                 });
 
                 updateStatus("hosting", "operational", {
-                    uptime: "99.9%",
                     response: "<50"
                 });
 
                 updateStatus("firebase", "operational", {
-                    db: "Online",
                     response: "<150"
                 });
 
                 updateStatus("cloudinary", "operational", {
-                    storage: "Active",
                     response: "<200"
                 });
 
                 updateOverallStatus(defaultData);
+                updateUptimeCounters();
             }
 
             window.checkAllServices = async function () {
@@ -844,7 +919,6 @@
                 } catch (error) {
                     console.error("Error checking Firebase:", error);
                     updateStatus("firebase", "down", {
-                        db: "Error",
                         response: "--"
                     });
                     updateLastUpdated();
@@ -861,7 +935,6 @@
                 (error) => {
                     console.error("Error with real-time updates:", error);
                     updateStatus("firebase", "down", {
-                        db: "Error",
                         response: "--"
                     });
                     updateLastUpdated();
