@@ -1,601 +1,642 @@
 <!doctype html>
 <html lang="en-AU">
-<head>
-  <meta charset="utf-8" />
-  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Staff Application | Infinity SMP</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Infinity | Staff Application</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&display=swap"
+            rel="stylesheet" />
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
 
-    :root {
-      --bg-primary: #0a1929;
-      --bg-secondary: #0d2137;
-      --bg-tertiary: #132f4c;
-      --text-primary: #e3f2fd;
-      --text-secondary: #90caf9;
-      --text-tertiary: #64b5f6;
-      --accent: #2196f3;
-      --accent-hover: #42a5f5;
-      --accent-dark: #1976d2;
-      --success: #4caf50;
-      --warning: #ff9800;
-      --danger: #f44336;
-      --border: rgba(33, 150, 243, 0.15);
-      --border-hover: rgba(33, 150, 243, 0.3);
-      --shadow-sm: 0 2px 8px rgba(33, 150, 243, 0.1);
-      --shadow-md: 0 4px 20px rgba(33, 150, 243, 0.15);
-      --shadow-lg: 0 12px 48px rgba(33, 150, 243, 0.25);
-      --shadow-glow: 0 0 40px rgba(33, 150, 243, 0.2);
-      --radius-sm: 10px;
-      --radius-md: 14px;
-      --radius-lg: 20px;
-    }
+            :root {
+                --bg-primary: #0a1929;
+                --bg-secondary: #0d2137;
+                --bg-tertiary: #132f4c;
+                --text-primary: #e3f2fd;
+                --text-secondary: #90caf9;
+                --text-tertiary: #64b5f6;
+                --accent: #2196f3;
+                --accent-hover: #42a5f5;
+                --accent-dark: #1976d2;
+                --success: #4caf50;
+                --warning: #ff9800;
+                --danger: #f44336;
+                --border: rgba(33, 150, 243, 0.15);
+                --border-hover: rgba(33, 150, 243, 0.3);
+                --shadow-sm: 0 2px 8px rgba(33, 150, 243, 0.1);
+                --shadow-md: 0 4px 20px rgba(33, 150, 243, 0.15);
+                --shadow-lg: 0 12px 48px rgba(33, 150, 243, 0.25);
+                --shadow-glow: 0 0 40px rgba(33, 150, 243, 0.2);
+                --radius-sm: 10px;
+                --radius-md: 14px;
+                --radius-lg: 20px;
+            }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-      background: var(--bg-primary);
-      color: var(--text-primary);
-      min-height: 100vh;
-      padding: 40px 20px;
-      line-height: 1.5;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      position: relative;
-    }
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Oxygen, Ubuntu,
+                    sans-serif;
+                background: var(--bg-primary);
+                color: var(--text-primary);
+                min-height: 100vh;
+                padding: 40px 20px;
+                line-height: 1.5;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+                position: relative;
+            }
 
-    /* Pulsing glow background */
-    body::before {
-      content: '';
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      width: 800px;
-      height: 800px;
-      background: radial-gradient(circle, rgba(33, 150, 243, 0.15) 0%, rgba(33, 150, 243, 0.05) 40%, transparent 70%);
-      transform: translate(-50%, -50%);
-      animation: pulse 4s ease-in-out infinite;
-      pointer-events: none;
-      z-index: 0;
-      filter: blur(60px);
-    }
+            /* Pulsing glow background */
+            body::before {
+                content: "";
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                width: 800px;
+                height: 800px;
+                background: radial-gradient(
+                    circle,
+                    rgba(33, 150, 243, 0.15) 0%,
+                    rgba(33, 150, 243, 0.05) 40%,
+                    transparent 70%
+                );
+                transform: translate(-50%, -50%);
+                animation: pulse 4s ease-in-out infinite;
+                pointer-events: none;
+                z-index: 0;
+                filter: blur(60px);
+            }
 
-    body::after {
-      content: '';
-      position: fixed;
-      top: 30%;
-      left: 70%;
-      width: 600px;
-      height: 600px;
-      background: radial-gradient(circle, rgba(66, 165, 245, 0.12) 0%, rgba(33, 150, 243, 0.04) 40%, transparent 70%);
-      transform: translate(-50%, -50%);
-      animation: pulse 6s ease-in-out infinite;
-      animation-delay: 1s;
-      pointer-events: none;
-      z-index: 0;
-      filter: blur(80px);
-    }
+            body::after {
+                content: "";
+                position: fixed;
+                top: 30%;
+                left: 70%;
+                width: 600px;
+                height: 600px;
+                background: radial-gradient(
+                    circle,
+                    rgba(66, 165, 245, 0.12) 0%,
+                    rgba(33, 150, 243, 0.04) 40%,
+                    transparent 70%
+                );
+                transform: translate(-50%, -50%);
+                animation: pulse 6s ease-in-out infinite;
+                animation-delay: 1s;
+                pointer-events: none;
+                z-index: 0;
+                filter: blur(80px);
+            }
 
-    @keyframes pulse {
-      0%, 100% {
-        opacity: 0.6;
-        transform: translate(-50%, -50%) scale(1);
-      }
-      50% {
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(1.1);
-      }
-    }
+            @keyframes pulse {
+                0%,
+                100% {
+                    opacity: 0.6;
+                    transform: translate(-50%, -50%) scale(1);
+                }
+                50% {
+                    opacity: 1;
+                    transform: translate(-50%, -50%) scale(1.1);
+                }
+            }
 
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-      position: relative;
-      z-index: 1;
-      animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-    }
+            .container {
+                max-width: 800px;
+                margin: 0 auto;
+                position: relative;
+                z-index: 1;
+                animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            }
 
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
 
-    .header {
-      text-align: center;
-      margin-bottom: 48px;
-    }
+            .header {
+                text-align: center;
+                margin-bottom: 48px;
+            }
 
-    .logo {
-      width: 80px;
-      height: 80px;
-      margin: 0 auto 24px;
-      border-radius: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      box-shadow: var(--shadow-glow), var(--shadow-lg);
-      background: var(--bg-secondary);
-      border: 2px solid var(--border);
-      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    }
+            .logo {
+                width: 80px;
+                height: 80px;
+                margin: 0 auto 24px;
+                border-radius: 20px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                overflow: hidden;
+                box-shadow: var(--shadow-glow), var(--shadow-lg);
+                background: var(--bg-secondary);
+                border: 2px solid var(--border);
+                transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            }
 
-    .logo:hover {
-      transform: scale(1.05) translateY(-5px);
-      box-shadow: 0 0 60px rgba(33, 150, 243, 0.4), var(--shadow-lg);
-      border-color: var(--accent);
-    }
+            .logo:hover {
+                transform: scale(1.05) translateY(-5px);
+                box-shadow:
+                    0 0 60px rgba(33, 150, 243, 0.4),
+                    var(--shadow-lg);
+                border-color: var(--accent);
+            }
 
-    .logo img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
+            .logo img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
 
-    h1 {
-      font-size: 42px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      margin-bottom: 12px;
-      background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
+            h1 {
+                font-size: 42px;
+                font-weight: 700;
+                letter-spacing: -0.02em;
+                margin-bottom: 12px;
+                background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent) 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
 
-    .subtitle {
-      font-size: 17px;
-      color: var(--text-secondary);
-      max-width: 600px;
-      margin: 0 auto;
-    }
+            .subtitle {
+                font-size: 17px;
+                color: var(--text-secondary);
+                max-width: 600px;
+                margin: 0 auto;
+            }
 
-    /* Form */
-    .application-form {
-      background: var(--bg-secondary);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 40px;
-      box-shadow: var(--shadow-md);
-    }
+            /* Form */
+            .application-form {
+                background: var(--bg-secondary);
+                border: 1px solid var(--border);
+                border-radius: var(--radius-lg);
+                padding: 40px;
+                box-shadow: var(--shadow-md);
+            }
 
-    .form-section {
-      margin-bottom: 32px;
-    }
+            .form-section {
+                margin-bottom: 32px;
+            }
 
-    .section-title {
-      font-size: 18px;
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 16px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid var(--border);
-    }
+            .section-title {
+                font-size: 18px;
+                font-weight: 600;
+                color: var(--text-primary);
+                margin-bottom: 16px;
+                padding-bottom: 12px;
+                border-bottom: 1px solid var(--border);
+            }
 
-    .form-group {
-      margin-bottom: 24px;
-      animation: fadeInUp 0.4s ease-out backwards;
-    }
+            .form-group {
+                margin-bottom: 24px;
+                animation: fadeInUp 0.4s ease-out backwards;
+            }
 
-    .form-group:nth-child(1) { animation-delay: 0.1s; }
-    .form-group:nth-child(2) { animation-delay: 0.15s; }
-    .form-group:nth-child(3) { animation-delay: 0.2s; }
-    .form-group:nth-child(4) { animation-delay: 0.25s; }
-    .form-group:nth-child(5) { animation-delay: 0.3s; }
+            .form-group:nth-child(1) {
+                animation-delay: 0.1s;
+            }
+            .form-group:nth-child(2) {
+                animation-delay: 0.15s;
+            }
+            .form-group:nth-child(3) {
+                animation-delay: 0.2s;
+            }
+            .form-group:nth-child(4) {
+                animation-delay: 0.25s;
+            }
+            .form-group:nth-child(5) {
+                animation-delay: 0.3s;
+            }
 
-    label {
-      display: block;
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--text-secondary);
-      margin-bottom: 8px;
-    }
+            label {
+                display: block;
+                font-size: 14px;
+                font-weight: 500;
+                color: var(--text-secondary);
+                margin-bottom: 8px;
+            }
 
-    label .required {
-      color: var(--danger);
-      margin-left: 4px;
-    }
+            label .required {
+                color: var(--danger);
+                margin-left: 4px;
+            }
 
-    input[type="text"],
-    input[type="number"],
-    input[type="email"],
-    select,
-    textarea {
-      width: 100%;
-      padding: 14px 16px;
-      font-size: 15px;
-      font-family: inherit;
-      color: var(--text-primary);
-      background: var(--bg-primary);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      outline: none;
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    }
+            input[type="text"],
+            input[type="number"],
+            input[type="email"],
+            select,
+            textarea {
+                width: 100%;
+                padding: 14px 16px;
+                font-size: 15px;
+                font-family: inherit;
+                color: var(--text-primary);
+                background: var(--bg-primary);
+                border: 1px solid var(--border);
+                border-radius: var(--radius-sm);
+                outline: none;
+                transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            }
 
-    input[type="text"]:focus,
-    input[type="number"]:focus,
-    input[type="email"]:focus,
-    select:focus,
-    textarea:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.2);
-    }
+            input[type="text"]:focus,
+            input[type="number"]:focus,
+            input[type="email"]:focus,
+            select:focus,
+            textarea:focus {
+                border-color: var(--accent);
+                box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.2);
+            }
 
-    textarea {
-      min-height: 120px;
-      resize: vertical;
-    }
+            textarea {
+                min-height: 120px;
+                resize: vertical;
+            }
 
-    select {
-      cursor: pointer;
-    }
+            select {
+                cursor: pointer;
+            }
 
-    .char-count {
-      font-size: 12px;
-      color: var(--text-tertiary);
-      text-align: right;
-      margin-top: 6px;
-    }
+            .char-count {
+                font-size: 12px;
+                color: var(--text-tertiary);
+                text-align: right;
+                margin-top: 6px;
+            }
 
-    .submit-btn {
-      width: 100%;
-      padding: 16px 32px;
-      font-size: 16px;
-      font-weight: 600;
-      font-family: inherit;
-      color: white;
-      background: var(--accent);
-      border: none;
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      box-shadow: 0 4px 20px rgba(33, 150, 243, 0.4);
-      position: relative;
-      overflow: hidden;
-    }
+            .submit-btn {
+                width: 100%;
+                padding: 16px 32px;
+                font-size: 16px;
+                font-weight: 600;
+                font-family: inherit;
+                color: white;
+                background: var(--accent);
+                border: none;
+                border-radius: var(--radius-sm);
+                cursor: pointer;
+                transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+                box-shadow: 0 4px 20px rgba(33, 150, 243, 0.4);
+                position: relative;
+                overflow: hidden;
+            }
 
-    .submit-btn::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 0;
-      height: 0;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.2);
-      transform: translate(-50%, -50%);
-      transition: width 0.6s, height 0.6s;
-    }
+            .submit-btn::before {
+                content: "";
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 0;
+                height: 0;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.2);
+                transform: translate(-50%, -50%);
+                transition:
+                    width 0.6s,
+                    height 0.6s;
+            }
 
-    .submit-btn:hover::before {
-      width: 300px;
-      height: 300px;
-    }
+            .submit-btn:hover::before {
+                width: 300px;
+                height: 300px;
+            }
 
-    .submit-btn:hover {
-      background: var(--accent-hover);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 28px rgba(33, 150, 243, 0.5);
-    }
+            .submit-btn:hover {
+                background: var(--accent-hover);
+                transform: translateY(-2px);
+                box-shadow: 0 6px 28px rgba(33, 150, 243, 0.5);
+            }
 
-    .submit-btn:active {
-      transform: translateY(0);
-    }
+            .submit-btn:active {
+                transform: translateY(0);
+            }
 
-    .submit-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
-    }
+            .submit-btn:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+                transform: none;
+            }
 
-    .submit-btn span {
-      position: relative;
-      z-index: 1;
-    }
+            .submit-btn span {
+                position: relative;
+                z-index: 1;
+            }
 
-    /* Success Message */
-    .success-message {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(0.9);
-      background: var(--bg-secondary);
-      border: 2px solid var(--success);
-      border-radius: var(--radius-lg);
-      padding: 48px;
-      box-shadow: var(--shadow-lg), 0 0 100px rgba(76, 175, 80, 0.3);
-      text-align: center;
-      z-index: 1000;
-      opacity: 0;
-      pointer-events: none;
-      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-      max-width: 90%;
-    }
+            /* Success Message */
+            .success-message {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%) scale(0.9);
+                background: var(--bg-secondary);
+                border: 2px solid var(--success);
+                border-radius: var(--radius-lg);
+                padding: 48px;
+                box-shadow:
+                    var(--shadow-lg),
+                    0 0 100px rgba(76, 175, 80, 0.3);
+                text-align: center;
+                z-index: 1000;
+                opacity: 0;
+                pointer-events: none;
+                transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+                max-width: 90%;
+            }
 
-    .success-message.show {
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(1);
-      pointer-events: all;
-    }
+            .success-message.show {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+                pointer-events: all;
+            }
 
-    .success-icon {
-      font-size: 64px;
-      margin-bottom: 20px;
-      animation: successPop 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s backwards;
-    }
+            .success-icon {
+                font-size: 64px;
+                margin-bottom: 20px;
+                animation: successPop 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s backwards;
+            }
 
-    @keyframes successPop {
-      0% {
-        transform: scale(0);
-        opacity: 0;
-      }
-      50% {
-        transform: scale(1.2);
-      }
-      100% {
-        transform: scale(1);
-        opacity: 1;
-      }
-    }
+            @keyframes successPop {
+                0% {
+                    transform: scale(0);
+                    opacity: 0;
+                }
+                50% {
+                    transform: scale(1.2);
+                }
+                100% {
+                    transform: scale(1);
+                    opacity: 1;
+                }
+            }
 
-    .success-title {
-      font-size: 28px;
-      font-weight: 700;
-      color: var(--success);
-      margin-bottom: 12px;
-    }
+            .success-title {
+                font-size: 28px;
+                font-weight: 700;
+                color: var(--success);
+                margin-bottom: 12px;
+            }
 
-    .success-text {
-      font-size: 16px;
-      color: var(--text-secondary);
-      margin-bottom: 24px;
-    }
+            .success-text {
+                font-size: 16px;
+                color: var(--text-secondary);
+                margin-bottom: 24px;
+            }
 
-    .success-btn {
-      padding: 12px 32px;
-      font-size: 15px;
-      font-weight: 600;
-      font-family: inherit;
-      color: white;
-      background: var(--success);
-      border: none;
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
+            .success-btn {
+                padding: 12px 32px;
+                font-size: 15px;
+                font-weight: 600;
+                font-family: inherit;
+                color: white;
+                background: var(--success);
+                border: none;
+                border-radius: var(--radius-sm);
+                cursor: pointer;
+                transition: all 0.2s ease;
+            }
 
-    .success-btn:hover {
-      background: #30b350;
-      transform: translateY(-2px);
-    }
+            .success-btn:hover {
+                background: #30b350;
+                transform: translateY(-2px);
+            }
 
-    .overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(10, 25, 41, 0.8);
-      backdrop-filter: blur(4px);
-      z-index: 999;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
-    }
+            .overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(10, 25, 41, 0.8);
+                backdrop-filter: blur(4px);
+                z-index: 999;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.3s ease;
+            }
 
-    .overlay.show {
-      opacity: 1;
-      pointer-events: all;
-    }
+            .overlay.show {
+                opacity: 1;
+                pointer-events: all;
+            }
 
-    @media (max-width: 768px) {
-      body {
-        padding: 24px 16px;
-      }
+            @media (max-width: 768px) {
+                body {
+                    padding: 24px 16px;
+                }
 
-      h1 {
-        font-size: 32px;
-      }
+                h1 {
+                    font-size: 32px;
+                }
 
-      .role-options {
-        grid-template-columns: 1fr;
-      }
+                .role-options {
+                    grid-template-columns: 1fr;
+                }
 
-      .application-form {
-        padding: 28px;
-      }
+                .application-form {
+                    padding: 28px;
+                }
 
-      .success-message {
-        padding: 32px;
-      }
-    }
-  </style>
-</head>
-<body>
-  <div class="overlay" id="overlay"></div>
-  
-  <div class="container">
-    <div class="header">
-      <div class="logo">
-        <img src="logo.png" alt="Infinity SMP">
-      </div>
-      <h1>Staff Application</h1>
-      <p class="subtitle">Join our team and help make Infinity SMP an amazing community!</p>
-    </div>
+                .success-message {
+                    padding: 32px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="overlay" id="overlay"></div>
 
-    <!-- Application Form -->
-    <form class="application-form" id="applicationForm">
-      <div class="form-section">
-        <h3 class="section-title">Basic Information</h3>
-        
+        <div class="container">
+            <div class="header">
+                <div class="logo">
+                    <img src="../logo.png" alt="Infinity SMP" />
+                </div>
+                <h1>Staff Application</h1>
+                <p class="subtitle">Join our team and help make Infinity SMP an amazing community!</p>
+            </div>
 
-        <div class="form-group">
-          <label for="minecraftUsername">
-            Minecraft Username
-            <span class="required">*</span>
-          </label>
-          <input type="text" id="minecraftUsername" name="minecraftUsername" required>
+            <!-- Application Form -->
+            <form class="application-form" id="applicationForm">
+                <div class="form-section">
+                    <h3 class="section-title">Basic Information</h3>
+
+                    <div class="form-group">
+                        <label for="minecraftUsername">
+                            Minecraft Username
+                            <span class="required">*</span>
+                        </label>
+                        <input type="text" id="minecraftUsername" name="minecraftUsername" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="discord">
+                            Discord Username
+                            <span class="required">*</span>
+                        </label>
+                        <input type="text" id="discord" name="discord" placeholder="username#0000" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="age">
+                            Age
+                            <span class="required">*</span>
+                        </label>
+                        <input type="number" id="age" name="age" min="13" max="99" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="timezone">
+                            Timezone
+                            <span class="required">*</span>
+                        </label>
+                        <select id="timezone" name="timezone" required>
+                            <option value="">Select your timezone</option>
+                            <option value="PST">PST (Pacific)</option>
+                            <option value="MST">MST (Mountain)</option>
+                            <option value="CST">CST (Central)</option>
+                            <option value="EST">EST (Eastern)</option>
+                            <option value="GMT">GMT (London)</option>
+                            <option value="CET">CET (Central Europe)</option>
+                            <option value="AEST">AEST (Australia East)</option>
+                            <option value="JST">JST (Japan)</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="hours">
+                            Hours per week you can dedicate
+                            <span class="required">*</span>
+                        </label>
+                        <input
+                            type="number"
+                            id="hours"
+                            name="hours"
+                            min="1"
+                            max="168"
+                            placeholder="e.g., 10"
+                            required />
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="section-title">Additional Questions</h3>
+
+                    <div class="form-group">
+                        <label for="experience">
+                            Previous staff experience (if any)
+                            <span class="required">*</span>
+                        </label>
+                        <textarea
+                            id="experience"
+                            name="experience"
+                            placeholder="Tell us about any previous experience you have..."
+                            required></textarea>
+                        <div class="char-count"><span id="expCount">0</span> characters</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="why">
+                            Why do you want to join the Infinity SMP staff team?
+                            <span class="required">*</span>
+                        </label>
+                        <textarea id="why" name="why" placeholder="Share your motivation..." required></textarea>
+                        <div class="char-count"><span id="whyCount">0</span> characters</div>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    <span>Submit Application</span>
+                </button>
+            </form>
         </div>
 
-        <div class="form-group">
-          <label for="discord">
-            Discord Username
-            <span class="required">*</span>
-          </label>
-          <input type="text" id="discord" name="discord" placeholder="username#0000" required>
+        <!-- Success Message -->
+        <div class="success-message" id="successMessage">
+            <div class="success-icon">✅</div>
+            <h2 class="success-title">Application Submitted!</h2>
+            <p class="success-text">Thank you for applying! We'll review your application and get back to you soon.</p>
+            <button class="success-btn" onclick="window.location.href='https://infinitysmp.github.io/staffstatus/'">
+                View status
+            </button>
         </div>
 
-        <div class="form-group">
-          <label for="age">
-            Age
-            <span class="required">*</span>
-          </label>
-          <input type="number" id="age" name="age" min="13" max="99" required>
-        </div>
+        <script type="module">
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+            import {
+                getFirestore,
+                collection,
+                addDoc,
+                serverTimestamp
+            } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-        <div class="form-group">
-          <label for="timezone">
-            Timezone
-            <span class="required">*</span>
-          </label>
-          <select id="timezone" name="timezone" required>
-            <option value="">Select your timezone</option>
-            <option value="PST">PST (Pacific)</option>
-            <option value="MST">MST (Mountain)</option>
-            <option value="CST">CST (Central)</option>
-            <option value="EST">EST (Eastern)</option>
-            <option value="GMT">GMT (London)</option>
-            <option value="CET">CET (Central Europe)</option>
-            <option value="AEST">AEST (Australia East)</option>
-            <option value="JST">JST (Japan)</option>
-            <option value="Other">Other</option>
-          </select>
-        </div>
+            const firebaseConfig = {
+                apiKey: "AIzaSyBgV9PoUFut3FPc0iChFNm2-h6-Uc5z6s0",
+                authDomain: "infinity-service-b2f10.firebaseapp.com",
+                projectId: "infinity-service-b2f10",
+                storageBucket: "infinity-service-b2f10.firebasestorage.app",
+                messagingSenderId: "805770674259",
+                appId: "1:805770674259:web:bcc520979e6772fda5c6a6"
+            };
 
-        <div class="form-group">
-          <label for="hours">
-            Hours per week you can dedicate
-            <span class="required">*</span>
-          </label>
-          <input type="number" id="hours" name="hours" min="1" max="168" placeholder="e.g., 10" required>
-        </div>
-      </div>
+            const app = initializeApp(firebaseConfig);
+            const db = getFirestore(app);
 
-      <div class="form-section">
-        <h3 class="section-title">Additional Questions</h3>
+            // Character counters
+            document.getElementById("experience").addEventListener("input", function () {
+                document.getElementById("expCount").textContent = this.value.length;
+            });
 
-        <div class="form-group">
-          <label for="experience">
-            Previous staff experience (if any)
-            <span class="required">*</span>
-          </label>
-          <textarea id="experience" name="experience" placeholder="Tell us about any previous experience you have..." required></textarea>
-          <div class="char-count"><span id="expCount">0</span> characters</div>
-        </div>
+            document.getElementById("why").addEventListener("input", function () {
+                document.getElementById("whyCount").textContent = this.value.length;
+            });
 
-        <div class="form-group">
-          <label for="why">
-            Why do you want to join the Infinity SMP staff team?
-            <span class="required">*</span>
-          </label>
-          <textarea id="why" name="why" placeholder="Share your motivation..." required></textarea>
-          <div class="char-count"><span id="whyCount">0</span> characters</div>
-        </div>
-      </div>
+            // Form submission
+            document.getElementById("applicationForm").addEventListener("submit", async function (e) {
+                e.preventDefault();
 
-      <button type="submit" class="submit-btn">
-        <span>Submit Application</span>
-      </button>
-    </form>
-  </div>
+                const submitBtn = this.querySelector(".submit-btn");
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = "<span>Submitting...</span>";
 
-  <!-- Success Message -->
-  <div class="success-message" id="successMessage">
-    <div class="success-icon">✅</div>
-    <h2 class="success-title">Application Submitted!</h2>
-    <p class="success-text">Thank you for applying! We'll review your application and get back to you soon.</p>
-    <button
-  class="success-btn"
-  onclick="window.location.href='https://infinitysmp.github.io/staffstatus/'">
-  View status
-</button>
+                try {
+                    const formData = new FormData(this);
+                    const data = {
+                        role: formData.get("role"),
+                        minecraftUsername: formData.get("minecraftUsername"),
+                        discord: formData.get("discord"),
+                        age: parseInt(formData.get("age")),
+                        timezone: formData.get("timezone"),
+                        hours: parseInt(formData.get("hours")),
+                        experience: formData.get("experience"),
+                        why: formData.get("why"),
+                        submittedAt: serverTimestamp()
+                    };
 
-  </div>
+                    await addDoc(collection(db, "staffApplications"), data);
 
-  <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
-    import { getFirestore, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyBgV9PoUFut3FPc0iChFNm2-h6-Uc5z6s0",
-      authDomain: "infinity-service-b2f10.firebaseapp.com",
-      projectId: "infinity-service-b2f10",
-      storageBucket: "infinity-service-b2f10.firebasestorage.app",
-      messagingSenderId: "805770674259",
-      appId: "1:805770674259:web:bcc520979e6772fda5c6a6"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    // Character counters
-    document.getElementById('experience').addEventListener('input', function() {
-      document.getElementById('expCount').textContent = this.value.length;
-    });
-
-    document.getElementById('why').addEventListener('input', function() {
-      document.getElementById('whyCount').textContent = this.value.length;
-    });
-
-    // Form submission
-    document.getElementById('applicationForm').addEventListener('submit', async function(e) {
-      e.preventDefault();
-
-      const submitBtn = this.querySelector('.submit-btn');
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = '<span>Submitting...</span>';
-
-      try {
-        const formData = new FormData(this);
-        const data = {
-          role: formData.get('role'),
-          minecraftUsername: formData.get('minecraftUsername'),
-          discord: formData.get('discord'),
-          age: parseInt(formData.get('age')),
-          timezone: formData.get('timezone'),
-          hours: parseInt(formData.get('hours')),
-          experience: formData.get('experience'),
-          why: formData.get('why'),
-          submittedAt: serverTimestamp()
-        };
-
-        await addDoc(collection(db, 'staffApplications'), data);
-
-        // Show success message
-        document.getElementById('overlay').classList.add('show');
-        document.getElementById('successMessage').classList.add('show');
-
-      } catch (error) {
-        console.error('Error submitting application:', error);
-        alert('Failed to submit application. Please message Infinity');
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = '<span>Submit Application</span>';
-      }
-    });
-  </script>
-</body>
+                    // Show success message
+                    document.getElementById("overlay").classList.add("show");
+                    document.getElementById("successMessage").classList.add("show");
+                } catch (error) {
+                    console.error("Error submitting application:", error);
+                    alert("Failed to submit application. Please message Infinity");
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = "<span>Submit Application</span>";
+                }
+            });
+        </script>
+    </body>
 </html>
