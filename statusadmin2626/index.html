@@ -292,7 +292,8 @@
             }
 
             select,
-            input[type="text"] {
+            input[type="text"],
+            textarea {
                 background: var(--bg-tertiary);
                 border: 1px solid var(--border);
                 border-radius: var(--radius-md);
@@ -304,14 +305,23 @@
                 outline: none;
             }
 
+            textarea {
+                resize: vertical;
+                min-height: 80px;
+                font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Oxygen, Ubuntu,
+                    sans-serif;
+            }
+
             select:focus,
-            input[type="text"]:focus {
+            input[type="text"]:focus,
+            textarea:focus {
                 border-color: var(--accent);
                 box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
             }
 
             select:hover,
-            input[type="text"]:hover {
+            input[type="text"]:hover,
+            textarea:hover {
                 border-color: var(--border-hover);
             }
 
@@ -477,6 +487,15 @@
                 line-height: 1.6;
             }
 
+            .reason-field {
+                display: none;
+                animation: fadeIn 0.3s ease-out;
+            }
+
+            .reason-field.show {
+                display: grid;
+            }
+
             @media (max-width: 768px) {
                 body {
                     padding: 32px 16px;
@@ -621,15 +640,13 @@
                                 <option value="down">❌ Down</option>
                             </select>
                         </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label">Uptime</label>
-                                <input type="text" id="serverUptime" name="uptime" placeholder="99.9%" />
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Response Time (ms)</label>
-                                <input type="text" id="serverResponse" name="response" placeholder="100" />
-                            </div>
+                        <div class="form-group">
+                            <label class="form-label">Response Time (ms)</label>
+                            <input type="text" id="serverResponse" name="response" placeholder="100" />
+                        </div>
+                        <div class="form-group reason-field" id="serverReasonField">
+                            <label class="form-label">Reason (shown when degraded/down)</label>
+                            <textarea id="serverReason" name="reason" placeholder="e.g., Scheduled maintenance, investigating connectivity issues..."></textarea>
                         </div>
                         <div class="status-preview">
                             <div class="status-preview-label">Current Status</div>
@@ -661,15 +678,13 @@
                                 <option value="down">❌ Down</option>
                             </select>
                         </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label">Uptime</label>
-                                <input type="text" id="hostingUptime" name="uptime" placeholder="99.9%" />
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Response Time (ms)</label>
-                                <input type="text" id="hostingResponse" name="response" placeholder="50" />
-                            </div>
+                        <div class="form-group">
+                            <label class="form-label">Response Time (ms)</label>
+                            <input type="text" id="hostingResponse" name="response" placeholder="50" />
+                        </div>
+                        <div class="form-group reason-field" id="hostingReasonField">
+                            <label class="form-label">Reason (shown when degraded/down)</label>
+                            <textarea id="hostingReason" name="reason" placeholder="e.g., Scheduled maintenance, investigating connectivity issues..."></textarea>
                         </div>
                         <div class="status-preview">
                             <div class="status-preview-label">Current Status</div>
@@ -701,15 +716,13 @@
                                 <option value="down">❌ Down</option>
                             </select>
                         </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label">Database Status</label>
-                                <input type="text" id="firebaseDb" name="db" placeholder="Online" />
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Response Time (ms)</label>
-                                <input type="text" id="firebaseResponse" name="response" placeholder="150" />
-                            </div>
+                        <div class="form-group">
+                            <label class="form-label">Response Time (ms)</label>
+                            <input type="text" id="firebaseResponse" name="response" placeholder="150" />
+                        </div>
+                        <div class="form-group reason-field" id="firebaseReasonField">
+                            <label class="form-label">Reason (shown when degraded/down)</label>
+                            <textarea id="firebaseReason" name="reason" placeholder="e.g., Scheduled maintenance, investigating connectivity issues..."></textarea>
                         </div>
                         <div class="status-preview">
                             <div class="status-preview-label">Current Status</div>
@@ -741,15 +754,13 @@
                                 <option value="down">❌ Down</option>
                             </select>
                         </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label">Storage Status</label>
-                                <input type="text" id="cloudinaryStorage" name="storage" placeholder="Active" />
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Response Time (ms)</label>
-                                <input type="text" id="cloudinaryResponse" name="response" placeholder="200" />
-                            </div>
+                        <div class="form-group">
+                            <label class="form-label">Response Time (ms)</label>
+                            <input type="text" id="cloudinaryResponse" name="response" placeholder="200" />
+                        </div>
+                        <div class="form-group reason-field" id="cloudinaryReasonField">
+                            <label class="form-label">Reason (shown when degraded/down)</label>
+                            <textarea id="cloudinaryReason" name="reason" placeholder="e.g., Scheduled maintenance, investigating connectivity issues..."></textarea>
                         </div>
                         <div class="status-preview">
                             <div class="status-preview-label">Current Status</div>
@@ -808,11 +819,22 @@
                 text.textContent = status.charAt(0).toUpperCase() + status.slice(1);
             }
 
+            // Toggle reason field visibility
+            function toggleReasonField(service, status) {
+                const reasonField = document.getElementById(`${service}ReasonField`);
+                if (status === 'degraded' || status === 'down') {
+                    reasonField.classList.add('show');
+                } else {
+                    reasonField.classList.remove('show');
+                }
+            }
+
             // Add event listeners for all status selects
             ["server", "hosting", "firebase", "cloudinary"].forEach((service) => {
                 const select = document.getElementById(`${service}Status`);
                 select.addEventListener("change", (e) => {
                     updatePreview(service, e.target.value);
+                    toggleReasonField(service, e.target.value);
                 });
             });
 
@@ -846,30 +868,37 @@
                         if (data.serverStatus) {
                             document.getElementById("serverStatus").value = data.serverStatus;
                             updatePreview("server", data.serverStatus);
+                            toggleReasonField("server", data.serverStatus);
                         }
-                        if (data.serverUptime) document.getElementById("serverUptime").value = data.serverUptime;
                         if (data.serverResponse) document.getElementById("serverResponse").value = data.serverResponse;
+                        if (data.serverReason) document.getElementById("serverReason").value = data.serverReason;
 
                         // Hosting
                         if (data.hostingStatus) {
                             document.getElementById("hostingStatus").value = data.hostingStatus;
                             updatePreview("hosting", data.hostingStatus);
+                            toggleReasonField("hosting", data.hostingStatus);
                         }
-                        if (data.hostingUptime) document.getElementById("hostingUptime").value = data.hostingUptime;
-                        if (data.hostingResponse)
-                            document.getElementById("hostingResponse").value = data.hostingResponse;
+                        if (data.hostingResponse) document.getElementById("hostingResponse").value = data.hostingResponse;
+                        if (data.hostingReason) document.getElementById("hostingReason").value = data.hostingReason;
+
+                        // Firebase
+                        if (data.firebaseStatus) {
+                            document.getElementById("firebaseStatus").value = data.firebaseStatus;
+                            updatePreview("firebase", data.firebaseStatus);
+                            toggleReasonField("firebase", data.firebaseStatus);
+                        }
+                        if (data.firebaseResponse) document.getElementById("firebaseResponse").value = data.firebaseResponse;
+                        if (data.firebaseReason) document.getElementById("firebaseReason").value = data.firebaseReason;
 
                         // Cloudinary
                         if (data.cloudinaryStatus) {
                             document.getElementById("cloudinaryStatus").value = data.cloudinaryStatus;
                             updatePreview("cloudinary", data.cloudinaryStatus);
+                            toggleReasonField("cloudinary", data.cloudinaryStatus);
                         }
-                        if (data.cloudinaryStorage)
-                            document.getElementById("cloudinaryStorage").value = data.cloudinaryStorage;
-                        if (data.cloudinaryResponse)
-                            document.getElementById("cloudinaryResponse").value = data.cloudinaryResponse;
-
-                        // Firebase (note: we don't load firebase status fields since it's self-referential)
+                        if (data.cloudinaryResponse) document.getElementById("cloudinaryResponse").value = data.cloudinaryResponse;
+                        if (data.cloudinaryReason) document.getElementById("cloudinaryReason").value = data.cloudinaryReason;
                     }
                 } catch (error) {
                     console.error("Error loading status:", error);
@@ -929,6 +958,7 @@
                 const form = document.getElementById(`${service}Form`);
                 form.reset();
                 updatePreview(service, "operational");
+                toggleReasonField(service, "operational");
             };
 
             // Load status on page load
