@@ -1,0 +1,875 @@
+<!doctype html>
+<html lang="en-AU">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Infinity | System Status</title>
+        <link rel="icon" type="image/png" href="../logo.png" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=SF+Pro+Display:wght@300;400;500;600;700&display=swap"
+            rel="stylesheet" />
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            html {
+                overflow-x: hidden;
+                overflow-y: auto;
+            }
+
+            body {
+                overflow-x: hidden;
+            }
+
+            body::-webkit-scrollbar,
+            html::-webkit-scrollbar {
+                display: none;
+            }
+
+            body,
+            html {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+
+            :root {
+                --bg-primary: #0a1929;
+                --bg-secondary: #0d2137;
+                --bg-tertiary: #132f4c;
+                --text-primary: #e3f2fd;
+                --text-secondary: #90caf9;
+                --text-tertiary: #64b5f6;
+                --accent: #2196f3;
+                --accent-hover: #42a5f5;
+                --accent-dark: #1976d2;
+                --border: rgba(33, 150, 243, 0.15);
+                --border-hover: rgba(33, 150, 243, 0.3);
+                --shadow-sm: 0 2px 8px rgba(33, 150, 243, 0.1);
+                --shadow-md: 0 4px 20px rgba(33, 150, 243, 0.15);
+                --shadow-lg: 0 12px 48px rgba(33, 150, 243, 0.25);
+                --shadow-glow: 0 0 40px rgba(33, 150, 243, 0.2);
+                --radius-sm: 10px;
+                --radius-md: 14px;
+                --radius-lg: 20px;
+                --status-operational: #4caf50;
+                --status-degraded: #ff9800;
+                --status-down: #f44336;
+                --status-unknown: #9e9e9e;
+            }
+
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Oxygen, Ubuntu,
+                    sans-serif;
+                background: var(--bg-primary);
+                color: var(--text-primary);
+                min-height: 100vh;
+                padding: 40px 20px;
+                line-height: 1.5;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+                position: relative;
+                width: 100%;
+                max-width: 100vw;
+            }
+
+            body::before {
+                content: "";
+                position: fixed;
+                top: -50%;
+                left: -50%;
+                width: 200%;
+                height: 200%;
+                background: radial-gradient(circle at 30% 50%, rgba(33, 150, 243, 0.1) 0%, transparent 50%),
+                    radial-gradient(circle at 70% 50%, rgba(33, 150, 243, 0.05) 0%, transparent 50%);
+                animation: float 20s ease-in-out infinite;
+                pointer-events: none;
+            }
+
+            @keyframes float {
+                0%,
+                100% {
+                    transform: translate(0, 0) rotate(0deg);
+                }
+                33% {
+                    transform: translate(30px, -30px) rotate(5deg);
+                }
+                66% {
+                    transform: translate(-20px, 20px) rotate(-5deg);
+                }
+            }
+
+            .container {
+                width: 100%;
+                max-width: 1200px;
+                margin: 0 auto;
+                animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+                position: relative;
+                z-index: 1;
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .header {
+                text-align: center;
+                margin-bottom: 48px;
+            }
+
+            .logo-container {
+                margin-bottom: 32px;
+                animation: fadeIn 0.6s ease-out;
+            }
+
+            .logo {
+                width: 96px;
+                height: 96px;
+                margin: 0 auto;
+                border-radius: 24px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                overflow: hidden;
+                box-shadow: var(--shadow-glow), var(--shadow-lg);
+                background: var(--bg-secondary);
+                border: 2px solid var(--border);
+                transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+
+            .logo:hover {
+                transform: scale(1.05) translateY(-5px);
+                box-shadow:
+                    0 0 60px rgba(33, 150, 243, 0.4),
+                    var(--shadow-lg);
+                border-color: var(--accent);
+            }
+
+            .logo img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            .back-link {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                color: var(--text-secondary);
+                text-decoration: none;
+                font-size: 14px;
+                margin-bottom: 24px;
+                transition: all 0.3s ease;
+                font-weight: 500;
+            }
+
+            .back-link:hover {
+                color: var(--accent);
+                gap: 12px;
+            }
+
+            .back-arrow {
+                transition: transform 0.3s ease;
+            }
+
+            .back-link:hover .back-arrow {
+                transform: translateX(-4px);
+            }
+
+            h1 {
+                font-size: 48px;
+                font-weight: 700;
+                letter-spacing: -0.03em;
+                margin-bottom: 16px;
+                background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent) 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                animation: fadeIn 0.6s ease-out 0.2s backwards;
+            }
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .status-overview {
+                background: var(--bg-secondary);
+                border-radius: var(--radius-lg);
+                padding: 40px;
+                margin-bottom: 40px;
+                box-shadow: var(--shadow-md);
+                border: 1px solid var(--border);
+                animation: fadeIn 0.6s ease-out 0.3s backwards;
+            }
+
+            .overall-status {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+                margin-bottom: 24px;
+            }
+
+            .status-indicator-large {
+                width: 24px;
+                height: 24px;
+                border-radius: 50%;
+                position: relative;
+                animation: pulse 2s ease-in-out infinite;
+            }
+
+            .status-indicator-large.operational {
+                background: var(--status-operational);
+                box-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
+            }
+
+            .status-indicator-large.degraded {
+                background: var(--status-degraded);
+                box-shadow: 0 0 20px rgba(255, 152, 0, 0.5);
+            }
+
+            .status-indicator-large.down {
+                background: var(--status-down);
+                box-shadow: 0 0 20px rgba(244, 67, 54, 0.5);
+            }
+
+            @keyframes pulse {
+                0%,
+                100% {
+                    transform: scale(1);
+                    opacity: 1;
+                }
+                50% {
+                    transform: scale(1.1);
+                    opacity: 0.8;
+                }
+            }
+
+            .overall-status h2 {
+                font-size: 32px;
+                font-weight: 600;
+                color: var(--text-primary);
+            }
+
+            .last-updated {
+                font-size: 14px;
+                color: var(--text-tertiary);
+                font-family: "JetBrains Mono", monospace;
+            }
+
+            .services-grid {
+                display: grid;
+                gap: 24px;
+            }
+
+            .service-card {
+                background: var(--bg-secondary);
+                border-radius: var(--radius-lg);
+                padding: 32px;
+                box-shadow: var(--shadow-md);
+                border: 1px solid var(--border);
+                transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .service-card::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 3px;
+                background: linear-gradient(90deg, var(--accent), var(--accent-hover));
+                transform: scaleX(0);
+                transform-origin: left;
+                transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+
+            .service-card:hover::before {
+                transform: scaleX(1);
+            }
+
+            .service-card:hover {
+                transform: translateY(-4px);
+                box-shadow: var(--shadow-lg);
+                border-color: var(--border-hover);
+            }
+
+            .service-card:nth-child(1) {
+                animation: fadeInUp 0.6s ease-out 0.4s backwards;
+            }
+
+            .service-card:nth-child(2) {
+                animation: fadeInUp 0.6s ease-out 0.5s backwards;
+            }
+
+            .service-card:nth-child(3) {
+                animation: fadeInUp 0.6s ease-out 0.6s backwards;
+            }
+
+            .service-card:nth-child(4) {
+                animation: fadeInUp 0.6s ease-out 0.7s backwards;
+            }
+
+            .service-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                margin-bottom: 20px;
+            }
+
+            .service-info {
+                flex: 1;
+            }
+
+            .service-name {
+                font-size: 24px;
+                font-weight: 600;
+                color: var(--text-primary);
+                margin-bottom: 8px;
+                letter-spacing: -0.01em;
+            }
+
+            .service-description {
+                font-size: 14px;
+                color: var(--text-secondary);
+                line-height: 1.5;
+            }
+
+            .status-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                padding: 8px 16px;
+                border-radius: 20px;
+                font-size: 13px;
+                font-weight: 600;
+                font-family: "JetBrains Mono", monospace;
+                letter-spacing: 0.02em;
+                text-transform: uppercase;
+            }
+
+            .status-badge.operational {
+                background: rgba(76, 175, 80, 0.15);
+                color: var(--status-operational);
+                border: 1px solid rgba(76, 175, 80, 0.3);
+            }
+
+            .status-badge.degraded {
+                background: rgba(255, 152, 0, 0.15);
+                color: var(--status-degraded);
+                border: 1px solid rgba(255, 152, 0, 0.3);
+            }
+
+            .status-badge.down {
+                background: rgba(244, 67, 54, 0.15);
+                color: var(--status-down);
+                border: 1px solid rgba(244, 67, 54, 0.3);
+            }
+
+            .status-badge.checking {
+                background: rgba(158, 158, 158, 0.15);
+                color: var(--status-unknown);
+                border: 1px solid rgba(158, 158, 158, 0.3);
+            }
+
+            .status-indicator {
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                animation: pulse 2s ease-in-out infinite;
+            }
+
+            .status-indicator.operational {
+                background: var(--status-operational);
+            }
+
+            .status-indicator.degraded {
+                background: var(--status-degraded);
+            }
+
+            .status-indicator.down {
+                background: var(--status-down);
+            }
+
+            .status-indicator.checking {
+                background: var(--status-unknown);
+            }
+
+            .service-metrics {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                gap: 16px;
+                margin-top: 20px;
+                padding-top: 20px;
+                border-top: 1px solid var(--border);
+            }
+
+            .metric {
+                text-align: left;
+            }
+
+            .metric-label {
+                font-size: 12px;
+                color: var(--text-tertiary);
+                margin-bottom: 4px;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                font-weight: 500;
+            }
+
+            .metric-value {
+                font-size: 20px;
+                font-weight: 600;
+                color: var(--text-primary);
+                font-family: "JetBrains Mono", monospace;
+            }
+
+            .footer {
+                text-align: center;
+                margin-top: 60px;
+                padding-top: 32px;
+                border-top: 1px solid var(--border);
+                animation: fadeIn 0.6s ease-out 0.8s backwards;
+            }
+
+            .footer-text {
+                font-size: 14px;
+                color: var(--text-tertiary);
+                line-height: 1.6;
+            }
+
+            .refresh-button {
+                background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+                color: white;
+                border: none;
+                padding: 12px 24px;
+                border-radius: var(--radius-md);
+                font-size: 14px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+                box-shadow: 0 4px 16px rgba(33, 150, 243, 0.3);
+                margin-bottom: 16px;
+            }
+
+            .refresh-button:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 24px rgba(33, 150, 243, 0.5);
+            }
+
+            .refresh-button:active {
+                transform: translateY(0);
+            }
+
+            @media (max-width: 768px) {
+                body {
+                    padding: 32px 16px;
+                }
+
+                h1 {
+                    font-size: 36px;
+                }
+
+                .logo {
+                    width: 80px;
+                    height: 80px;
+                }
+
+                .status-overview,
+                .service-card {
+                    padding: 24px;
+                }
+
+                .service-header {
+                    flex-direction: column;
+                    gap: 16px;
+                }
+
+                .service-metrics {
+                    grid-template-columns: repeat(2, 1fr);
+                }
+            }
+
+            .particles {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+                z-index: 0;
+                overflow: hidden;
+            }
+
+            .particle {
+                position: absolute;
+                width: 3px;
+                height: 3px;
+                background: var(--accent);
+                border-radius: 50%;
+                opacity: 0;
+                animation: float-particle 15s infinite;
+                box-shadow: 0 0 10px var(--accent);
+            }
+
+            @keyframes float-particle {
+                0% {
+                    transform: translateY(100vh) translateX(0);
+                    opacity: 0;
+                }
+                10% {
+                    opacity: 0.5;
+                }
+                90% {
+                    opacity: 0.5;
+                }
+                100% {
+                    transform: translateY(-100px) translateX(100px);
+                    opacity: 0;
+                }
+            }
+
+            .particle:nth-child(1) {
+                left: 10%;
+                animation-delay: 0s;
+            }
+            .particle:nth-child(2) {
+                left: 25%;
+                animation-delay: 3s;
+            }
+            .particle:nth-child(3) {
+                left: 40%;
+                animation-delay: 6s;
+            }
+            .particle:nth-child(4) {
+                left: 60%;
+                animation-delay: 9s;
+            }
+            .particle:nth-child(5) {
+                left: 75%;
+                animation-delay: 12s;
+            }
+            .particle:nth-child(6) {
+                left: 90%;
+                animation-delay: 2s;
+            }
+
+            .loading {
+                opacity: 0.6;
+                pointer-events: none;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="particles">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+        </div>
+
+        <div class="container">
+            <div class="header">
+                <div class="logo-container">
+                    <a href="https://infinitysmp.github.io/" class="logo">
+                        <img src="../logo.png" alt="Infinity SMP" />
+                    </a>
+                </div>
+                <h1>System Status</h1>
+            </div>
+
+            <div class="status-overview">
+                <div class="overall-status">
+                    <div class="status-indicator-large operational" id="overallIndicator"></div>
+                    <h2 id="overallStatus">All Systems Operational</h2>
+                </div>
+                <button class="refresh-button" onclick="checkAllServices()">🔄 Refresh Status</button>
+                <div class="last-updated" id="lastUpdated">Last updated: Never</div>
+            </div>
+
+            <div class="services-grid">
+                <div class="service-card" id="serverCard">
+                    <div class="service-header">
+                        <div class="service-info">
+                            <h3 class="service-name">🖥️ Server Computer</h3>
+                            <p class="service-description">Main server infrastructure and processing</p>
+                        </div>
+                        <div class="status-badge checking" id="serverStatus">
+                            <div class="status-indicator checking"></div>
+                            Checking...
+                        </div>
+                    </div>
+                    <div class="service-metrics">
+                        <div class="metric">
+                            <div class="metric-label">Uptime</div>
+                            <div class="metric-value" id="serverUptime">--</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Response</div>
+                            <div class="metric-value" id="serverResponse">-- ms</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="service-card" id="hostingCard">
+                    <div class="service-header">
+                        <div class="service-info">
+                            <h3 class="service-name">🌐 Hosting Service</h3>
+                            <p class="service-description">Web hosting and domain management</p>
+                        </div>
+                        <div class="status-badge checking" id="hostingStatus">
+                            <div class="status-indicator checking"></div>
+                            Checking...
+                        </div>
+                    </div>
+                    <div class="service-metrics">
+                        <div class="metric">
+                            <div class="metric-label">Uptime</div>
+                            <div class="metric-value" id="hostingUptime">--</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Response</div>
+                            <div class="metric-value" id="hostingResponse">-- ms</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="service-card" id="firebaseCard">
+                    <div class="service-header">
+                        <div class="service-info">
+                            <h3 class="service-name">🔥 Firebase Backend</h3>
+                            <p class="service-description">Database and authentication services</p>
+                        </div>
+                        <div class="status-badge checking" id="firebaseStatus">
+                            <div class="status-indicator checking"></div>
+                            Checking...
+                        </div>
+                    </div>
+                    <div class="service-metrics">
+                        <div class="metric">
+                            <div class="metric-label">Database</div>
+                            <div class="metric-value" id="firebaseDb">--</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Response</div>
+                            <div class="metric-value" id="firebaseResponse">-- ms</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="service-card" id="cloudinaryCard">
+                    <div class="service-header">
+                        <div class="service-info">
+                            <h3 class="service-name">☁️ Cloudinary CDN</h3>
+                            <p class="service-description">Image storage and delivery network</p>
+                        </div>
+                        <div class="status-badge checking" id="cloudinaryStatus">
+                            <div class="status-indicator checking"></div>
+                            Checking...
+                        </div>
+                    </div>
+                    <div class="service-metrics">
+                        <div class="metric">
+                            <div class="metric-label">Storage</div>
+                            <div class="metric-value" id="cloudinaryStorage">--</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-label">Response</div>
+                            <div class="metric-value" id="cloudinaryResponse">-- ms</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer">
+                <p class="footer-text">
+                    Infinity SMP System Status • Updates in real-time<br />
+                    Having issues? Contact us on <a href="https://discord.gg/3FbYYN4cQS">Discord</a>
+                </p>
+            </div>
+        </div>
+
+        <script type="module">
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+            import {
+                getDatabase,
+                ref,
+                onValue,
+                get
+            } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+            const firebaseConfig = {
+                apiKey: "AIzaSyBgV9PoUFut3FPc0iChFNm2-h6-Uc5z6s0",
+                authDomain: "infinity-service-b2f10.firebaseapp.com",
+                databaseURL: "https://infinity-service-b2f10-default-rtdb.firebaseio.com",
+                projectId: "infinity-service-b2f10",
+                storageBucket: "infinity-service-b2f10.firebasestorage.app",
+                messagingSenderId: "805770674259",
+                appId: "1:805770674259:web:bcc520979e6772fda5c6a6"
+            };
+
+            const app = initializeApp(firebaseConfig);
+            const database = getDatabase(app);
+
+            function updateStatus(service, status, metrics = {}) {
+                const statusBadge = document.getElementById(`${service}Status`);
+                const card = document.getElementById(`${service}Card`);
+
+                statusBadge.className = `status-badge ${status}`;
+                statusBadge.innerHTML = `
+                    <div class="status-indicator ${status}"></div>
+                    ${status === "operational" ? "Operational" : status === "degraded" ? "Degraded" : status === "down" ? "Down" : "Checking..."}
+                `;
+
+                // Update metrics if provided
+                Object.keys(metrics).forEach((key) => {
+                    const element = document.getElementById(`${service}${key.charAt(0).toUpperCase() + key.slice(1)}`);
+                    if (element) {
+                        element.textContent = metrics[key];
+                    }
+                });
+            }
+
+            function updateOverallStatus(data) {
+                const allOperational = [data.serverStatus, data.hostingStatus, data.cloudinaryStatus].every(
+                    (s) => s === "operational" || !s
+                );
+
+                const overallIndicator = document.getElementById("overallIndicator");
+                const overallStatus = document.getElementById("overallStatus");
+
+                if (allOperational) {
+                    overallIndicator.className = "status-indicator-large operational";
+                    overallStatus.textContent = "All Systems Operational";
+                } else {
+                    overallIndicator.className = "status-indicator-large degraded";
+                    overallStatus.textContent = "Some Systems Degraded";
+                }
+            }
+
+            function updateLastUpdated() {
+                const now = new Date();
+                document.getElementById("lastUpdated").textContent =
+                    `Last updated: ${now.toLocaleTimeString()} on ${now.toLocaleDateString()}`;
+            }
+
+            function processStatusData(data) {
+                if (data) {
+                    // Update all services based on Firebase data
+                    updateStatus("server", data.serverStatus || "operational", {
+                        uptime: data.serverUptime || "99.9%",
+                        response: data.serverResponse || "<100"
+                    });
+
+                    updateStatus("hosting", data.hostingStatus || "operational", {
+                        uptime: data.hostingUptime || "99.9%",
+                        response: data.hostingResponse || "<50"
+                    });
+
+                    updateStatus("firebase", "operational", {
+                        db: "Online",
+                        response: data.firebaseResponse || "<150"
+                    });
+
+                    updateStatus("cloudinary", data.cloudinaryStatus || "operational", {
+                        storage: data.cloudinaryStorage || "Active",
+                        response: data.cloudinaryResponse || "<200"
+                    });
+
+                    updateOverallStatus(data);
+                } else {
+                    setDefaultStatuses();
+                }
+                updateLastUpdated();
+            }
+
+            function setDefaultStatuses() {
+                const defaultData = {
+                    serverStatus: "operational",
+                    hostingStatus: "operational",
+                    cloudinaryStatus: "operational"
+                };
+
+                updateStatus("server", "operational", {
+                    uptime: "99.9%",
+                    response: "<100"
+                });
+
+                updateStatus("hosting", "operational", {
+                    uptime: "99.9%",
+                    response: "<50"
+                });
+
+                updateStatus("firebase", "operational", {
+                    db: "Online",
+                    response: "<150"
+                });
+
+                updateStatus("cloudinary", "operational", {
+                    storage: "Active",
+                    response: "<200"
+                });
+
+                updateOverallStatus(defaultData);
+            }
+
+            window.checkAllServices = async function () {
+                document.getElementById("lastUpdated").textContent = "Checking...";
+                try {
+                    const statusRef = ref(database, "system/status");
+                    const snapshot = await get(statusRef);
+                    processStatusData(snapshot.val());
+                } catch (error) {
+                    console.error("Error checking Firebase:", error);
+                    updateStatus("firebase", "down", {
+                        db: "Error",
+                        response: "--"
+                    });
+                    updateLastUpdated();
+                }
+            };
+
+            // Set up real-time listener
+            const statusRef = ref(database, "system/status");
+            onValue(
+                statusRef,
+                (snapshot) => {
+                    processStatusData(snapshot.val());
+                },
+                (error) => {
+                    console.error("Error with real-time updates:", error);
+                    updateStatus("firebase", "down", {
+                        db: "Error",
+                        response: "--"
+                    });
+                    updateLastUpdated();
+                }
+            );
+
+            // Initial check
+            checkAllServices();
+        </script>
+    </body>
+</html>
