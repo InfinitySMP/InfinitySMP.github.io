@@ -1,0 +1,659 @@
+<!doctype html>
+<html lang="en-AU">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Check Application Status | Infinity SMP</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&display=swap"
+            rel="stylesheet" />
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            :root {
+                --bg-primary: #0a1929;
+                --bg-secondary: #0d2137;
+                --bg-tertiary: #132f4c;
+                --text-primary: #e3f2fd;
+                --text-secondary: #90caf9;
+                --text-tertiary: #64b5f6;
+                --accent: #2196f3;
+                --accent-hover: #42a5f5;
+                --accent-dark: #1976d2;
+                --success: #4caf50;
+                --warning: #ff9800;
+                --danger: #f44336;
+                --border: rgba(33, 150, 243, 0.15);
+                --border-hover: rgba(33, 150, 243, 0.3);
+                --shadow-sm: 0 2px 8px rgba(33, 150, 243, 0.1);
+                --shadow-md: 0 4px 20px rgba(33, 150, 243, 0.15);
+                --shadow-lg: 0 12px 48px rgba(33, 150, 243, 0.25);
+                --shadow-glow: 0 0 40px rgba(33, 150, 243, 0.2);
+                --radius-sm: 10px;
+                --radius-md: 14px;
+                --radius-lg: 20px;
+            }
+
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Oxygen, Ubuntu,
+                    sans-serif;
+                background: var(--bg-primary);
+                color: var(--text-primary);
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 40px 20px;
+                line-height: 1.5;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+                position: relative;
+            }
+
+            body::before {
+                content: "";
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                width: 900px;
+                height: 900px;
+                background: radial-gradient(
+                    circle,
+                    rgba(33, 150, 243, 0.15) 0%,
+                    rgba(33, 150, 243, 0.05) 40%,
+                    transparent 70%
+                );
+                transform: translate(-50%, -50%);
+                animation: pulse 4s ease-in-out infinite;
+                pointer-events: none;
+                z-index: 0;
+                filter: blur(60px);
+            }
+
+            body::after {
+                content: "";
+                position: fixed;
+                top: 30%;
+                left: 20%;
+                width: 700px;
+                height: 700px;
+                background: radial-gradient(
+                    circle,
+                    rgba(66, 165, 245, 0.12) 0%,
+                    rgba(33, 150, 243, 0.04) 40%,
+                    transparent 70%
+                );
+                transform: translate(-50%, -50%);
+                animation: pulse 6s ease-in-out infinite;
+                animation-delay: 1s;
+                pointer-events: none;
+                z-index: 0;
+                filter: blur(80px);
+            }
+
+            @keyframes pulse {
+                0%,
+                100% {
+                    opacity: 0.6;
+                    transform: translate(-50%, -50%) scale(1);
+                }
+                50% {
+                    opacity: 1;
+                    transform: translate(-50%, -50%) scale(1.1);
+                }
+            }
+
+            .container {
+                max-width: 600px;
+                width: 100%;
+                animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+                position: relative;
+                z-index: 1;
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .header {
+                text-align: center;
+                margin-bottom: 48px;
+            }
+
+            .logo {
+                width: 80px;
+                height: 80px;
+                margin: 0 auto 24px;
+                border-radius: 20px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                overflow: hidden;
+                box-shadow: var(--shadow-glow);
+                background: var(--bg-secondary);
+                border: 2px solid var(--border);
+            }
+
+            .logo img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            h1 {
+                font-size: 42px;
+                font-weight: 700;
+                letter-spacing: -0.02em;
+                margin-bottom: 16px;
+                background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent) 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .subtitle {
+                font-size: 18px;
+                color: var(--text-secondary);
+                font-weight: 400;
+                line-height: 1.6;
+            }
+
+            .card {
+                background: var(--bg-secondary);
+                border-radius: var(--radius-lg);
+                padding: 40px;
+                box-shadow: var(--shadow-md);
+                border: 1px solid var(--border);
+                margin-bottom: 24px;
+            }
+
+            .form-group {
+                margin-bottom: 24px;
+            }
+
+            .form-label {
+                display: block;
+                font-size: 14px;
+                font-weight: 600;
+                color: var(--text-secondary);
+                margin-bottom: 8px;
+                text-transform: uppercase;
+                letter-spacing: 0.04em;
+            }
+
+            .form-input {
+                width: 100%;
+                padding: 14px 18px;
+                font-size: 16px;
+                font-family: inherit;
+                color: var(--text-primary);
+                background: var(--bg-primary);
+                border: 1px solid var(--border);
+                border-radius: var(--radius-sm);
+                outline: none;
+                transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+
+            .form-input:focus {
+                border-color: var(--accent);
+                box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.2);
+            }
+
+            .submit-btn {
+                width: 100%;
+                padding: 14px 24px;
+                font-size: 16px;
+                font-weight: 600;
+                font-family: inherit;
+                background: var(--accent);
+                color: white;
+                border: none;
+                border-radius: var(--radius-sm);
+                cursor: pointer;
+                transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+                box-shadow: 0 2px 12px rgba(33, 150, 243, 0.4);
+            }
+
+            .submit-btn:hover {
+                background: var(--accent-hover);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 16px rgba(33, 150, 243, 0.5);
+            }
+
+            .submit-btn:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+                transform: none;
+            }
+
+            .result-card {
+                display: none;
+                background: var(--bg-secondary);
+                border-radius: var(--radius-lg);
+                padding: 40px;
+                box-shadow: var(--shadow-md);
+                border: 1px solid var(--border);
+                margin-bottom: 24px;
+                animation: fadeIn 0.5s ease-out;
+            }
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .result-card.show {
+                display: block;
+            }
+
+            .result-icon {
+                width: 80px;
+                height: 80px;
+                margin: 0 auto 24px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 40px;
+            }
+
+            .result-icon.approved {
+                background: rgba(76, 175, 80, 0.2);
+                border: 3px solid var(--success);
+            }
+
+            .result-icon.rejected {
+                background: rgba(244, 67, 54, 0.2);
+                border: 3px solid var(--danger);
+            }
+
+            .result-icon.pending {
+                background: rgba(33, 150, 243, 0.2);
+                border: 3px solid var(--accent);
+            }
+
+            .result-title {
+                text-align: center;
+                font-size: 32px;
+                font-weight: 700;
+                margin-bottom: 16px;
+                letter-spacing: -0.02em;
+            }
+
+            .result-title.approved {
+                color: var(--success);
+            }
+
+            .result-title.rejected {
+                color: var(--danger);
+            }
+
+            .result-title.pending {
+                color: var(--accent);
+            }
+
+            .result-message {
+                text-align: center;
+                font-size: 17px;
+                color: var(--text-secondary);
+                line-height: 1.7;
+                margin-bottom: 24px;
+            }
+
+            .result-details {
+                background: var(--bg-primary);
+                border: 1px solid var(--border);
+                border-radius: var(--radius-sm);
+                padding: 20px;
+                margin-top: 24px;
+            }
+
+            .detail-row {
+                display: flex;
+                justify-content: space-between;
+                padding: 12px 0;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .detail-row:last-child {
+                border-bottom: none;
+            }
+
+            .detail-label {
+                font-size: 14px;
+                font-weight: 600;
+                color: var(--text-tertiary);
+                text-transform: uppercase;
+                letter-spacing: 0.04em;
+            }
+
+            .detail-value {
+                font-size: 15px;
+                font-weight: 500;
+                color: var(--text-primary);
+            }
+
+            .rejection-box {
+                background: rgba(244, 67, 54, 0.1);
+                border: 2px solid rgba(244, 67, 54, 0.3);
+                border-radius: var(--radius-sm);
+                padding: 20px;
+                margin-top: 24px;
+            }
+
+            .rejection-box-title {
+                font-size: 16px;
+                font-weight: 600;
+                color: var(--danger);
+                margin-bottom: 12px;
+                text-transform: uppercase;
+                letter-spacing: 0.04em;
+            }
+
+            .rejection-box-text {
+                font-size: 15px;
+                line-height: 1.7;
+                color: var(--text-primary);
+            }
+
+            .approval-box {
+                background: rgba(76, 175, 80, 0.1);
+                border: 2px solid rgba(76, 175, 80, 0.3);
+                border-radius: var(--radius-sm);
+                padding: 20px;
+                margin-top: 24px;
+            }
+
+            .approval-box-title {
+                font-size: 16px;
+                font-weight: 600;
+                color: var(--success);
+                margin-bottom: 12px;
+                text-transform: uppercase;
+                letter-spacing: 0.04em;
+            }
+
+            .approval-box-text {
+                font-size: 15px;
+                line-height: 1.7;
+                color: var(--text-primary);
+            }
+
+            .discord-highlight {
+                color: var(--accent);
+                font-weight: 600;
+            }
+
+            .back-btn {
+                width: 100%;
+                padding: 12px 24px;
+                font-size: 15px;
+                font-weight: 500;
+                font-family: inherit;
+                background: var(--bg-tertiary);
+                color: var(--text-primary);
+                border: 1px solid var(--border);
+                border-radius: var(--radius-sm);
+                cursor: pointer;
+                transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+                margin-top: 16px;
+            }
+
+            .back-btn:hover {
+                background: var(--bg-primary);
+                border-color: var(--accent);
+            }
+
+            .error-message {
+                background: rgba(244, 67, 54, 0.1);
+                border: 1px solid rgba(244, 67, 54, 0.3);
+                border-radius: var(--radius-sm);
+                padding: 16px;
+                color: var(--danger);
+                font-size: 15px;
+                margin-top: 16px;
+                display: none;
+            }
+
+            .error-message.show {
+                display: block;
+            }
+
+            @media (max-width: 768px) {
+                body {
+                    padding: 24px 16px;
+                }
+
+                h1 {
+                    font-size: 32px;
+                }
+
+                .card,
+                .result-card {
+                    padding: 28px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <div class="logo">
+                    <img src="logo.png" alt="Infinity SMP" />
+                </div>
+                <h1>Check Status</h1>
+                <p class="subtitle">Enter your Minecraft username to check your application status</p>
+            </div>
+
+            <div class="card" id="searchCard">
+                <form id="searchForm">
+                    <div class="form-group">
+                        <label class="form-label" for="username">Minecraft Username</label>
+                        <input
+                            type="text"
+                            id="username"
+                            class="form-input"
+                            placeholder="Enter your username (First question on staff form)"
+                            required />
+                    </div>
+                    <button type="submit" class="submit-btn" id="submitBtn">Check Status</button>
+                    <div class="error-message" id="errorMessage"></div>
+                </form>
+            </div>
+
+            <div class="result-card" id="resultCard">
+                <div class="result-icon" id="resultIcon"></div>
+                <h2 class="result-title" id="resultTitle"></h2>
+                <p class="result-message" id="resultMessage"></p>
+
+                <div class="result-details" id="resultDetails"></div>
+
+                <div id="extraInfo"></div>
+
+                <button class="back-btn" onclick="resetSearch()">Check Another Application</button>
+            </div>
+        </div>
+
+        <script type="module">
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+            import {
+                getFirestore,
+                collection,
+                query,
+                where,
+                getDocs
+            } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+
+            const firebaseConfig = {
+                apiKey: "AIzaSyBgV9PoUFut3FPc0iChFNm2-h6-Uc5z6s0",
+                authDomain: "infinity-service-b2f10.firebaseapp.com",
+                projectId: "infinity-service-b2f10",
+                storageBucket: "infinity-service-b2f10.firebasestorage.app",
+                messagingSenderId: "805770674259",
+                appId: "1:805770674259:web:bcc520979e6772fda5c6a6"
+            };
+
+            const app = initializeApp(firebaseConfig);
+            const db = getFirestore(app);
+
+            const searchForm = document.getElementById("searchForm");
+            const searchCard = document.getElementById("searchCard");
+            const resultCard = document.getElementById("resultCard");
+            const errorMessage = document.getElementById("errorMessage");
+            const submitBtn = document.getElementById("submitBtn");
+
+            searchForm.addEventListener("submit", async (e) => {
+                e.preventDefault();
+
+                const username = document.getElementById("username").value.trim();
+
+                if (!username) {
+                    showError("Please enter a username");
+                    return;
+                }
+
+                submitBtn.disabled = true;
+                submitBtn.textContent = "Searching...";
+                errorMessage.classList.remove("show");
+
+                try {
+                    const q = query(collection(db, "staffApplications"), where("minecraftUsername", "==", username));
+
+                    const snapshot = await getDocs(q);
+
+                    if (snapshot.empty) {
+                        showError("No application found for this username");
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = "Check Status";
+                        return;
+                    }
+
+                    const appData = snapshot.docs[0].data();
+                    displayResult(appData);
+                } catch (error) {
+                    console.error("Error searching application:", error);
+                    showError("An error occurred. Please try again.");
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = "Check Status";
+                }
+            });
+
+            function showError(message) {
+                errorMessage.textContent = message;
+                errorMessage.classList.add("show");
+            }
+
+            function displayResult(app) {
+                const resultIcon = document.getElementById("resultIcon");
+                const resultTitle = document.getElementById("resultTitle");
+                const resultMessage = document.getElementById("resultMessage");
+                const resultDetails = document.getElementById("resultDetails");
+                const extraInfo = document.getElementById("extraInfo");
+
+                const status = app.status || "pending";
+
+                // Set icon and title
+                if (status === "approved") {
+                    resultIcon.innerHTML = "✓";
+                    resultIcon.className = "result-icon approved";
+                    resultTitle.textContent = "Congratulations!";
+                    resultTitle.className = "result-title approved";
+                    resultMessage.textContent = "Your application has been approved!";
+
+                    extraInfo.innerHTML = `
+          <div class="approval-box">
+            <div class="approval-box-title">Next Steps</div>
+            <div class="approval-box-text">
+              Please message <span class="discord-highlight">Infinity</span> on Discord to get started with your staff role.
+              ${app.approvalMessage ? "<br><br>" + app.approvalMessage : ""}
+            </div>
+          </div>
+        `;
+                } else if (status === "rejected") {
+                    resultIcon.innerHTML = "✗";
+                    resultIcon.className = "result-icon rejected";
+                    resultTitle.textContent = "Application Not Accepted";
+                    resultTitle.className = "result-title rejected";
+                    resultMessage.textContent = "Unfortunately, your application was not accepted at this time.";
+
+                    if (app.rejectionReason) {
+                        extraInfo.innerHTML = `
+            <div class="rejection-box">
+              <div class="rejection-box-title">Feedback</div>
+              <div class="rejection-box-text">${app.rejectionReason}</div>
+            </div>
+          `;
+                    }
+                } else {
+                    resultIcon.innerHTML = "⏱";
+                    resultIcon.className = "result-icon pending";
+                    resultTitle.textContent = "Under Review";
+                    resultTitle.className = "result-title pending";
+                    resultMessage.textContent = "Your application is currently being reviewed by our team.";
+                    extraInfo.innerHTML = "";
+                }
+
+                // Set details
+                const submittedDate = app.submittedAt
+                    ? new Date(app.submittedAt.seconds * 1000).toLocaleDateString("en-AU", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric"
+                      })
+                    : "Unknown";
+
+                resultDetails.innerHTML = `
+        <div class="detail-row">
+          <span class="detail-label">Minecraft Username</span>
+          <span class="detail-value">${app.minecraftUsername || "N/A"}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Discord</span>
+          <span class="detail-value">${app.discord || "N/A"}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Submitted</span>
+          <span class="detail-value">${submittedDate}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Status</span>
+          <span class="detail-value">${status.charAt(0).toUpperCase() + status.slice(1)}</span>
+        </div>
+      `;
+
+                // Show result card, hide search card
+                searchCard.style.display = "none";
+                resultCard.classList.add("show");
+                submitBtn.disabled = false;
+                submitBtn.textContent = "Check Status";
+            }
+
+            window.resetSearch = function () {
+                searchCard.style.display = "block";
+                resultCard.classList.remove("show");
+                document.getElementById("username").value = "";
+                errorMessage.classList.remove("show");
+            };
+        </script>
+    </body>
+</html>
