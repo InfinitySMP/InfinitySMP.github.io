@@ -4,12 +4,12 @@
         <meta charset="utf-8" />
         <meta http-equiv="X-UA-Compatible" content="ie=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Infinity | Admin Control Panel</title>
-        <link rel="icon" type="image/png" href="../logo.png" />
+        <title>Infinity | Home</title>
+        <link rel="icon" type="image/png" href="logo.png" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link
-            href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=SF+Pro+Display:wght@300;400;500;600;700&display=swap"
+            href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&display=swap"
             rel="stylesheet" />
         <style>
             * {
@@ -57,9 +57,6 @@
                 --radius-sm: 10px;
                 --radius-md: 14px;
                 --radius-lg: 20px;
-                --status-operational: #4caf50;
-                --status-degraded: #ff9800;
-                --status-down: #f44336;
             }
 
             body {
@@ -68,6 +65,9 @@
                 background: var(--bg-primary);
                 color: var(--text-primary);
                 min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
                 padding: 40px 20px;
                 line-height: 1.5;
                 -webkit-font-smoothing: antialiased;
@@ -106,7 +106,6 @@
             .container {
                 width: 100%;
                 max-width: 1200px;
-                margin: 0 auto;
                 animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
                 position: relative;
                 z-index: 1;
@@ -125,36 +124,45 @@
 
             .header {
                 text-align: center;
-                margin-bottom: 48px;
+                margin-bottom: 64px;
             }
 
-            .back-link {
-                display: inline-flex;
+            .logo-container {
+                margin-bottom: 32px;
+                animation: fadeIn 0.6s ease-out;
+            }
+
+            .logo {
+                width: 96px;
+                height: 96px;
+                margin: 0 auto;
+                border-radius: 24px;
+                display: flex;
                 align-items: center;
-                gap: 8px;
-                color: var(--text-secondary);
-                text-decoration: none;
-                font-size: 14px;
-                margin-bottom: 24px;
-                transition: all 0.3s ease;
-                font-weight: 500;
+                justify-content: center;
+                overflow: hidden;
+                box-shadow: var(--shadow-glow), var(--shadow-lg);
+                background: var(--bg-secondary);
+                border: 2px solid var(--border);
+                transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             }
 
-            .back-link:hover {
-                color: var(--accent);
-                gap: 12px;
+            .logo:hover {
+                transform: scale(1.05) translateY(-5px);
+                box-shadow:
+                    0 0 60px rgba(33, 150, 243, 0.4),
+                    var(--shadow-lg);
+                border-color: var(--accent);
             }
 
-            .back-arrow {
-                transition: transform 0.3s ease;
-            }
-
-            .back-link:hover .back-arrow {
-                transform: translateX(-4px);
+            .logo img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
             }
 
             h1 {
-                font-size: 48px;
+                font-size: 56px;
                 font-weight: 700;
                 letter-spacing: -0.03em;
                 margin-bottom: 16px;
@@ -166,9 +174,12 @@
             }
 
             .subtitle {
-                font-size: 18px;
+                font-size: 21px;
                 color: var(--text-secondary);
                 font-weight: 400;
+                max-width: 700px;
+                margin: 0 auto;
+                line-height: 1.6;
                 animation: fadeIn 0.6s ease-out 0.3s backwards;
             }
 
@@ -183,73 +194,90 @@
                 }
             }
 
-            .admin-warning {
-                background: rgba(244, 67, 54, 0.1);
-                border: 2px solid rgba(244, 67, 54, 0.3);
-                border-radius: var(--radius-lg);
-                padding: 24px;
-                margin-bottom: 32px;
-                text-align: center;
-                animation: fadeIn 0.6s ease-out 0.4s backwards;
-            }
-
-            .admin-warning-icon {
-                font-size: 32px;
-                margin-bottom: 12px;
-            }
-
-            .admin-warning-text {
-                font-size: 16px;
-                color: #f44336;
-                font-weight: 600;
-            }
-
-            .controls-grid {
+            .cards-grid {
                 display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
                 gap: 24px;
+                max-width: 1000px;
+                margin: 0 auto;
             }
 
-            .control-card {
+            .card {
                 background: var(--bg-secondary);
                 border-radius: var(--radius-lg);
-                padding: 32px;
+                padding: 40px;
                 box-shadow: var(--shadow-md);
                 border: 1px solid var(--border);
                 transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+                cursor: pointer;
                 position: relative;
                 overflow: hidden;
+                text-decoration: none;
+                color: inherit;
+                display: block;
             }
 
-            .control-card:hover {
+            .card::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: linear-gradient(90deg, var(--accent), var(--accent-hover));
+                transform: scaleX(0);
+                transform-origin: left;
+                transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+
+            .card:hover::before {
+                transform: scaleX(1);
+            }
+
+            .card::after {
+                content: "";
+                position: absolute;
+                inset: -1px;
+                border-radius: var(--radius-lg);
+                padding: 1px;
+                background: linear-gradient(135deg, var(--accent), transparent);
+                -webkit-mask:
+                    linear-gradient(#fff 0 0) content-box,
+                    linear-gradient(#fff 0 0);
+                -webkit-mask-composite: xor;
+                mask-composite: exclude;
+                opacity: 0;
+                transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+                pointer-events: none;
+            }
+
+            .card:hover {
+                transform: translateY(-8px);
+                box-shadow: var(--shadow-lg), var(--shadow-glow);
                 border-color: var(--border-hover);
-                box-shadow: var(--shadow-lg);
             }
 
-            .control-card:nth-child(1) {
+            .card:hover::after {
+                opacity: 0.5;
+            }
+
+            .card:nth-child(1) {
+                animation: fadeInUp 0.6s ease-out 0.4s backwards;
+            }
+
+            .card:nth-child(2) {
                 animation: fadeInUp 0.6s ease-out 0.5s backwards;
             }
 
-            .control-card:nth-child(2) {
+            .card:nth-child(3) {
                 animation: fadeInUp 0.6s ease-out 0.6s backwards;
             }
 
-            .control-card:nth-child(3) {
+            .card:nth-child(4) {
                 animation: fadeInUp 0.6s ease-out 0.7s backwards;
             }
 
-            .control-card:nth-child(4) {
-                animation: fadeInUp 0.6s ease-out 0.8s backwards;
-            }
-
-            .control-header {
-                display: flex;
-                align-items: center;
-                gap: 16px;
-                margin-bottom: 24px;
-            }
-
-            .control-icon {
-                font-size: 32px;
+            .card-icon {
                 width: 56px;
                 height: 56px;
                 background: linear-gradient(135deg, var(--accent), var(--accent-hover));
@@ -257,218 +285,72 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                font-size: 28px;
+                margin-bottom: 24px;
                 box-shadow: 0 4px 16px rgba(33, 150, 243, 0.3);
+                transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             }
 
-            .control-title {
-                font-size: 24px;
-                font-weight: 600;
-                color: var(--text-primary);
-                letter-spacing: -0.01em;
-            }
-
-            .control-form {
-                display: grid;
-                gap: 20px;
-            }
-
-            .form-group {
-                display: grid;
-                gap: 8px;
-            }
-
-            .form-label {
-                font-size: 14px;
-                color: var(--text-secondary);
-                font-weight: 500;
-                text-transform: uppercase;
-                letter-spacing: 0.05em;
-            }
-
-            .form-row {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 16px;
-            }
-
-            select,
-            input[type="text"] {
-                background: var(--bg-tertiary);
-                border: 1px solid var(--border);
-                border-radius: var(--radius-md);
-                padding: 12px 16px;
-                font-size: 15px;
-                color: var(--text-primary);
-                font-family: "JetBrains Mono", monospace;
-                transition: all 0.3s ease;
-                outline: none;
-            }
-
-            select:focus,
-            input[type="text"]:focus {
-                border-color: var(--accent);
-                box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
-            }
-
-            select:hover,
-            input[type="text"]:hover {
-                border-color: var(--border-hover);
-            }
-
-            select option {
-                background: var(--bg-tertiary);
-                color: var(--text-primary);
-            }
-
-            .button-group {
-                display: flex;
-                gap: 12px;
-                margin-top: 8px;
-            }
-
-            .btn {
-                padding: 12px 24px;
-                border-radius: var(--radius-md);
-                font-size: 14px;
-                font-weight: 600;
-                cursor: pointer;
-                transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-                border: none;
-                outline: none;
-                font-family: inherit;
-            }
-
-            .btn-primary {
-                background: linear-gradient(135deg, var(--accent), var(--accent-hover));
-                color: white;
-                box-shadow: 0 4px 16px rgba(33, 150, 243, 0.3);
-                flex: 1;
-            }
-
-            .btn-primary:hover {
-                transform: translateY(-2px);
+            .card:hover .card-icon {
+                transform: scale(1.1) rotate(5deg);
                 box-shadow: 0 8px 24px rgba(33, 150, 243, 0.5);
             }
 
-            .btn-primary:active {
-                transform: translateY(0);
+            .card-icon-image {
+                padding: 0;
+                overflow: hidden;
             }
 
-            .btn-secondary {
-                background: var(--bg-tertiary);
-                color: var(--text-secondary);
-                border: 1px solid var(--border);
+            .card-icon-image img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
             }
 
-            .btn-secondary:hover {
-                border-color: var(--border-hover);
+            .card-title {
+                font-size: 26px;
+                font-weight: 600;
                 color: var(--text-primary);
+                margin-bottom: 12px;
+                letter-spacing: -0.01em;
             }
 
-            .status-preview {
-                margin-top: 16px;
-                padding: 16px;
-                background: var(--bg-tertiary);
-                border-radius: var(--radius-md);
-                border: 1px solid var(--border);
-            }
-
-            .status-preview-label {
-                font-size: 12px;
-                color: var(--text-tertiary);
-                margin-bottom: 8px;
-                text-transform: uppercase;
-                letter-spacing: 0.05em;
-                font-weight: 500;
-            }
-
-            .status-preview-value {
+            .card-description {
                 font-size: 16px;
-                color: var(--text-primary);
-                font-family: "JetBrains Mono", monospace;
-                display: flex;
+                color: var(--text-secondary);
+                line-height: 1.6;
+                margin-bottom: 24px;
+            }
+
+            .card-link {
+                display: inline-flex;
                 align-items: center;
-                gap: 12px;
-            }
-
-            .status-dot {
-                width: 12px;
-                height: 12px;
-                border-radius: 50%;
-                animation: pulse 2s ease-in-out infinite;
-            }
-
-            .status-dot.operational {
-                background: var(--status-operational);
-                box-shadow: 0 0 12px rgba(76, 175, 80, 0.6);
-            }
-
-            .status-dot.degraded {
-                background: var(--status-degraded);
-                box-shadow: 0 0 12px rgba(255, 152, 0, 0.6);
-            }
-
-            .status-dot.down {
-                background: var(--status-down);
-                box-shadow: 0 0 12px rgba(244, 67, 54, 0.6);
-            }
-
-            @keyframes pulse {
-                0%,
-                100% {
-                    transform: scale(1);
-                    opacity: 1;
-                }
-                50% {
-                    transform: scale(1.2);
-                    opacity: 0.7;
-                }
-            }
-
-            .notification {
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: var(--bg-secondary);
-                border: 1px solid var(--border);
-                border-radius: var(--radius-md);
-                padding: 16px 24px;
-                box-shadow: var(--shadow-lg);
-                z-index: 1000;
-                transform: translateX(400px);
-                transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-                display: flex;
-                align-items: center;
-                gap: 12px;
-            }
-
-            .notification.show {
-                transform: translateX(0);
-            }
-
-            .notification.success {
-                border-color: var(--status-operational);
-            }
-
-            .notification.error {
-                border-color: var(--status-down);
-            }
-
-            .notification-icon {
-                font-size: 24px;
-            }
-
-            .notification-text {
-                font-size: 14px;
+                gap: 8px;
+                font-size: 15px;
                 font-weight: 500;
+                color: var(--accent);
+                transition: gap 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+
+            .card:hover .card-link {
+                gap: 12px;
+            }
+
+            .arrow {
+                display: inline-block;
+                transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+
+            .card:hover .arrow {
+                transform: translateX(4px);
             }
 
             .footer {
                 text-align: center;
-                margin-top: 60px;
+                margin-top: 80px;
                 padding-top: 32px;
                 border-top: 1px solid var(--border);
-                animation: fadeIn 0.6s ease-out 0.9s backwards;
+                animation: fadeIn 0.6s ease-out 0.8s backwards;
             }
 
             .footer-text {
@@ -477,35 +359,42 @@
                 line-height: 1.6;
             }
 
+            .footer-text a {
+                color: var(--accent);
+                text-decoration: none;
+                transition: color 0.2s ease;
+            }
+
+            .footer-text a:hover {
+                color: var(--accent-hover);
+                text-decoration: underline;
+            }
+
             @media (max-width: 768px) {
                 body {
                     padding: 32px 16px;
                 }
 
                 h1 {
-                    font-size: 36px;
+                    font-size: 40px;
                 }
 
-                .control-card {
-                    padding: 24px;
+                .subtitle {
+                    font-size: 18px;
                 }
 
-                .form-row {
+                .cards-grid {
                     grid-template-columns: 1fr;
+                    gap: 20px;
                 }
 
-                .button-group {
-                    flex-direction: column;
+                .card {
+                    padding: 32px;
                 }
 
-                .notification {
-                    left: 20px;
-                    right: 20px;
-                    transform: translateY(-200px);
-                }
-
-                .notification.show {
-                    transform: translateY(0);
+                .logo {
+                    width: 80px;
+                    height: 80px;
                 }
             }
 
@@ -584,355 +473,68 @@
             <div class="particle"></div>
         </div>
 
-        <div class="notification" id="notification">
-            <div class="notification-icon">✓</div>
-            <div class="notification-text">Status updated successfully</div>
-        </div>
-
         <div class="container">
             <div class="header">
-                <a href="https://infinitysmp.github.io/" class="back-link">
-                    <span class="back-arrow">←</span>
-                    Back to Home
+                <div class="logo-container">
+                    <a href="https://infinitysmp.github.io/" class="logo">
+                        <img src="logo.png" alt="Infinity SMP" />
+                    </a>
+                </div>
+                <h1>Infinity SMP</h1>
+                <p class="subtitle">Welcome to the Infinity SMP staff portal. Choose an option below to get started.</p>
+            </div>
+
+            <div class="cards-grid">
+                <a href="https://discord.gg/3FbYYN4cQS" class="card">
+                    <div class="card-icon card-icon-image">
+                        <img
+                            src="https://static.vecteezy.com/system/resources/previews/006/892/625/non_2x/discord-logo-icon-editorial-free-vector.jpg"
+                            alt="Community" />
+                    </div>
+                    <h2 class="card-title">Discord Server</h2>
+                    <p class="card-description">
+                        Hang out with our members! Get perks and giveaways, and have fun in public voicechat channels
+                        and text channels!
+                    </p>
+                    <span class="card-link"> Join community (11/10 agree with us)<span class="arrow">→</span> </span>
                 </a>
-                <h1>Admin Control Panel</h1>
-                <p class="subtitle">Manage system status and service configurations</p>
-            </div>
 
-            <div class="admin-warning">
-                <div class="admin-warning-icon">⚠️</div>
-                <div class="admin-warning-text">
-                    Administrator Access Only - Changes will affect the public status page
-                </div>
-            </div>
+                <a href="https://infinitysmp.github.io/staffapplication/" class="card">
+                    <div class="card-icon">📝</div>
+                    <h2 class="card-title">Apply for Staff</h2>
+                    <p class="card-description">
+                        Join our team! Fill out a staff application to become part of the Infinity SMP staff team.
+                    </p>
+                    <span class="card-link">
+                        Get Started
+                        <span class="arrow">→</span>
+                    </span>
+                </a>
 
-            <div class="controls-grid">
-                <div class="control-card">
-                    <div class="control-header">
-                        <div class="control-icon">🖥️</div>
-                        <h2 class="control-title">Server Computer</h2>
+                <a href="https://infinitysmp.github.io/staffstatus/" class="card">
+                    <div class="card-icon">🔍</div>
+                    <h2 class="card-title">Check Application Status</h2>
+                    <p class="card-description">
+                        Already applied? Check the status of your application and see if you've been accepted or
+                        rejected.
+                    </p>
+                    <span class="card-link">
+                        View Status
+                        <span class="arrow">→</span>
+                    </span>
+                </a>
+
+                <a href="https://www.reddit.com/r/InfinitySmpEdu/" class="card">
+                    <div class="card-icon card-icon-image">
+                        <img
+                            src="https://cdn.brandfetch.io/idkKwm0IT0/w/400/h/400/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1768324678544"
+                            alt="Community" />
                     </div>
-                    <form class="control-form" id="serverForm">
-                        <div class="form-group">
-                            <label class="form-label">Status</label>
-                            <select id="serverStatus" name="status">
-                                <option value="operational">✅ Operational</option>
-                                <option value="degraded">⚠️ Degraded</option>
-                                <option value="down">❌ Down</option>
-                            </select>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label">Uptime</label>
-                                <input type="text" id="serverUptime" name="uptime" placeholder="99.9%" />
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Response Time (ms)</label>
-                                <input type="text" id="serverResponse" name="response" placeholder="100" />
-                            </div>
-                        </div>
-                        <div class="status-preview">
-                            <div class="status-preview-label">Current Status</div>
-                            <div class="status-preview-value">
-                                <div class="status-dot operational" id="serverPreviewDot"></div>
-                                <span id="serverPreviewText">Operational</span>
-                            </div>
-                        </div>
-                        <div class="button-group">
-                            <button type="submit" class="btn btn-primary">💾 Save Changes</button>
-                            <button type="button" class="btn btn-secondary" onclick="resetForm('server')">
-                                ↺ Reset
-                            </button>
-                        </div>
-                    </form>
-                </div>
-
-                <div class="control-card">
-                    <div class="control-header">
-                        <div class="control-icon">🌐</div>
-                        <h2 class="control-title">Hosting Service</h2>
-                    </div>
-                    <form class="control-form" id="hostingForm">
-                        <div class="form-group">
-                            <label class="form-label">Status</label>
-                            <select id="hostingStatus" name="status">
-                                <option value="operational">✅ Operational</option>
-                                <option value="degraded">⚠️ Degraded</option>
-                                <option value="down">❌ Down</option>
-                            </select>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label">Uptime</label>
-                                <input type="text" id="hostingUptime" name="uptime" placeholder="99.9%" />
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Response Time (ms)</label>
-                                <input type="text" id="hostingResponse" name="response" placeholder="50" />
-                            </div>
-                        </div>
-                        <div class="status-preview">
-                            <div class="status-preview-label">Current Status</div>
-                            <div class="status-preview-value">
-                                <div class="status-dot operational" id="hostingPreviewDot"></div>
-                                <span id="hostingPreviewText">Operational</span>
-                            </div>
-                        </div>
-                        <div class="button-group">
-                            <button type="submit" class="btn btn-primary">💾 Save Changes</button>
-                            <button type="button" class="btn btn-secondary" onclick="resetForm('hosting')">
-                                ↺ Reset
-                            </button>
-                        </div>
-                    </form>
-                </div>
-
-                <div class="control-card">
-                    <div class="control-header">
-                        <div class="control-icon">🔥</div>
-                        <h2 class="control-title">Firebase Backend</h2>
-                    </div>
-                    <form class="control-form" id="firebaseForm">
-                        <div class="form-group">
-                            <label class="form-label">Status</label>
-                            <select id="firebaseStatus" name="status">
-                                <option value="operational">✅ Operational</option>
-                                <option value="degraded">⚠️ Degraded</option>
-                                <option value="down">❌ Down</option>
-                            </select>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label">Database Status</label>
-                                <input type="text" id="firebaseDb" name="db" placeholder="Online" />
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Response Time (ms)</label>
-                                <input type="text" id="firebaseResponse" name="response" placeholder="150" />
-                            </div>
-                        </div>
-                        <div class="status-preview">
-                            <div class="status-preview-label">Current Status</div>
-                            <div class="status-preview-value">
-                                <div class="status-dot operational" id="firebasePreviewDot"></div>
-                                <span id="firebasePreviewText">Operational</span>
-                            </div>
-                        </div>
-                        <div class="button-group">
-                            <button type="submit" class="btn btn-primary">💾 Save Changes</button>
-                            <button type="button" class="btn btn-secondary" onclick="resetForm('firebase')">
-                                ↺ Reset
-                            </button>
-                        </div>
-                    </form>
-                </div>
-
-                <div class="control-card">
-                    <div class="control-header">
-                        <div class="control-icon">☁️</div>
-                        <h2 class="control-title">Cloudinary CDN</h2>
-                    </div>
-                    <form class="control-form" id="cloudinaryForm">
-                        <div class="form-group">
-                            <label class="form-label">Status</label>
-                            <select id="cloudinaryStatus" name="status">
-                                <option value="operational">✅ Operational</option>
-                                <option value="degraded">⚠️ Degraded</option>
-                                <option value="down">❌ Down</option>
-                            </select>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label">Storage Status</label>
-                                <input type="text" id="cloudinaryStorage" name="storage" placeholder="Active" />
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Response Time (ms)</label>
-                                <input type="text" id="cloudinaryResponse" name="response" placeholder="200" />
-                            </div>
-                        </div>
-                        <div class="status-preview">
-                            <div class="status-preview-label">Current Status</div>
-                            <div class="status-preview-value">
-                                <div class="status-dot operational" id="cloudinaryPreviewDot"></div>
-                                <span id="cloudinaryPreviewText">Operational</span>
-                            </div>
-                        </div>
-                        <div class="button-group">
-                            <button type="submit" class="btn btn-primary">💾 Save Changes</button>
-                            <button type="button" class="btn btn-secondary" onclick="resetForm('cloudinary')">
-                                ↺ Reset
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <div class="footer">
-                <p class="footer-text">
-                    Infinity SMP Admin Control Panel<br />
-                    Changes are saved to Firebase and reflected on the public status page
-                </p>
+                    <h2 class="card-title">Reddit</h2>
+                    <p class="card-description">Join our public reddit to look at updates and changelog features!</p>
+                    <span class="card-link"> Join reddit community<span class="arrow">→</span> </span>
+                </a>
             </div>
         </div>
-
-        <script type="module">
-            import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-            import {
-                getDatabase,
-                ref,
-                set,
-                get,
-                update
-            } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
-            const firebaseConfig = {
-                apiKey: "AIzaSyBgV9PoUFut3FPc0iChFNm2-h6-Uc5z6s0",
-                authDomain: "infinity-service-b2f10.firebaseapp.com",
-                databaseURL: "https://infinity-service-b2f10-default-rtdb.firebaseio.com",
-                projectId: "infinity-service-b2f10",
-                storageBucket: "infinity-service-b2f10.firebasestorage.app",
-                messagingSenderId: "805770674259",
-                appId: "1:805770674259:web:bcc520979e6772fda5c6a6"
-            };
-
-            const app = initializeApp(firebaseConfig);
-            const database = getDatabase(app);
-
-            // Update preview when status changes
-            function updatePreview(service, status) {
-                const dot = document.getElementById(`${service}PreviewDot`);
-                const text = document.getElementById(`${service}PreviewText`);
-
-                dot.className = `status-dot ${status}`;
-                text.textContent = status.charAt(0).toUpperCase() + status.slice(1);
-            }
-
-            // Add event listeners for all status selects
-            ["server", "hosting", "firebase", "cloudinary"].forEach((service) => {
-                const select = document.getElementById(`${service}Status`);
-                select.addEventListener("change", (e) => {
-                    updatePreview(service, e.target.value);
-                });
-            });
-
-            // Show notification
-            function showNotification(message, type = "success") {
-                const notification = document.getElementById("notification");
-                const icon = notification.querySelector(".notification-icon");
-                const text = notification.querySelector(".notification-text");
-
-                notification.className = `notification ${type}`;
-                icon.textContent = type === "success" ? "✓" : "✗";
-                text.textContent = message;
-
-                notification.classList.add("show");
-
-                setTimeout(() => {
-                    notification.classList.remove("show");
-                }, 3000);
-            }
-
-            // Load current status from Firebase
-            async function loadStatus() {
-                try {
-                    const statusRef = ref(database, "system/status");
-                    const snapshot = await get(statusRef);
-
-                    if (snapshot.exists()) {
-                        const data = snapshot.val();
-
-                        // Server
-                        if (data.serverStatus) {
-                            document.getElementById("serverStatus").value = data.serverStatus;
-                            updatePreview("server", data.serverStatus);
-                        }
-                        if (data.serverUptime) document.getElementById("serverUptime").value = data.serverUptime;
-                        if (data.serverResponse) document.getElementById("serverResponse").value = data.serverResponse;
-
-                        // Hosting
-                        if (data.hostingStatus) {
-                            document.getElementById("hostingStatus").value = data.hostingStatus;
-                            updatePreview("hosting", data.hostingStatus);
-                        }
-                        if (data.hostingUptime) document.getElementById("hostingUptime").value = data.hostingUptime;
-                        if (data.hostingResponse)
-                            document.getElementById("hostingResponse").value = data.hostingResponse;
-
-                        // Cloudinary
-                        if (data.cloudinaryStatus) {
-                            document.getElementById("cloudinaryStatus").value = data.cloudinaryStatus;
-                            updatePreview("cloudinary", data.cloudinaryStatus);
-                        }
-                        if (data.cloudinaryStorage)
-                            document.getElementById("cloudinaryStorage").value = data.cloudinaryStorage;
-                        if (data.cloudinaryResponse)
-                            document.getElementById("cloudinaryResponse").value = data.cloudinaryResponse;
-
-                        // Firebase (note: we don't load firebase status fields since it's self-referential)
-                    }
-                } catch (error) {
-                    console.error("Error loading status:", error);
-                    showNotification("Error loading current status", "error");
-                }
-            }
-
-            // Save status to Firebase
-            async function saveStatus(service, data) {
-                try {
-                    const statusRef = ref(database, "system/status");
-                    const updateData = {};
-
-                    // Build update object with service-specific fields
-                    Object.keys(data).forEach((key) => {
-                        updateData[`${service}${key.charAt(0).toUpperCase() + key.slice(1)}`] = data[key];
-                    });
-
-                    await update(statusRef, updateData);
-                    showNotification(
-                        `${service.charAt(0).toUpperCase() + service.slice(1)} status updated successfully`,
-                        "success"
-                    );
-                } catch (error) {
-                    console.error("Error saving status:", error);
-                    showNotification("Error saving status. Please try again.", "error");
-                }
-            }
-
-            // Form submit handlers
-            document.getElementById("serverForm").addEventListener("submit", async (e) => {
-                e.preventDefault();
-                const formData = new FormData(e.target);
-                await saveStatus("server", Object.fromEntries(formData));
-            });
-
-            document.getElementById("hostingForm").addEventListener("submit", async (e) => {
-                e.preventDefault();
-                const formData = new FormData(e.target);
-                await saveStatus("hosting", Object.fromEntries(formData));
-            });
-
-            document.getElementById("firebaseForm").addEventListener("submit", async (e) => {
-                e.preventDefault();
-                const formData = new FormData(e.target);
-                await saveStatus("firebase", Object.fromEntries(formData));
-            });
-
-            document.getElementById("cloudinaryForm").addEventListener("submit", async (e) => {
-                e.preventDefault();
-                const formData = new FormData(e.target);
-                await saveStatus("cloudinary", Object.fromEntries(formData));
-            });
-
-            // Reset form
-            window.resetForm = function (service) {
-                const form = document.getElementById(`${service}Form`);
-                form.reset();
-                updatePreview(service, "operational");
-            };
-
-            // Load status on page load
-            loadStatus();
-        </script>
     </body>
 </html>
