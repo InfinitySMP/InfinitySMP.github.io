@@ -490,71 +490,118 @@
                 let file = e.target.files[0];
                 if (!file) return;
 
-                let data = await file.arrayBuffer();
-                currentZip = await JSZip.loadAsync(data);
+                try {
+                    let data = await file.arrayBuffer();
+                    currentZip = await JSZip.loadAsync(data);
 
-                // find manifest.json
-                manifestPath = Object.keys(currentZip.files).find((p) => p.endsWith("manifest.json"));
-                if (!manifestPath) {
-                    alert("manifest.json not found");
-                    return;
+                    // find manifest.json - search all files
+                    const files = Object.keys(currentZip.files);
+                    console.log("Files in pack:", files);
+
+                    manifestPath = files.find(
+                        (p) => p.toLowerCase().endsWith("manifest.json") && !currentZip.files[p].dir
+                    );
+
+                    if (!manifestPath) {
+                        alert("manifest.json not found in the pack. Files found: " + files.join(", "));
+                        return;
+                    }
+
+                    console.log("Found manifest at:", manifestPath);
+                    let manifestText = await currentZip.file(manifestPath).async("string");
+                    let manifest = JSON.parse(manifestText);
+
+                    console.log("Manifest:", manifest);
+
+                    document.getElementById("packName").value = manifest.header?.name || "";
+                    document.getElementById("packDesc").value = manifest.header?.description || "";
+
+                    // Handle both 'authors' array and old format
+                    let authorsList = manifest.header?.authors || manifest.metadata?.authors || [];
+                    document.getElementById("packAuthors").value = authorsList.join(", ");
+
+                    alert("Pack loaded successfully!");
+                } catch (error) {
+                    console.error("Error loading pack:", error);
+                    alert("Error loading pack: " + error.message);
                 }
-
-                let manifest = JSON.parse(await currentZip.file(manifestPath).async("string"));
-                document.getElementById("packName").value = manifest.header?.name || "";
-                document.getElementById("packDesc").value = manifest.header?.description || "";
-                document.getElementById("packAuthors").value = (manifest.header?.authors || []).join(", ");
             });
 
             document.getElementById("saveBtn").addEventListener("click", async () => {
                 if (!currentZip || !manifestPath) {
-                    alert("No pack loaded");
+                    alert("Please load a pack first by selecting a .mcpack or .mcaddon file");
                     return;
                 }
 
-                let name = document.getElementById("packName").value;
-                let desc = document.getElementById("packDesc").value;
-                let authorsText = document.getElementById("packAuthors").value;
-                let authors = authorsText
-                    .split(",")
-                    .map((a) => a.trim())
-                    .filter((a) => a);
+                try {
+                    let name = document.getElementById("packName").value;
+                    let desc = document.getElementById("packDesc").value;
+                    let authorsText = document.getElementById("packAuthors").value;
+                    let authors = authorsText
+                        .split(",")
+                        .map((a) => a.trim())
+                        .filter((a) => a);
 
-                // load and update manifest
-                let manifest = JSON.parse(await currentZip.file(manifestPath).async("string"));
-                manifest.header.name = name;
-                manifest.header.description = desc;
-                if (manifest.header.authors !== undefined) {
-                    manifest.header.authors = authors;
+                    // load and update manifest
+                    let manifestText = await currentZip.file(manifestPath).async("string");
+                    let manifest = JSON.parse(manifestText);
+
+                    manifest.header.name = name;
+                    manifest.header.description = desc;
+
+                    // Update authors in header or metadata depending on structure
+                    if (manifest.header.authors !== undefined) {
+                        manifest.header.authors = authors;
+                    }
+                    if (manifest.metadata?.authors !== undefined) {
+                        manifest.metadata.authors = authors;
+                    }
+
+                    if (manifest.modules) {
+                        manifest.modules.forEach((m) => {
+                            m.description = desc;
+                        });
+                    }
+
+                    currentZip.file(manifestPath, JSON.stringify(manifest, null, 2));
+
+                    // icon
+                    let iconFile = document.getElementById("iconpicker").files[0];
+                    if (iconFile) {
+                        let iconData = await iconFile.arrayBuffer();
+                        // Try to find existing pack_icon.png path or use root
+                        let iconPath = Object.keys(currentZip.files).find((p) =>
+                            p.toLowerCase().endsWith("pack_icon.png")
+                        );
+                        if (!iconPath) {
+                            // Use the same directory as manifest
+                            let manifestDir = manifestPath.substring(0, manifestPath.lastIndexOf("/") + 1);
+                            iconPath = manifestDir + "pack_icon.png";
+                        }
+                        currentZip.file(iconPath, iconData);
+                    }
+
+                    // generate new file
+                    let content = await currentZip.generateAsync({ type: "blob" });
+
+                    let originalName = document.getElementById("filepicker").files[0].name;
+                    let baseName = originalName.substring(0, originalName.lastIndexOf(".")) || "edited_pack";
+                    let newName = prompt("Save file name (without extension)", baseName + "_edited");
+                    if (!newName) return;
+
+                    let ext = filenameExtension(originalName);
+                    let downloadName = newName + "." + ext;
+
+                    let link = document.createElement("a");
+                    link.href = URL.createObjectURL(content);
+                    link.download = downloadName;
+                    link.click();
+
+                    alert("Pack saved successfully!");
+                } catch (error) {
+                    console.error("Error saving pack:", error);
+                    alert("Error saving pack: " + error.message);
                 }
-                if (manifest.modules) {
-                    manifest.modules.forEach((m) => {
-                        m.description = desc;
-                    });
-                }
-
-                currentZip.file(manifestPath, JSON.stringify(manifest, null, 2));
-
-                // icon
-                let iconFile = document.getElementById("iconpicker").files[0];
-                if (iconFile) {
-                    let iconData = await iconFile.arrayBuffer();
-                    currentZip.file("pack_icon.png", iconData);
-                }
-
-                // generate new file
-                let content = await currentZip.generateAsync({ type: "blob" });
-
-                let newName = prompt("Save file name (without extension)", "edited_pack");
-                if (!newName) return;
-
-                let ext = filenameExtension(document.getElementById("filepicker").files[0].name);
-                let downloadName = newName + "." + ext;
-
-                let link = document.createElement("a");
-                link.href = URL.createObjectURL(content);
-                link.download = downloadName;
-                link.click();
             });
 
             function filenameExtension(name) {
