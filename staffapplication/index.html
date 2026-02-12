@@ -505,8 +505,8 @@
                 <p class="subtitle">Join our team and help make Infinity SMP an amazing community!</p>
             </div>
 
-            <div class="limit-banner" id="limitBanner" style="display: none">
-                <div class="limit-text">Applications Remaining</div>
+            <div class="limit-banner" id="limitBanner" style="display: none;">
+                <div class="limit-text">Staff Positions Remaining</div>
                 <div class="limit-count" id="limitCount">0</div>
                 <div class="limit-subtext" id="limitSubtext">Hurry before slots fill up!</div>
             </div>
@@ -652,54 +652,56 @@
             async function loadLimitInfo() {
                 try {
                     // Get limit setting
-                    const limitDoc = await getDoc(doc(db, "settings", "applicationLimit"));
+                    const limitDoc = await getDoc(doc(db, 'settings', 'applicationLimit'));
                     if (limitDoc.exists() && limitDoc.data().limit !== null) {
                         applicationLimit = limitDoc.data().limit;
-
-                        // Count current applications
-                        const appsSnapshot = await getDocs(collection(db, "staffApplications"));
+                        
+                        // Count only APPROVED applications
+                        const appsQuery = query(collection(db, 'staffApplications'), where('status', '==', 'approved'));
+                        const appsSnapshot = await getDocs(appsQuery);
                         currentApplicationCount = appsSnapshot.size;
-
+                        
                         const remaining = applicationLimit - currentApplicationCount;
-
+                        
                         if (remaining <= 0) {
-                            // Applications closed
-                            document.getElementById("limitBanner").style.display = "block";
-                            document.getElementById("limitBanner").classList.add("closed");
-                            document.getElementById("limitCount").textContent = "0";
-                            document.getElementById("limitSubtext").textContent = "Applications are currently closed";
-                            document.getElementById("applicationForm").classList.add("disabled");
+                            // All approved slots filled
+                            document.getElementById('limitBanner').style.display = 'block';
+                            document.getElementById('limitBanner').classList.add('closed');
+                            document.getElementById('limitCount').textContent = '0';
+                            document.getElementById('limitSubtext').textContent = 'All staff positions are currently filled';
+                            document.getElementById('applicationForm').classList.add('disabled');
                         } else {
-                            // Show remaining spots
-                            document.getElementById("limitBanner").style.display = "block";
-                            document.getElementById("limitCount").textContent = remaining;
-                            document.getElementById("limitSubtext").textContent =
-                                remaining === 1 ? "Last spot available!" : "Hurry before slots fill up!";
+                            // Show remaining approved slots
+                            document.getElementById('limitBanner').style.display = 'block';
+                            document.getElementById('limitCount').textContent = remaining;
+                            document.getElementById('limitSubtext').textContent = remaining === 1 
+                                ? 'Last staff position available!' 
+                                : 'Staff positions available!';
                         }
                     }
                 } catch (error) {
-                    console.error("Error loading limit info:", error);
+                    console.error('Error loading limit info:', error);
                 }
             }
 
             // Typing speed tracking
             function trackTyping(field) {
                 const textarea = document.getElementById(field);
-
-                textarea.addEventListener("focus", () => {
+                
+                textarea.addEventListener('focus', () => {
                     if (!typingData[field].startTime) {
                         typingData[field].startTime = Date.now();
                     }
                 });
 
-                textarea.addEventListener("input", () => {
+                textarea.addEventListener('input', () => {
                     if (!typingData[field].startTime) {
                         typingData[field].startTime = Date.now();
                     }
-
+                    
                     const currentLength = textarea.value.length;
                     const previousLength = typingData[field].chars;
-
+                    
                     if (currentLength > previousLength) {
                         typingData[field].chars = currentLength;
                         typingData[field].time = Date.now() - typingData[field].startTime;
@@ -710,9 +712,9 @@
             function calculateWPM() {
                 const totalChars = typingData.experience.chars + typingData.why.chars;
                 const totalTime = typingData.experience.time + typingData.why.time;
-
+                
                 if (totalTime === 0) return 0;
-
+                
                 const minutes = totalTime / 60000;
                 const words = totalChars / 5; // Average word length
                 return words / minutes;
@@ -728,21 +730,22 @@
             });
 
             // Track typing for both text areas
-            trackTyping("experience");
-            trackTyping("why");
+            trackTyping('experience');
+            trackTyping('why');
 
             // Form submission
             document.getElementById("applicationForm").addEventListener("submit", async function (e) {
                 e.preventDefault();
 
-                // Check if applications are closed
+                // Check if approved slots are full
                 if (applicationLimit !== null) {
-                    const appsSnapshot = await getDocs(collection(db, "staffApplications"));
-                    const currentCount = appsSnapshot.size;
-
-                    if (currentCount >= applicationLimit) {
-                        alert("Sorry, applications are now closed. All spots have been filled.");
-                        return;
+                    const appsQuery = query(collection(db, 'staffApplications'), where('status', '==', 'approved'));
+                    const appsSnapshot = await getDocs(appsQuery);
+                    const approvedCount = appsSnapshot.size;
+                    
+                    if (approvedCount >= applicationLimit) {
+                        alert('Sorry, all staff positions are currently filled. You can still submit your application and we will review it if positions open up.');
+                        // Don't block submission, just warn them
                     }
                 }
 
@@ -753,7 +756,7 @@
                 try {
                     const formData = new FormData(this);
                     const wpm = calculateWPM();
-
+                    
                     const data = {
                         minecraftUsername: formData.get("minecraftUsername"),
                         discord: formData.get("discord"),
@@ -764,7 +767,7 @@
                         why: formData.get("why"),
                         typingSpeed: wpm,
                         submittedAt: serverTimestamp(),
-                        status: "pending"
+                        status: 'pending'
                     };
 
                     await addDoc(collection(db, "staffApplications"), data);
