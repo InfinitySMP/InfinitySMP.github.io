@@ -55,7 +55,6 @@
                 position: relative;
             }
 
-            /* Pulsing glow background */
             body::before {
                 content: "";
                 position: fixed;
@@ -180,13 +179,54 @@
                 margin: 0 auto;
             }
 
-            /* Form */
+            .limit-banner {
+                background: var(--bg-secondary);
+                border: 2px solid var(--warning);
+                border-radius: var(--radius-md);
+                padding: 20px;
+                text-align: center;
+                margin-bottom: 24px;
+                box-shadow: var(--shadow-md);
+            }
+
+            .limit-banner.closed {
+                border-color: var(--danger);
+            }
+
+            .limit-text {
+                font-size: 16px;
+                color: var(--text-primary);
+                margin-bottom: 8px;
+                font-weight: 600;
+            }
+
+            .limit-count {
+                font-size: 32px;
+                font-weight: 700;
+                color: var(--warning);
+                margin-bottom: 4px;
+            }
+
+            .limit-banner.closed .limit-count {
+                color: var(--danger);
+            }
+
+            .limit-subtext {
+                font-size: 14px;
+                color: var(--text-secondary);
+            }
+
             .application-form {
                 background: var(--bg-secondary);
                 border: 1px solid var(--border);
                 border-radius: var(--radius-lg);
                 padding: 40px;
                 box-shadow: var(--shadow-md);
+            }
+
+            .application-form.disabled {
+                opacity: 0.6;
+                pointer-events: none;
             }
 
             .form-section {
@@ -336,7 +376,6 @@
                 z-index: 1;
             }
 
-            /* Success Message */
             .success-message {
                 position: fixed;
                 top: 50%;
@@ -442,10 +481,6 @@
                     font-size: 32px;
                 }
 
-                .role-options {
-                    grid-template-columns: 1fr;
-                }
-
                 .application-form {
                     padding: 28px;
                 }
@@ -462,13 +497,20 @@
         <div class="container">
             <div class="header">
                 <div class="logo">
-                    <img src="../logo.png" alt="Infinity SMP" />
+                    <a href="https://infinitysmp.github.io/">
+                        <img src="../logo.png" alt="Infinity SMP" />
+                    </a>
                 </div>
                 <h1>Staff Application</h1>
                 <p class="subtitle">Join our team and help make Infinity SMP an amazing community!</p>
             </div>
 
-            <!-- Application Form -->
+            <div class="limit-banner" id="limitBanner" style="display: none">
+                <div class="limit-text">Applications Remaining</div>
+                <div class="limit-count" id="limitCount">0</div>
+                <div class="limit-subtext" id="limitSubtext">Hurry before slots fill up!</div>
+            </div>
+
             <form class="application-form" id="applicationForm">
                 <div class="form-section">
                     <h3 class="section-title">Basic Information</h3>
@@ -564,7 +606,6 @@
             </form>
         </div>
 
-        <!-- Success Message -->
         <div class="success-message" id="successMessage">
             <div class="success-icon">✅</div>
             <h2 class="success-title">Application Submitted!</h2>
@@ -580,7 +621,12 @@
                 getFirestore,
                 collection,
                 addDoc,
-                serverTimestamp
+                serverTimestamp,
+                getDoc,
+                doc,
+                getDocs,
+                query,
+                where
             } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
             const firebaseConfig = {
@@ -595,6 +641,83 @@
             const app = initializeApp(firebaseConfig);
             const db = getFirestore(app);
 
+            let applicationLimit = null;
+            let currentApplicationCount = 0;
+            let typingData = {
+                experience: { chars: 0, time: 0, startTime: null },
+                why: { chars: 0, time: 0, startTime: null }
+            };
+
+            // Load application limit and count
+            async function loadLimitInfo() {
+                try {
+                    // Get limit setting
+                    const limitDoc = await getDoc(doc(db, "settings", "applicationLimit"));
+                    if (limitDoc.exists() && limitDoc.data().limit !== null) {
+                        applicationLimit = limitDoc.data().limit;
+
+                        // Count current applications
+                        const appsSnapshot = await getDocs(collection(db, "staffApplications"));
+                        currentApplicationCount = appsSnapshot.size;
+
+                        const remaining = applicationLimit - currentApplicationCount;
+
+                        if (remaining <= 0) {
+                            // Applications closed
+                            document.getElementById("limitBanner").style.display = "block";
+                            document.getElementById("limitBanner").classList.add("closed");
+                            document.getElementById("limitCount").textContent = "0";
+                            document.getElementById("limitSubtext").textContent = "Applications are currently closed";
+                            document.getElementById("applicationForm").classList.add("disabled");
+                        } else {
+                            // Show remaining spots
+                            document.getElementById("limitBanner").style.display = "block";
+                            document.getElementById("limitCount").textContent = remaining;
+                            document.getElementById("limitSubtext").textContent =
+                                remaining === 1 ? "Last spot available!" : "Hurry before slots fill up!";
+                        }
+                    }
+                } catch (error) {
+                    console.error("Error loading limit info:", error);
+                }
+            }
+
+            // Typing speed tracking
+            function trackTyping(field) {
+                const textarea = document.getElementById(field);
+
+                textarea.addEventListener("focus", () => {
+                    if (!typingData[field].startTime) {
+                        typingData[field].startTime = Date.now();
+                    }
+                });
+
+                textarea.addEventListener("input", () => {
+                    if (!typingData[field].startTime) {
+                        typingData[field].startTime = Date.now();
+                    }
+
+                    const currentLength = textarea.value.length;
+                    const previousLength = typingData[field].chars;
+
+                    if (currentLength > previousLength) {
+                        typingData[field].chars = currentLength;
+                        typingData[field].time = Date.now() - typingData[field].startTime;
+                    }
+                });
+            }
+
+            function calculateWPM() {
+                const totalChars = typingData.experience.chars + typingData.why.chars;
+                const totalTime = typingData.experience.time + typingData.why.time;
+
+                if (totalTime === 0) return 0;
+
+                const minutes = totalTime / 60000;
+                const words = totalChars / 5; // Average word length
+                return words / minutes;
+            }
+
             // Character counters
             document.getElementById("experience").addEventListener("input", function () {
                 document.getElementById("expCount").textContent = this.value.length;
@@ -604,9 +727,24 @@
                 document.getElementById("whyCount").textContent = this.value.length;
             });
 
+            // Track typing for both text areas
+            trackTyping("experience");
+            trackTyping("why");
+
             // Form submission
             document.getElementById("applicationForm").addEventListener("submit", async function (e) {
                 e.preventDefault();
+
+                // Check if applications are closed
+                if (applicationLimit !== null) {
+                    const appsSnapshot = await getDocs(collection(db, "staffApplications"));
+                    const currentCount = appsSnapshot.size;
+
+                    if (currentCount >= applicationLimit) {
+                        alert("Sorry, applications are now closed. All spots have been filled.");
+                        return;
+                    }
+                }
 
                 const submitBtn = this.querySelector(".submit-btn");
                 submitBtn.disabled = true;
@@ -614,8 +752,9 @@
 
                 try {
                     const formData = new FormData(this);
+                    const wpm = calculateWPM();
+
                     const data = {
-                        role: formData.get("role"),
                         minecraftUsername: formData.get("minecraftUsername"),
                         discord: formData.get("discord"),
                         age: parseInt(formData.get("age")),
@@ -623,7 +762,9 @@
                         hours: parseInt(formData.get("hours")),
                         experience: formData.get("experience"),
                         why: formData.get("why"),
-                        submittedAt: serverTimestamp()
+                        typingSpeed: wpm,
+                        submittedAt: serverTimestamp(),
+                        status: "pending"
                     };
 
                     await addDoc(collection(db, "staffApplications"), data);
@@ -638,6 +779,9 @@
                     submitBtn.innerHTML = "<span>Submit Application</span>";
                 }
             });
+
+            // Load limit info on page load
+            loadLimitInfo();
         </script>
     </body>
 </html>
