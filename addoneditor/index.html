@@ -1,18 +1,16 @@
 <!doctype html>
-<html lang="en">
+<html lang="en-AU">
     <head>
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://infinitysmp.github.io/" />
-        <meta property="og:title" content="Infinity | Addon Editor" />
-        <meta
-            property="og:description"
-            content="Edit the image, name, description and authors of a .mcaddon or .mcpack!" />
+        <meta property="og:title" content="Infinity | Home" />
+        <meta property="og:description" content="Apply for staff, go to our discord view uptime status + more!" />
         <meta property="og:image" content="https://infinitysmp.github.io/logo.png" />
         <meta charset="utf-8" />
         <meta http-equiv="X-UA-Compatible" content="ie=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Infinity | Addon Editor</title>
-        <link rel="icon" type="image/png" href="../logo.png" />
+        <title>Infinity | Home</title>
+        <link rel="icon" type="image/png" href="logo.png" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link
@@ -112,7 +110,7 @@
 
             .container {
                 width: 100%;
-                max-width: 800px;
+                max-width: 1200px;
                 animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
                 position: relative;
                 z-index: 1;
@@ -131,7 +129,7 @@
 
             .header {
                 text-align: center;
-                margin-bottom: 48px;
+                margin-bottom: 64px;
             }
 
             .logo-container {
@@ -152,7 +150,6 @@
                 background: var(--bg-secondary);
                 border: 2px solid var(--border);
                 transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-                cursor: pointer;
             }
 
             .logo:hover {
@@ -170,7 +167,7 @@
             }
 
             h1 {
-                font-size: 48px;
+                font-size: 56px;
                 font-weight: 700;
                 letter-spacing: -0.03em;
                 margin-bottom: 16px;
@@ -182,10 +179,10 @@
             }
 
             .subtitle {
-                font-size: 18px;
+                font-size: 21px;
                 color: var(--text-secondary);
                 font-weight: 400;
-                max-width: 600px;
+                max-width: 700px;
                 margin: 0 auto;
                 line-height: 1.6;
                 animation: fadeIn 0.6s ease-out 0.3s backwards;
@@ -202,118 +199,169 @@
                 }
             }
 
-            .editor-card {
+            .cards-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 24px;
+                max-width: 1000px;
+                margin: 0 auto;
+            }
+
+            .card {
                 background: var(--bg-secondary);
                 border-radius: var(--radius-lg);
                 padding: 40px;
                 box-shadow: var(--shadow-md);
                 border: 1px solid var(--border);
+                transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+                cursor: pointer;
+                position: relative;
+                overflow: hidden;
+                text-decoration: none;
+                color: inherit;
+                display: block;
+            }
+
+            .card::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: linear-gradient(90deg, var(--accent), var(--accent-hover));
+                transform: scaleX(0);
+                transform-origin: left;
+                transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+
+            .card:hover::before {
+                transform: scaleX(1);
+            }
+
+            .card::after {
+                content: "";
+                position: absolute;
+                inset: -1px;
+                border-radius: var(--radius-lg);
+                padding: 1px;
+                background: linear-gradient(135deg, var(--accent), transparent);
+                -webkit-mask:
+                    linear-gradient(#fff 0 0) content-box,
+                    linear-gradient(#fff 0 0);
+                -webkit-mask-composite: xor;
+                mask-composite: exclude;
+                opacity: 0;
+                transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+                pointer-events: none;
+            }
+
+            .card:hover {
+                transform: translateY(-8px);
+                box-shadow: var(--shadow-lg), var(--shadow-glow);
+                border-color: var(--border-hover);
+            }
+
+            .card:hover::after {
+                opacity: 0.5;
+            }
+
+            .card:nth-child(1) {
                 animation: fadeInUp 0.6s ease-out 0.4s backwards;
             }
 
-            .form-group {
-                margin-bottom: 28px;
+            .card:nth-child(2) {
+                animation: fadeInUp 0.6s ease-out 0.5s backwards;
             }
 
-            .form-group:last-of-type {
-                margin-bottom: 32px;
+            .card:nth-child(3) {
+                animation: fadeInUp 0.6s ease-out 0.6s backwards;
             }
 
-            label {
-                display: block;
-                font-size: 15px;
-                font-weight: 500;
-                color: var(--text-primary);
-                margin-bottom: 10px;
-                letter-spacing: -0.01em;
+            .card:nth-child(4) {
+                animation: fadeInUp 0.6s ease-out 0.7s backwards;
             }
 
-            input[type="text"],
-            input[type="file"],
-            textarea {
-                width: 100%;
-                padding: 14px 16px;
-                background: var(--bg-tertiary);
-                border: 1px solid var(--border);
-                border-radius: var(--radius-md);
-                color: var(--text-primary);
-                font-size: 15px;
-                font-family: inherit;
-                transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-                outline: none;
-            }
-
-            input[type="text"]:focus,
-            textarea:focus {
-                border-color: var(--accent);
-                box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
-                background: var(--bg-secondary);
-            }
-
-            input[type="file"] {
-                padding: 12px;
-                cursor: pointer;
-            }
-
-            input[type="file"]::file-selector-button {
-                padding: 10px 20px;
-                background: var(--accent);
-                color: white;
-                border: none;
-                border-radius: var(--radius-sm);
-                font-weight: 500;
-                cursor: pointer;
-                transition: all 0.3s ease;
-                margin-right: 12px;
-            }
-
-            input[type="file"]::file-selector-button:hover {
-                background: var(--accent-hover);
-                transform: translateY(-1px);
-            }
-
-            textarea {
-                resize: vertical;
-                min-height: 100px;
-                line-height: 1.6;
-            }
-
-            button {
-                width: 100%;
-                padding: 16px 32px;
+            .card-icon {
+                width: 56px;
+                height: 56px;
                 background: linear-gradient(135deg, var(--accent), var(--accent-hover));
-                color: white;
-                border: none;
-                border-radius: var(--radius-md);
-                font-size: 16px;
-                font-weight: 600;
-                cursor: pointer;
+                border-radius: 14px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 28px;
+                margin-bottom: 24px;
+                box-shadow: 0 4px 16px rgba(33, 150, 243, 0.3);
                 transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-                box-shadow: var(--shadow-md);
+            }
+
+            .card:hover .card-icon {
+                transform: scale(1.1) rotate(5deg);
+                box-shadow: 0 8px 24px rgba(33, 150, 243, 0.5);
+            }
+
+            .card-icon-image {
+                padding: 0;
+                overflow: hidden;
+                background: none;
+                box-shadow: none;
+            }
+
+            .card:hover .card-icon-image {
+                box-shadow: none;
+            }
+
+            .card-icon-image img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            .card-title {
+                font-size: 26px;
+                font-weight: 600;
+                color: var(--text-primary);
+                margin-bottom: 12px;
                 letter-spacing: -0.01em;
             }
 
-            button:hover {
-                transform: translateY(-2px);
-                box-shadow: var(--shadow-lg), var(--shadow-glow);
+            .card-description {
+                font-size: 16px;
+                color: var(--text-secondary);
+                line-height: 1.6;
+                margin-bottom: 24px;
             }
 
-            button:active {
-                transform: translateY(0);
+            .card-link {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                font-size: 15px;
+                font-weight: 500;
+                color: var(--accent);
+                transition: gap 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             }
 
-            button:disabled {
-                opacity: 0.5;
-                cursor: not-allowed;
-                transform: none;
+            .card:hover .card-link {
+                gap: 12px;
+            }
+
+            .arrow {
+                display: inline-block;
+                transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+
+            .card:hover .arrow {
+                transform: translateX(4px);
             }
 
             .footer {
                 text-align: center;
-                margin-top: 48px;
+                margin-top: 80px;
                 padding-top: 32px;
                 border-top: 1px solid var(--border);
-                animation: fadeIn 0.6s ease-out 0.5s backwards;
+                animation: fadeIn 0.6s ease-out 0.8s backwards;
             }
 
             .footer-text {
@@ -331,6 +379,34 @@
             .footer-text a:hover {
                 color: var(--accent-hover);
                 text-decoration: underline;
+            }
+
+            @media (max-width: 768px) {
+                body {
+                    padding: 32px 16px;
+                }
+
+                h1 {
+                    font-size: 40px;
+                }
+
+                .subtitle {
+                    font-size: 18px;
+                }
+
+                .cards-grid {
+                    grid-template-columns: 1fr;
+                    gap: 20px;
+                }
+
+                .card {
+                    padding: 32px;
+                }
+
+                .logo {
+                    width: 80px;
+                    height: 80px;
+                }
             }
 
             .particles {
@@ -396,29 +472,6 @@
                 left: 90%;
                 animation-delay: 2s;
             }
-
-            @media (max-width: 768px) {
-                body {
-                    padding: 32px 16px;
-                }
-
-                h1 {
-                    font-size: 36px;
-                }
-
-                .subtitle {
-                    font-size: 16px;
-                }
-
-                .editor-card {
-                    padding: 28px;
-                }
-
-                .logo {
-                    width: 80px;
-                    height: 80px;
-                }
-            }
         </style>
     </head>
     <body>
@@ -435,212 +488,82 @@
             <div class="header">
                 <div class="logo-container">
                     <a href="https://infinitysmp.github.io/" class="logo">
-                        <img src="../logo.png" alt="Infinity SMP" />
+                        <img src="logo.png" alt="Infinity SMP" />
                     </a>
                 </div>
-                <h1>Addon Editor</h1>
-                <p class="subtitle">
-                    Edit the metadata and icon of your Minecraft .mcpack or .mcaddon files locally in your browser.
-                </p>
+                <h1>Infinity SMP</h1>
+                <p class="subtitle">Welcome to the Infinity SMP staff portal. Choose an option below to get started.</p>
             </div>
 
-            <div class="editor-card">
-                <div class="form-group">
-                    <label for="filepicker">Select .mcpack / .mcaddon</label>
-                    <input type="file" id="filepicker" accept=".mcpack,.mcaddon" />
-                </div>
+            <div class="cards-grid">
+                <a href="https://discord.gg/3FbYYN4cQS" class="card">
+                    <div class="card-icon card-icon-image">
+                        <img
+                            src="https://static.vecteezy.com/system/resources/previews/006/892/625/non_2x/discord-logo-icon-editorial-free-vector.jpg"
+                            alt="Community" />
+                    </div>
+                    <h2 class="card-title">Discord Server</h2>
+                    <p class="card-description">
+                        Hang out with our members! Get perks and giveaways, and have fun in public voicechat channels
+                        and text channels!
+                    </p>
+                    <span class="card-link"> Join community (11/10 agree with us)<span class="arrow">→</span> </span>
+                </a>
 
-                <div class="form-group">
-                    <label for="packName">Pack Name</label>
-                    <input type="text" id="packName" placeholder="Enter pack name..." />
-                </div>
+                <a href="https://infinitysmp.github.io/staffapplication/" class="card">
+                    <div class="card-icon">📝</div>
+                    <h2 class="card-title">Apply for Staff</h2>
+                    <p class="card-description">
+                        Join our team! Fill out a staff application to become part of the Infinity SMP staff team.
+                    </p>
+                    <span class="card-link">
+                        Get Started
+                        <span class="arrow">→</span>
+                    </span>
+                </a>
 
-                <div class="form-group">
-                    <label for="packDesc">Description</label>
-                    <textarea id="packDesc" rows="3" placeholder="Enter pack description..."></textarea>
-                </div>
+                <a href="https://infinitysmp.github.io/staffstatus/" class="card">
+                    <div class="card-icon">🔍</div>
+                    <h2 class="card-title">Check Application Status</h2>
+                    <p class="card-description">
+                        Already applied? Check the status of your application and see if you've been accepted or
+                        rejected.
+                    </p>
+                    <span class="card-link">
+                        View Status
+                        <span class="arrow">→</span>
+                    </span>
+                </a>
 
-                <div class="form-group">
-                    <label for="packAuthors">Authors (comma separated)</label>
-                    <input type="text" id="packAuthors" placeholder="Author1, Author2, Author3..." />
-                </div>
-
-                <div class="form-group">
-                    <label for="iconpicker">Pack Icon PNG (optional - updates BP & RP for .mcaddon)</label>
-                    <input type="file" id="iconpicker" accept="image/png" />
-                </div>
-
-                <button id="saveBtn">Save & Download Updated Pack</button>
-            </div>
-
-            <div class="footer">
-                <p class="footer-text">
-                    Made with ❤️ for the Infinity SMP community •
-                    <a href="https://infinitysmp.github.io/">Back to Home</a>
-                </p>
+                <a href="https://www.reddit.com/r/InfinitySmpEdu/" class="card">
+                    <div class="card-icon card-icon-image">
+                        <img
+                            src="https://cdn.brandfetch.io/idkKwm0IT0/w/400/h/400/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1768324678544"
+                            alt="Community" />
+                    </div>
+                    <h2 class="card-title">Reddit</h2>
+                    <p class="card-description">Join our public reddit to look at updates and changelog features!</p>
+                    <span class="card-link"> Join reddit community<span class="arrow">→</span> </span>
+                </a>
+                <a href="https://infinitysmp.github.io/addoneditor/" class="card">
+                    <div class="card-icon card-icon-image">
+                        <img src="https://infinitysmp.github.io/addon.png" alt="Community" />
+                    </div>
+                    <h2 class="card-title">Addon Editor</h2>
+                    <p class="card-description">
+                        Edit .mcpacks and .mcaddons so people cannot see what mods you have in their cached data!
+                    </p>
+                    <span class="card-link"><span class="arrow">Edit now! →</span> </span>
+                </a>
+                <a href="https://infinitysmp.github.io/status/" class="card">
+                    <div class="card-icon card-icon-image">
+                        <img src="https://infinitysmp.github.io/status.png" alt="Community" />
+                    </div>
+                    <h2 class="card-title">Status Page</h2>
+                    <p class="card-description">View the uptime and status of the SMP, server computer and more!</p>
+                    <span class="card-link"> Check Now!<span class="arrow">→</span> </span>
+                </a>
             </div>
         </div>
-
-        <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
-
-        <script>
-            let currentZip, manifestPath;
-
-            document.getElementById("filepicker").addEventListener("change", async (e) => {
-                let file = e.target.files[0];
-                if (!file) return;
-
-                try {
-                    let data = await file.arrayBuffer();
-                    currentZip = await JSZip.loadAsync(data);
-
-                    // find manifest.json - search all files
-                    const files = Object.keys(currentZip.files);
-                    console.log("Files in pack:", files);
-
-                    manifestPath = files.find(
-                        (p) => p.toLowerCase().endsWith("manifest.json") && !currentZip.files[p].dir
-                    );
-
-                    if (!manifestPath) {
-                        alert("manifest.json not found in the pack. Files found: " + files.join(", "));
-                        return;
-                    }
-
-                    console.log("Found manifest at:", manifestPath);
-                    let manifestText = await currentZip.file(manifestPath).async("string");
-                    let manifest = JSON.parse(manifestText);
-
-                    console.log("Manifest:", manifest);
-
-                    document.getElementById("packName").value = manifest.header?.name || "";
-                    document.getElementById("packDesc").value = manifest.header?.description || "";
-
-                    // Handle both 'authors' array and old format
-                    let authorsList = manifest.header?.authors || manifest.metadata?.authors || [];
-                    document.getElementById("packAuthors").value = authorsList.join(", ");
-
-                    alert("Pack loaded successfully!");
-                } catch (error) {
-                    console.error("Error loading pack:", error);
-                    alert("Error loading pack: " + error.message);
-                }
-            });
-
-            document.getElementById("saveBtn").addEventListener("click", async () => {
-                if (!currentZip || !manifestPath) {
-                    alert("Please load a pack first by selecting a .mcpack or .mcaddon file");
-                    return;
-                }
-
-                try {
-                    let name = document.getElementById("packName").value;
-                    let desc = document.getElementById("packDesc").value;
-                    let authorsText = document.getElementById("packAuthors").value;
-                    let authors = authorsText
-                        .split(",")
-                        .map((a) => a.trim())
-                        .filter((a) => a);
-
-                    // load and update manifest
-                    let manifestText = await currentZip.file(manifestPath).async("string");
-                    let manifest = JSON.parse(manifestText);
-
-                    manifest.header.name = name;
-                    manifest.header.description = desc;
-
-                    // Update authors in header or metadata depending on structure
-                    if (manifest.header.authors !== undefined) {
-                        manifest.header.authors = authors;
-                    }
-                    if (manifest.metadata?.authors !== undefined) {
-                        manifest.metadata.authors = authors;
-                    }
-
-                    if (manifest.modules) {
-                        manifest.modules.forEach((m) => {
-                            m.description = desc;
-                        });
-                    }
-
-                    currentZip.file(manifestPath, JSON.stringify(manifest, null, 2));
-
-                    // icon
-                    let iconFile = document.getElementById("iconpicker").files[0];
-                    if (iconFile) {
-                        let iconData = await iconFile.arrayBuffer();
-                        let originalFileName = document.getElementById("filepicker").files[0].name;
-                        let isMcaddon = originalFileName.toLowerCase().endsWith(".mcaddon");
-
-                        if (isMcaddon) {
-                            // For .mcaddon files, update pack_icon.png in both BP and RP folders
-                            let allFiles = Object.keys(currentZip.files);
-                            let iconPaths = allFiles.filter((p) => p.toLowerCase().endsWith("pack_icon.png"));
-
-                            if (iconPaths.length > 0) {
-                                // Update all existing pack_icon.png files
-                                iconPaths.forEach((path) => {
-                                    currentZip.file(path, iconData);
-                                });
-                            } else {
-                                // If no icons exist, try to find BP and RP folders
-                                let bpFolder = allFiles.find(
-                                    (p) => p.toLowerCase().includes("bp/") || p.toLowerCase().includes("behavior")
-                                );
-                                let rpFolder = allFiles.find(
-                                    (p) => p.toLowerCase().includes("rp/") || p.toLowerCase().includes("resource")
-                                );
-
-                                if (bpFolder) {
-                                    let bpDir = bpFolder.substring(0, bpFolder.indexOf("/") + 1);
-                                    currentZip.file(bpDir + "pack_icon.png", iconData);
-                                }
-                                if (rpFolder) {
-                                    let rpDir = rpFolder.substring(0, rpFolder.indexOf("/") + 1);
-                                    currentZip.file(rpDir + "pack_icon.png", iconData);
-                                }
-                            }
-                        } else {
-                            // For .mcpack files, single pack_icon.png
-                            let iconPath = Object.keys(currentZip.files).find((p) =>
-                                p.toLowerCase().endsWith("pack_icon.png")
-                            );
-                            if (!iconPath) {
-                                // Use the same directory as manifest
-                                let manifestDir = manifestPath.substring(0, manifestPath.lastIndexOf("/") + 1);
-                                iconPath = manifestDir + "pack_icon.png";
-                            }
-                            currentZip.file(iconPath, iconData);
-                        }
-                    }
-
-                    // generate new file
-                    let content = await currentZip.generateAsync({ type: "blob" });
-
-                    let originalName = document.getElementById("filepicker").files[0].name;
-                    let baseName = originalName.substring(0, originalName.lastIndexOf(".")) || "edited_pack";
-                    let newName = prompt("Save file name (without extension)", baseName + "_edited");
-                    if (!newName) return;
-
-                    let ext = filenameExtension(originalName);
-                    let downloadName = newName + "." + ext;
-
-                    let link = document.createElement("a");
-                    link.href = URL.createObjectURL(content);
-                    link.download = downloadName;
-                    link.click();
-
-                    alert("Pack saved successfully!");
-                } catch (error) {
-                    console.error("Error saving pack:", error);
-                    alert("Error saving pack: " + error.message);
-                }
-            });
-
-            function filenameExtension(name) {
-                let idx = name.lastIndexOf(".");
-                return idx >= 0 ? name.substring(idx + 1) : "";
-            }
-        </script>
     </body>
 </html>
