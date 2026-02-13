@@ -3,13 +3,13 @@
     <head>
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://infinitysmp.github.io/" />
-        <meta property="og:title" content="Infinity | Home" />
-        <meta property="og:description" content="Apply for staff, go to our discord view uptime status + more!" />
+        <meta property="og:title" content="Infinity | 404 Not Found" />
+        <meta property="og:description" content="Page not found - Infinity SMP" />
         <meta property="og:image" content="https://infinitysmp.github.io/logo.png" />
         <meta charset="utf-8" />
         <meta http-equiv="X-UA-Compatible" content="ie=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Infinity | Home</title>
+        <title>Infinity | 404 Not Found</title>
         <link rel="icon" type="image/png" href="logo.png" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -110,7 +110,7 @@
 
             .container {
                 width: 100%;
-                max-width: 1200px;
+                max-width: 800px;
                 animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
                 position: relative;
                 z-index: 1;
@@ -127,9 +127,8 @@
                 }
             }
 
-            .header {
+            .error-content {
                 text-align: center;
-                margin-bottom: 64px;
             }
 
             .logo-container {
@@ -166,8 +165,8 @@
                 object-fit: cover;
             }
 
-            h1 {
-                font-size: 56px;
+            .error-code {
+                font-size: 120px;
                 font-weight: 700;
                 letter-spacing: -0.03em;
                 margin-bottom: 16px;
@@ -175,17 +174,49 @@
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
                 background-clip: text;
-                animation: fadeIn 0.6s ease-out 0.2s backwards;
+                animation:
+                    fadeIn 0.6s ease-out 0.2s backwards,
+                    glitch 3s ease-in-out infinite;
+                line-height: 1;
             }
 
-            .subtitle {
+            @keyframes glitch {
+                0%,
+                90%,
+                100% {
+                    transform: translate(0);
+                }
+                92% {
+                    transform: translate(-2px, 2px);
+                }
+                94% {
+                    transform: translate(2px, -2px);
+                }
+                96% {
+                    transform: translate(-2px, -2px);
+                }
+                98% {
+                    transform: translate(2px, 2px);
+                }
+            }
+
+            .error-title {
+                font-size: 42px;
+                font-weight: 600;
+                color: var(--text-primary);
+                margin-bottom: 16px;
+                letter-spacing: -0.02em;
+                animation: fadeIn 0.6s ease-out 0.3s backwards;
+            }
+
+            .error-message {
                 font-size: 21px;
                 color: var(--text-secondary);
                 font-weight: 400;
-                max-width: 700px;
-                margin: 0 auto;
+                max-width: 600px;
+                margin: 0 auto 48px;
                 line-height: 1.6;
-                animation: fadeIn 0.6s ease-out 0.3s backwards;
+                animation: fadeIn 0.6s ease-out 0.4s backwards;
             }
 
             @keyframes fadeIn {
@@ -199,152 +230,65 @@
                 }
             }
 
-            .cards-grid {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-                gap: 24px;
-                max-width: 1000px;
-                margin: 0 auto;
+            .action-buttons {
+                display: flex;
+                gap: 16px;
+                justify-content: center;
+                flex-wrap: wrap;
+                animation: fadeIn 0.6s ease-out 0.5s backwards;
             }
 
-            .card {
+            .btn {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                padding: 16px 32px;
                 background: var(--bg-secondary);
-                border-radius: var(--radius-lg);
-                padding: 40px;
-                box-shadow: var(--shadow-md);
                 border: 1px solid var(--border);
+                border-radius: var(--radius-md);
+                color: var(--text-primary);
+                text-decoration: none;
+                font-size: 16px;
+                font-weight: 500;
+                box-shadow: var(--shadow-md);
                 transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
                 cursor: pointer;
                 position: relative;
                 overflow: hidden;
-                text-decoration: none;
-                color: inherit;
-                display: block;
             }
 
-            .card::before {
+            .btn::before {
                 content: "";
                 position: absolute;
                 top: 0;
                 left: 0;
                 right: 0;
-                height: 4px;
+                height: 3px;
                 background: linear-gradient(90deg, var(--accent), var(--accent-hover));
                 transform: scaleX(0);
                 transform-origin: left;
                 transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             }
 
-            .card:hover::before {
+            .btn:hover::before {
                 transform: scaleX(1);
             }
 
-            .card::after {
-                content: "";
-                position: absolute;
-                inset: -1px;
-                border-radius: var(--radius-lg);
-                padding: 1px;
-                background: linear-gradient(135deg, var(--accent), transparent);
-                -webkit-mask:
-                    linear-gradient(#fff 0 0) content-box,
-                    linear-gradient(#fff 0 0);
-                -webkit-mask-composite: xor;
-                mask-composite: exclude;
-                opacity: 0;
-                transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-                pointer-events: none;
-            }
-
-            .card:hover {
-                transform: translateY(-8px);
+            .btn:hover {
+                transform: translateY(-4px);
                 box-shadow: var(--shadow-lg), var(--shadow-glow);
                 border-color: var(--border-hover);
             }
 
-            .card:hover::after {
-                opacity: 0.5;
-            }
-
-            .card:nth-child(1) {
-                animation: fadeInUp 0.6s ease-out 0.4s backwards;
-            }
-
-            .card:nth-child(2) {
-                animation: fadeInUp 0.6s ease-out 0.5s backwards;
-            }
-
-            .card:nth-child(3) {
-                animation: fadeInUp 0.6s ease-out 0.6s backwards;
-            }
-
-            .card:nth-child(4) {
-                animation: fadeInUp 0.6s ease-out 0.7s backwards;
-            }
-
-            .card-icon {
-                width: 56px;
-                height: 56px;
+            .btn-primary {
                 background: linear-gradient(135deg, var(--accent), var(--accent-hover));
-                border-radius: 14px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 28px;
-                margin-bottom: 24px;
-                box-shadow: 0 4px 16px rgba(33, 150, 243, 0.3);
-                transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+                border-color: var(--accent);
+                color: white;
             }
 
-            .card:hover .card-icon {
-                transform: scale(1.1) rotate(5deg);
-                box-shadow: 0 8px 24px rgba(33, 150, 243, 0.5);
-            }
-
-            .card-icon-image {
-                padding: 0;
-                overflow: hidden;
-                background: none;
-                box-shadow: none;
-            }
-
-            .card:hover .card-icon-image {
-                box-shadow: none;
-            }
-
-            .card-icon-image img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-            }
-
-            .card-title {
-                font-size: 26px;
-                font-weight: 600;
-                color: var(--text-primary);
-                margin-bottom: 12px;
-                letter-spacing: -0.01em;
-            }
-
-            .card-description {
-                font-size: 16px;
-                color: var(--text-secondary);
-                line-height: 1.6;
-                margin-bottom: 24px;
-            }
-
-            .card-link {
-                display: inline-flex;
-                align-items: center;
-                gap: 8px;
-                font-size: 15px;
-                font-weight: 500;
-                color: var(--accent);
-                transition: gap 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            }
-
-            .card:hover .card-link {
-                gap: 12px;
+            .btn-primary::before {
+                background: white;
+                opacity: 0.2;
             }
 
             .arrow {
@@ -352,61 +296,54 @@
                 transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             }
 
-            .card:hover .arrow {
+            .btn:hover .arrow {
                 transform: translateX(4px);
             }
 
-            .footer {
-                text-align: center;
-                margin-top: 80px;
-                padding-top: 32px;
+            .suggestions {
+                margin-top: 64px;
+                padding-top: 48px;
                 border-top: 1px solid var(--border);
-                animation: fadeIn 0.6s ease-out 0.8s backwards;
+                animation: fadeIn 0.6s ease-out 0.6s backwards;
             }
 
-            .footer-text {
-                font-size: 14px;
-                color: var(--text-tertiary);
-                line-height: 1.6;
+            .suggestions-title {
+                font-size: 18px;
+                font-weight: 600;
+                color: var(--text-primary);
+                margin-bottom: 24px;
+                text-align: center;
             }
 
-            .footer-text a {
-                color: var(--accent);
+            .suggestions-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 16px;
+            }
+
+            .suggestion-link {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 16px;
+                background: var(--bg-secondary);
+                border: 1px solid var(--border);
+                border-radius: var(--radius-md);
+                color: var(--text-secondary);
                 text-decoration: none;
-                transition: color 0.2s ease;
+                font-size: 15px;
+                transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             }
 
-            .footer-text a:hover {
-                color: var(--accent-hover);
-                text-decoration: underline;
+            .suggestion-link:hover {
+                transform: translateY(-2px);
+                border-color: var(--accent);
+                color: var(--accent);
+                box-shadow: var(--shadow-md);
             }
 
-            @media (max-width: 768px) {
-                body {
-                    padding: 32px 16px;
-                }
-
-                h1 {
-                    font-size: 40px;
-                }
-
-                .subtitle {
-                    font-size: 18px;
-                }
-
-                .cards-grid {
-                    grid-template-columns: 1fr;
-                    gap: 20px;
-                }
-
-                .card {
-                    padding: 32px;
-                }
-
-                .logo {
-                    width: 80px;
-                    height: 80px;
-                }
+            .suggestion-icon {
+                font-size: 20px;
             }
 
             .particles {
@@ -472,6 +409,42 @@
                 left: 90%;
                 animation-delay: 2s;
             }
+
+            @media (max-width: 768px) {
+                body {
+                    padding: 32px 16px;
+                }
+
+                .error-code {
+                    font-size: 80px;
+                }
+
+                .error-title {
+                    font-size: 32px;
+                }
+
+                .error-message {
+                    font-size: 18px;
+                }
+
+                .logo {
+                    width: 80px;
+                    height: 80px;
+                }
+
+                .action-buttons {
+                    flex-direction: column;
+                }
+
+                .btn {
+                    width: 100%;
+                    justify-content: center;
+                }
+
+                .suggestions-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
         </style>
     </head>
     <body>
@@ -485,85 +458,127 @@
         </div>
 
         <div class="container">
-            <div class="header">
+            <div class="error-content">
                 <div class="logo-container">
                     <a href="https://infinitysmp.github.io/" class="logo">
                         <img src="logo.png" alt="Infinity SMP" />
                     </a>
                 </div>
-                <h1>Infinity SMP</h1>
-                <p class="subtitle">Welcome to the Infinity SMP staff portal. Choose an option below to get started.</p>
-            </div>
 
-            <div class="cards-grid">
-                <a href="https://discord.gg/3FbYYN4cQS" class="card">
-                    <div class="card-icon card-icon-image">
-                        <img
-                            src="https://static.vecteezy.com/system/resources/previews/006/892/625/non_2x/discord-logo-icon-editorial-free-vector.jpg"
-                            alt="Community" />
-                    </div>
-                    <h2 class="card-title">Discord Server</h2>
-                    <p class="card-description">
-                        Hang out with our members! Get perks and giveaways, and have fun in public voicechat channels
-                        and text channels!
-                    </p>
-                    <span class="card-link"> Join community (11/10 agree with us)<span class="arrow">→</span> </span>
-                </a>
+                <div class="error-code">404</div>
+                <h1 class="error-title" id="errorTitle">Page Not Found</h1>
+                <p class="error-message" id="errorMessage">
+                    This page seems to have vanished into the void. Maybe it fell into a nether portal?
+                </p>
 
-                <a href="https://infinitysmp.github.io/staffapplication/" class="card">
-                    <div class="card-icon">📝</div>
-                    <h2 class="card-title">Apply for Staff</h2>
-                    <p class="card-description">
-                        Join our team! Fill out a staff application to become part of the Infinity SMP staff team.
-                    </p>
-                    <span class="card-link">
-                        Get Started
+                <div class="action-buttons">
+                    <a href="https://infinitysmp.github.io/" class="btn btn-primary">
+                        <span>Go Home</span>
                         <span class="arrow">→</span>
-                    </span>
-                </a>
-
-                <a href="https://infinitysmp.github.io/staffstatus/" class="card">
-                    <div class="card-icon">🔍</div>
-                    <h2 class="card-title">Check Application Status</h2>
-                    <p class="card-description">
-                        Already applied? Check the status of your application and see if you've been accepted or
-                        rejected.
-                    </p>
-                    <span class="card-link">
-                        View Status
-                        <span class="arrow">→</span>
-                    </span>
-                </a>
-
-                <a href="https://www.reddit.com/r/InfinitySmpEdu/" class="card">
-                    <div class="card-icon card-icon-image">
-                        <img
-                            src="https://cdn.brandfetch.io/idkKwm0IT0/w/400/h/400/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1768324678544"
-                            alt="Community" />
-                    </div>
-                    <h2 class="card-title">Reddit</h2>
-                    <p class="card-description">Join our public reddit to look at updates and changelog features!</p>
-                    <span class="card-link"> Join reddit community<span class="arrow">→</span> </span>
-                </a>
-                <a href="https://infinitysmp.github.io/addoneditor/" class="card">
-                    <div class="card-icon card-icon-image">
-                        <img src="https://infinitysmp.github.io/addon.png" alt="Community" />
-                    </div>
-                    <h2 class="card-title">Addon Editor</h2>
-                    <p class="card-description">
-                        Edit .mcpacks and .mcaddons so people cannot see what mods you have in their cached data!
-                    </p>
-                    <span class="card-link"><span class="arrow">Edit now! →</span> </span>
-                </a>
-                <a href="https://infinitysmp.github.io/status/" class="card">
-                    <div class="card-icon card-icon-image">
-                        <img src="https://infinitysmp.github.io/status.png" alt="Community" />
-                    </div>
-                    <h2 class="card-title">Status Page</h2>
-                    <p class="card-description">View the uptime and status of the SMP, server computer and more!</p>
-                    <span class="card-link"> Check Now!<span class="arrow">→</span> </span>
-                </a>
+                    </a>
+                </div>
             </div>
         </div>
+
+        <script>
+            // Array of fun 404 messages
+            const errorMessages = [
+                {
+                    title: "Page Not Found",
+                    message: "This page seems to have vanished into the void. Maybe it fell into a nether portal?"
+                },
+                {
+                    title: "Oops! Lost in the Void",
+                    message:
+                        "We searched everywhere, but this page doesn't exist. Even our best staff couldn't find it!"
+                },
+                {
+                    title: "404: Chunk Not Loaded",
+                    message: "Looks like this chunk hasn't been generated yet. Try teleporting back to spawn!"
+                },
+                {
+                    title: "Connection Lost",
+                    message: "The page you're looking for has disconnected from the server. It might have timed out!"
+                },
+                {
+                    title: "Error 404: Page Despawned",
+                    message: "This page was last seen 5 minutes ago and has since despawned. Better luck next time!"
+                },
+                {
+                    title: "Page Missing!",
+                    message: "Someone must have accidentally /clear'd this page. Don't worry, we have backups!"
+                },
+                {
+                    title: "Teleport Failed",
+                    message: "Unable to teleport to requested coordinates. The page might be in a different dimension!"
+                },
+                {
+                    title: "404: Item Not Found",
+                    message: "We checked all the chests, but this page isn't in our inventory. Did you drop it?"
+                },
+                {
+                    title: "Server Error!",
+                    message: "This page got kicked for being AFK. Maybe try refreshing or heading back home?"
+                },
+                {
+                    title: "World Border Reached",
+                    message: "You've reached the edge of the map! This page exists beyond the world border."
+                },
+                {
+                    title: "Page Banned",
+                    message: "Just kidding! This page never existed in the first place. Our bad!"
+                },
+                {
+                    title: "404: Elytra Malfunction",
+                    message: "Your elytra broke mid-flight and you missed the landing zone. Let's get you back home!"
+                },
+                {
+                    title: "Compass Broken",
+                    message: "Your compass is spinning wildly! This page isn't on the map. Time to craft a new one?"
+                },
+                {
+                    title: "Plugin Error",
+                    message: "Looks like a plugin conflict removed this page. We're working on fixing it!"
+                },
+                {
+                    title: "Achievement Failed!",
+                    message:
+                        "You did NOT unlock: 'Find This Page'. Because it doesn't exist. Achievement failed successfully!"
+                },
+                {
+                    title: "Bedrock Reached",
+                    message: "You can't go any deeper than this! This page is beneath bedrock, aka nonexistent."
+                },
+                {
+                    title: "Ender Dragon Ate It",
+                    message: "The Ender Dragon must have destroyed this page during the final battle. RIP."
+                },
+                {
+                    title: "Phantom Attack!",
+                    message: "You haven't slept in 3 days and phantoms took this page. Get some rest!"
+                },
+                {
+                    title: "Creeper Explosion",
+                    message: "A creeper blew up this page. That's rough, buddy. Time to rebuild!"
+                },
+                {
+                    title: "404: Out of Render Distance",
+                    message:
+                        "This page is too far away to load. Try increasing your render distance... or just go home!"
+                }
+            ];
+
+            // Select a random message on page load
+            function loadRandomMessage() {
+                const randomIndex = Math.floor(Math.random() * errorMessages.length);
+                const selectedMessage = errorMessages[randomIndex];
+
+                document.getElementById("errorTitle").textContent = selectedMessage.title;
+                document.getElementById("errorMessage").textContent = selectedMessage.message;
+            }
+
+            // Load random message when page loads
+            loadRandomMessage();
+        </script>
     </body>
 </html>
