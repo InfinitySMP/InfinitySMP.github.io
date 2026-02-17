@@ -466,6 +466,16 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="packUrl">Homepage URL (optional)</label>
+                    <input type="text" id="packUrl" placeholder="https://example.com" />
+                </div>
+
+                <div class="form-group">
+                    <label for="packLicense">License URL (optional)</label>
+                    <input type="text" id="packLicense" placeholder="https://example.com/license" />
+                </div>
+
+                <div class="form-group">
                     <label for="iconpicker">Pack Icon PNG (optional - updates BP & RP for .mcaddon)</label>
                     <input type="file" id="iconpicker" accept="image/png" />
                 </div>
@@ -520,6 +530,10 @@
                     let authorsList = manifest.header?.authors || manifest.metadata?.authors || [];
                     document.getElementById("packAuthors").value = authorsList.join(", ");
 
+                    // Load URL fields
+                    document.getElementById("packUrl").value = manifest.metadata?.url || "";
+                    document.getElementById("packLicense").value = manifest.metadata?.license || "";
+
                     alert("Pack loaded successfully!");
                 } catch (error) {
                     console.error("Error loading pack:", error);
@@ -541,6 +555,8 @@
                         .split(",")
                         .map((a) => a.trim())
                         .filter((a) => a);
+                    let url = document.getElementById("packUrl").value.trim();
+                    let license = document.getElementById("packLicense").value.trim();
 
                     // load and update manifest
                     let manifestText = await currentZip.file(manifestPath).async("string");
@@ -555,6 +571,26 @@
                     }
                     if (manifest.metadata?.authors !== undefined) {
                         manifest.metadata.authors = authors;
+                    }
+
+                    // Ensure metadata object exists
+                    if (!manifest.metadata) {
+                        manifest.metadata = {};
+                    }
+
+                    // Update URL fields - only add if provided
+                    if (url) {
+                        manifest.metadata.url = url;
+                    } else if (manifest.metadata.url !== undefined) {
+                        // Remove if empty and exists
+                        delete manifest.metadata.url;
+                    }
+
+                    if (license) {
+                        manifest.metadata.license = license;
+                    } else if (manifest.metadata.license !== undefined) {
+                        // Remove if empty and exists
+                        delete manifest.metadata.license;
                     }
 
                     if (manifest.modules) {
