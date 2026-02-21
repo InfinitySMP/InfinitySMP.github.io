@@ -5,6 +5,26 @@
         <meta http-equiv="X-UA-Compatible" content="ie=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>Infinity | System Status</title>
+
+        <!-- Open Graph / Discord / Slack embed meta tags -->
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://infinitysmp.github.io/status/" />
+        <meta property="og:site_name" content="Infinity SMP" />
+        <meta property="og:title" content="Infinity SMP — System Status" id="og-title" />
+        <meta property="og:description" content="🔄 Checking system status..." id="og-description" />
+        <meta property="og:image" content="https://infinitysmp.github.io/logo.png" />
+        <meta property="og:image:width" content="512" />
+        <meta property="og:image:height" content="512" />
+
+        <!-- Twitter Card meta tags -->
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content="Infinity SMP — System Status" id="tw-title" />
+        <meta name="twitter:description" content="🔄 Checking system status..." id="tw-description" />
+        <meta name="twitter:image" content="https://infinitysmp.github.io/logo.png" />
+
+        <!-- Generic description meta -->
+        <meta name="description" content="Infinity SMP system status page." id="meta-description" />
+
         <link rel="icon" type="image/png" href="../logo.png" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -746,6 +766,74 @@
             const app = initializeApp(firebaseConfig);
             const database = getDatabase(app);
 
+            // Tracks current statuses for meta tag generation
+            const currentStatuses = {
+                server: "checking",
+                hosting: "checking",
+                firebase: "checking",
+                cloudinary: "checking"
+            };
+
+            // Emoji map for statuses
+            const statusEmoji = {
+                operational: "🟢",
+                degraded: "🟡",
+                down: "🔴",
+                checking: "⚪"
+            };
+
+            const statusLabel = {
+                operational: "Operational",
+                degraded: "Degraded",
+                down: "Down",
+                checking: "Checking..."
+            };
+
+            /**
+             * Updates the Open Graph / Twitter / description meta tags.
+             * Called every time status data changes.
+             */
+            function updateMetaTags(updatedAt) {
+                const serverSt = currentStatuses.server;
+                const hostingSt = currentStatuses.hosting;
+
+                // Build the two-line status summary shown in embeds
+                const descLines = [
+                    `🖥 Server Computer: ${statusEmoji[serverSt]} ${statusLabel[serverSt]}`,
+                    `🎮 Hosting Server: ${statusEmoji[hostingSt]} ${statusLabel[hostingSt]}`
+                ];
+
+                // Add an "updated" line if we have a real timestamp
+                if (updatedAt) {
+                    descLines.push(`⏱ Updated: ${updatedAt}`);
+                }
+
+                const description = descLines.join("  |  ");
+
+                // Determine overall title line
+                const allOp = serverSt === "operational" && hostingSt === "operational";
+                const anyDown = serverSt === "down" || hostingSt === "down";
+                const overallLabel = allOp
+                    ? "✅ All Systems Operational"
+                    : anyDown
+                      ? "🔴 Systems Down"
+                      : "🟡 Systems Degraded";
+                const title = `Infinity SMP — Status: ${overallLabel}`;
+
+                // Apply to all relevant meta tags
+                const setMeta = (id, value) => {
+                    const el = document.getElementById(id);
+                    if (el) el.setAttribute("content", value);
+                };
+
+                document.title = title;
+                setMeta("og-title", title);
+                setMeta("og-description", description);
+                setMeta("tw-title", title);
+                setMeta("tw-description", description);
+                setMeta("meta-description", description);
+            }
+
             function updateStatus(service, status, metrics = {}) {
                 const statusBadge = document.getElementById(`${service}Status`);
                 const reasonContainer = document.getElementById(`${service}ReasonContainer`);
@@ -755,6 +843,9 @@
                     <div class="status-indicator ${status}"></div>
                     ${status === "operational" ? "Operational" : status === "degraded" ? "Degraded" : status === "down" ? "Down" : "Checking..."}
                 `;
+
+                // Track for meta tag updates
+                currentStatuses[service] = status;
 
                 // Display reason if service is degraded or down
                 if ((status === "degraded" || status === "down") && metrics.reason) {
@@ -813,13 +904,15 @@
 
             function updateLastUpdated() {
                 const now = new Date();
-                document.getElementById("lastUpdated").textContent =
-                    `Last updated: ${now.toLocaleTimeString()} on ${now.toLocaleDateString()}`;
+                const timeStr = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+                const dateStr = now.toLocaleDateString([], { day: "numeric", month: "short", year: "numeric" });
+                const fullStr = `${timeStr} on ${dateStr}`;
+                document.getElementById("lastUpdated").textContent = `Last updated: ${fullStr}`;
+                return fullStr;
             }
 
             function processStatusData(data) {
                 if (data) {
-                    // Update all services based on Firebase data
                     updateStatus("server", data.serverStatus || "operational", {
                         response: data.serverResponse || "<100",
                         reason: data.serverReason
@@ -844,7 +937,11 @@
                 } else {
                     setDefaultStatuses();
                 }
-                updateLastUpdated();
+
+                const updatedAtStr = updateLastUpdated();
+
+                // Update meta tags with the latest statuses and timestamp
+                updateMetaTags(updatedAtStr);
             }
 
             function setDefaultStatuses() {
@@ -855,21 +952,10 @@
                     cloudinaryStatus: "operational"
                 };
 
-                updateStatus("server", "operational", {
-                    response: "<100"
-                });
-
-                updateStatus("hosting", "operational", {
-                    response: "<50"
-                });
-
-                updateStatus("firebase", "operational", {
-                    response: "<150"
-                });
-
-                updateStatus("cloudinary", "operational", {
-                    response: "<200"
-                });
+                updateStatus("server", "operational", { response: "<100" });
+                updateStatus("hosting", "operational", { response: "<50" });
+                updateStatus("firebase", "operational", { response: "<150" });
+                updateStatus("cloudinary", "operational", { response: "<200" });
 
                 updateOverallStatus(defaultData);
             }
@@ -886,7 +972,8 @@
                         response: "--",
                         reason: "Unable to connect to Firebase"
                     });
-                    updateLastUpdated();
+                    const updatedAtStr = updateLastUpdated();
+                    updateMetaTags(updatedAtStr);
                 }
             };
 
@@ -903,7 +990,8 @@
                         response: "--",
                         reason: "Unable to connect to Firebase"
                     });
-                    updateLastUpdated();
+                    const updatedAtStr = updateLastUpdated();
+                    updateMetaTags(updatedAtStr);
                 }
             );
 
