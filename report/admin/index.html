@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Infinity SMP | Admin Issue</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/png" href="https://infinitysmp.github.io/recall-images/logo.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=SF+Pro+Display:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        html { overflow-x:hidden; overflow-y:auto; }
+        body::-webkit-scrollbar, html::-webkit-scrollbar { display:none; }
+        body, html { -ms-overflow-style:none; scrollbar-width:none; }
+
+        :root {
+            --bg-primary:#0a1929; --bg-secondary:#0d2137; --bg-tertiary:#132f4c;
+            --text-primary:#e3f2fd; --text-secondary:#90caf9; --text-tertiary:#64b5f6;
+            --accent:#2196f3; --accent-hover:#42a5f5;
+            --border:rgba(33,150,243,0.15); --border-hover:rgba(33,150,243,0.3);
+            --shadow-md:0 4px 20px rgba(33,150,243,0.15);
+            --shadow-lg:0 12px 48px rgba(33,150,243,0.25);
+            --shadow-glow:0 0 40px rgba(33,150,243,0.2);
+            --radius-sm:10px; --radius-md:14px; --radius-lg:20px;
+            --green:#4caf50; --orange:#ff9800; --red:#f44336;
+        }
+
+        body { font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,sans-serif; background:var(--bg-primary); color:var(--text-primary); min-height:100vh; padding:40px 20px; line-height:1.5; -webkit-font-smoothing:antialiased; position:relative; max-width:100vw; }
+        body::before { content:""; position:fixed; top:-50%; left:-50%; width:200%; height:200%; background:radial-gradient(circle at 30% 50%,rgba(33,150,243,0.1) 0%,transparent 50%),radial-gradient(circle at 70% 50%,rgba(33,150,243,0.05) 0%,transparent 50%); animation:floatBg 20s ease-in-out infinite; pointer-events:none; }
+
+        @keyframes floatBg { 0%,100%{transform:translate(0,0) rotate(0deg)} 33%{transform:translate(30px,-30px) rotate(5deg)} 66%{transform:translate(-20px,20px) rotate(-5deg)} }
+        @keyframes fadeInUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes fadeIn   { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes spin     { to{transform:rotate(360deg)} }
+        @keyframes shake    { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-6px)} 80%{transform:translateX(6px)} }
+        @keyframes slideIn  { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes pulseDot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+
+        /* ── Lock ── */
+        #lockScreen { position:fixed; inset:0; background:var(--bg-primary); z-index:200; display:flex; align-items:center; justify-content:center; padding:20px; transition:opacity 0.4s ease; }
+        #lockScreen.hidden { opacity:0; pointer-events:none; }
+        .lock-card { background:var(--bg-secondary); border:1px solid var(--border); border-radius:var(--radius-lg); padding:48px 40px; max-width:400px; width:100%; text-align:center; box-shadow:var(--shadow-lg); position:relative; overflow:hidden; animation:fadeInUp 0.6s cubic-bezier(0.16,1,0.3,1); }
+        .lock-card::before { content:""; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--accent),var(--accent-hover)); }
+        .lock-icon { font-size:48px; margin-bottom:20px; display:block; }
+        .lock-title { font-size:24px; font-weight:700; margin-bottom:8px; background:linear-gradient(135deg,var(--text-primary) 0%,var(--accent) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .lock-subtitle { font-size:14px; color:var(--text-secondary); margin-bottom:32px; }
+        .lock-input { width:100%; background:var(--bg-primary); border:1px solid var(--border); border-radius:var(--radius-sm); padding:14px 16px; color:var(--text-primary); font-size:24px; font-family:"JetBrains Mono",monospace; text-align:center; letter-spacing:0.3em; outline:none; transition:all 0.3s ease; margin-bottom:8px; }
+        .lock-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(33,150,243,0.12); }
+        .lock-input.error { border-color:rgba(244,67,54,0.5); animation:shake 0.4s ease; }
+        .lock-error { font-size:13px; color:var(--red); margin-bottom:16px; min-height:20px; }
+        .lock-btn { width:100%; background:linear-gradient(135deg,var(--accent),var(--accent-hover)); color:white; border:none; padding:14px 24px; border-radius:var(--radius-md); font-size:15px; font-weight:600; cursor:pointer; transition:all 0.3s ease; box-shadow:0 4px 16px rgba(33,150,243,0.3); }
+        .lock-btn:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(33,150,243,0.5); }
+
+        /* ── Main ── */
+        .container { width:100%; max-width:1000px; margin:0 auto; animation:fadeInUp 0.8s cubic-bezier(0.16,1,0.3,1); position:relative; z-index:1; }
+        .header { text-align:center; margin-bottom:40px; }
+        .logo-container { margin-bottom:28px; }
+        .logo { width:96px; height:96px; margin:0 auto; border-radius:24px; display:flex; align-items:center; justify-content:center; overflow:hidden; box-shadow:var(--shadow-glow),var(--shadow-lg); background:var(--bg-secondary); border:2px solid var(--border); transition:all 0.4s cubic-bezier(0.16,1,0.3,1); text-decoration:none; }
+        .logo:hover { transform:scale(1.05) translateY(-5px); border-color:var(--accent); }
+        .logo img { width:100%; height:100%; object-fit:cover; }
+        .header-row { display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:16px; flex-wrap:wrap; }
+        .admin-badge { display:inline-flex; align-items:center; gap:6px; padding:4px 12px; background:rgba(33,150,243,0.1); border:1px solid var(--border); border-radius:20px; font-size:12px; font-weight:600; color:var(--text-tertiary); font-family:"JetBrains Mono",monospace; text-transform:uppercase; letter-spacing:0.04em; }
+        .signout-link { display:inline-flex; align-items:center; gap:6px; color:var(--text-tertiary); font-size:13px; cursor:pointer; border:none; background:none; font-family:inherit; transition:color 0.2s; }
+        .signout-link:hover { color:var(--red); }
+        .back-link { display:inline-flex; align-items:center; gap:8px; color:var(--text-secondary); text-decoration:none; font-size:14px; margin-bottom:20px; transition:all 0.3s ease; font-weight:500; }
+        .back-link:hover { color:var(--accent); }
+        h1 { font-size:48px; font-weight:700; letter-spacing:-0.03em; margin-bottom:12px; background:linear-gradient(135deg,var(--text-primary) 0%,var(--accent) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .header-subtitle { font-size:16px; color:var(--text-secondary); }
+
+        /* ── Stats ── */
+        .stats-bar { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:28px; }
+        .stat-card { background:var(--bg-secondary); border:1px solid var(--border); border-radius:var(--radius-md); padding:20px; text-align:center; transition:all 0.3s ease; }
+        .stat-card:hover { border-color:var(--border-hover); transform:translateY(-2px); box-shadow:var(--shadow-md); }
+        .stat-value { font-size:30px; font-weight:700; font-family:"JetBrains Mono",monospace; }
+        .stat-label { font-size:11px; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:0.08em; font-weight:600; margin-top:4px; }
+        .stat-card.s-issue .stat-value  { color:var(--red); }
+        .stat-card.s-known .stat-value  { color:var(--orange); }
+        .stat-card.s-fixing .stat-value { color:var(--accent); }
+        .stat-card.s-fixed .stat-value  { color:var(--green); }
+
+        /* ── Controls ── */
+        .controls { display:flex; gap:12px; margin-bottom:16px; flex-wrap:wrap; align-items:center; }
+        .search-input { flex:1; min-width:220px; background:var(--bg-secondary); border:1px solid var(--border); border-radius:var(--radius-sm); padding:10px 14px; color:var(--text-primary); font-size:14px; font-family:inherit; outline:none; transition:all 0.3s ease; }
+        .search-input::placeholder { color:rgba(100,181,246,0.35); }
+        .search-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(33,150,243,0.12); }
+        .ctrl-btn { background:var(--bg-secondary); border:1px solid var(--border); color:var(--text-secondary); padding:10px 18px; border-radius:var(--radius-sm); font-size:14px; font-weight:500; cursor:pointer; transition:all 0.3s ease; white-space:nowrap; }
+        .ctrl-btn:hover { border-color:var(--border-hover); color:var(--text-primary); background:var(--bg-tertiary); }
+        .ctrl-btn.danger { border-color:rgba(244,67,54,0.3); color:var(--red); }
+        .ctrl-btn.danger:hover { background:rgba(244,67,54,0.1); border-color:rgba(244,67,54,0.5); }
+
+        .filter-chips { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:24px; }
+        .filter-chip { padding:6px 16px; border-radius:20px; background:var(--bg-secondary); border:1px solid var(--border); color:var(--text-secondary); font-size:13px; font-weight:600; cursor:pointer; transition:all 0.2s ease; white-space:nowrap; }
+        .filter-chip:hover { border-color:var(--border-hover); color:var(--text-primary); }
+        .filter-chip.active { background:rgba(33,150,243,0.12); border-color:var(--accent); color:var(--accent); }
+        .filter-chip.active.fi { background:rgba(244,67,54,0.1);  border-color:rgba(244,67,54,0.4);  color:var(--red); }
+        .filter-chip.active.fk { background:rgba(255,152,0,0.1);  border-color:rgba(255,152,0,0.4);  color:var(--orange); }
+        .filter-chip.active.fx { background:rgba(33,150,243,0.1); border-color:rgba(33,150,243,0.4); color:var(--accent); }
+        .filter-chip.active.fd { background:rgba(76,175,80,0.1);  border-color:rgba(76,175,80,0.4);  color:var(--green); }
+
+        /* ── Issue Admin Cards ── */
+        .issue-list { display:grid; gap:16px; }
+        .admin-issue-card { background:var(--bg-secondary); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden; transition:all 0.3s ease; animation:slideIn 0.35s ease-out backwards; position:relative; }
+        .admin-issue-card::before { content:""; position:absolute; top:0; left:0; bottom:0; width:4px; }
+        .admin-issue-card.status-issue::before  { background:var(--red); }
+        .admin-issue-card.status-known::before  { background:var(--orange); }
+        .admin-issue-card.status-fixing::before { background:var(--accent); }
+        .admin-issue-card.status-fixed::before  { background:var(--green); }
+        .admin-issue-card:hover { border-color:var(--border-hover); box-shadow:var(--shadow-md); }
+
+        .card-main { padding:20px 22px 18px 26px; }
+        .card-top { display:flex; align-items:flex-start; gap:14px; margin-bottom:12px; }
+        .card-info { flex:1; min-width:0; }
+        .card-title { font-size:16px; font-weight:600; color:var(--text-primary); margin-bottom:4px; line-height:1.4; }
+        .card-desc { font-size:13px; color:var(--text-secondary); overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; line-height:1.5; }
+        .card-meta { display:flex; align-items:center; gap:12px; font-size:12px; color:var(--text-tertiary); font-family:"JetBrains Mono",monospace; flex-wrap:wrap; margin-bottom:14px; }
+        .card-badges { display:flex; gap:8px; flex-shrink:0; }
+        .status-badge { display:inline-flex; align-items:center; gap:5px; padding:4px 11px; border-radius:20px; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; white-space:nowrap; }
+        .status-badge.issue  { background:rgba(244,67,54,0.12);  border:1px solid rgba(244,67,54,0.3);  color:var(--red); }
+        .status-badge.known  { background:rgba(255,152,0,0.12);  border:1px solid rgba(255,152,0,0.3);  color:var(--orange); }
+        .status-badge.fixing { background:rgba(33,150,243,0.12); border:1px solid rgba(33,150,243,0.3); color:var(--accent); }
+        .status-badge.fixed  { background:rgba(76,175,80,0.12);  border:1px solid rgba(76,175,80,0.3);  color:var(--green); }
+        .has-video-badge { display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border-radius:20px; background:rgba(156,39,176,0.12); border:1px solid rgba(156,39,176,0.3); color:#ce93d8; font-size:12px; font-weight:600; }
+
+        /* Status action buttons */
+        .card-actions { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+        .status-action-label { font-size:11px; color:var(--text-tertiary); font-family:"JetBrains Mono",monospace; text-transform:uppercase; letter-spacing:0.06em; margin-right:4px; flex-shrink:0; }
+        .status-btn { padding:7px 14px; border-radius:20px; font-size:12px; font-weight:700; cursor:pointer; transition:all 0.25s ease; border:1px solid; letter-spacing:0.02em; }
+        .status-btn:hover { transform:translateY(-1px); }
+        .status-btn.active { transform:translateY(0); cursor:default; }
+        .status-btn.sb-issue  { background:rgba(244,67,54,0.08);  border-color:rgba(244,67,54,0.25);  color:rgba(244,67,54,0.6); }
+        .status-btn.sb-issue:hover  { background:rgba(244,67,54,0.15);  border-color:rgba(244,67,54,0.5);  color:var(--red); }
+        .status-btn.sb-issue.active { background:rgba(244,67,54,0.18);  border-color:var(--red);  color:var(--red); }
+        .status-btn.sb-known  { background:rgba(255,152,0,0.08);  border-color:rgba(255,152,0,0.25);  color:rgba(255,152,0,0.6); }
+        .status-btn.sb-known:hover  { background:rgba(255,152,0,0.15);  border-color:rgba(255,152,0,0.5);  color:var(--orange); }
+        .status-btn.sb-known.active { background:rgba(255,152,0,0.18);  border-color:var(--orange);  color:var(--orange); }
+        .status-btn.sb-fixing  { background:rgba(33,150,243,0.08);  border-color:rgba(33,150,243,0.25);  color:rgba(33,150,243,0.6); }
+        .status-btn.sb-fixing:hover  { background:rgba(33,150,243,0.15);  border-color:rgba(33,150,243,0.5);  color:var(--accent); }
+        .status-btn.sb-fixing.active { background:rgba(33,150,243,0.18);  border-color:var(--accent);  color:var(--accent); }
+        .status-btn.sb-fixed  { background:rgba(76,175,80,0.08);  border-color:rgba(76,175,80,0.25);  color:rgba(76,175,80,0.6); }
+        .status-btn.sb-fixed:hover  { background:rgba(76,175,80,0.15);  border-color:rgba(76,175,80,0.5);  color:var(--green); }
+        .status-btn.sb-fixed.active { background:rgba(76,175,80,0.18);  border-color:var(--green);  color:var(--green); }
+
+        .card-footer { border-top:1px solid var(--border); padding:14px 22px 14px 26px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; }
+        .card-counts { display:flex; align-items:center; gap:14px; font-size:12px; font-family:"JetBrains Mono",monospace; color:var(--text-tertiary); }
+        .count-pill { display:inline-flex; align-items:center; gap:5px; }
+        .count-pill.orange { color:var(--orange); }
+        .count-pill.blue   { color:var(--text-tertiary); }
+
+        .delete-btn { background:none; border:1px solid transparent; color:rgba(244,67,54,0.35); font-size:14px; cursor:pointer; padding:6px 12px; border-radius:var(--radius-sm); transition:all 0.2s; display:flex; align-items:center; gap:5px; font-size:13px; }
+        .delete-btn:hover { color:var(--red); background:rgba(244,67,54,0.1); border-color:rgba(244,67,54,0.3); }
+
+        /* Expand description */
+        .expand-btn { background:none; border:none; color:var(--text-tertiary); font-size:12px; cursor:pointer; padding:4px 0; transition:color 0.2s; display:inline-flex; align-items:center; gap:4px; }
+        .expand-btn:hover { color:var(--text-secondary); }
+        .full-desc { display:none; font-size:13px; color:var(--text-secondary); line-height:1.7; padding:10px 14px; background:var(--bg-primary); border-radius:var(--radius-sm); border-left:3px solid var(--border); margin-top:10px; white-space:pre-wrap; }
+        .full-desc.open { display:block; animation:fadeIn 0.2s ease; }
+
+        /* Comments expand */
+        .comments-wrap { display:none; padding:0 22px 16px 26px; border-top:1px solid var(--border); }
+        .comments-wrap.open { display:block; animation:fadeIn 0.2s ease; }
+        .comment-item-admin { background:var(--bg-primary); border:1px solid var(--border); border-radius:var(--radius-sm); padding:10px 12px; margin-top:10px; }
+        .comment-top { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+        .comment-avatar { width:24px; height:24px; border-radius:7px; overflow:hidden; background:var(--bg-tertiary); border:1px solid var(--border); flex-shrink:0; }
+        .comment-avatar img { width:100%; height:100%; object-fit:cover; }
+        .comment-user { font-size:12px; font-weight:600; color:var(--text-primary); font-family:"JetBrains Mono",monospace; }
+        .comment-time { font-size:11px; color:var(--text-tertiary); margin-left:auto; }
+        .comment-text-body { font-size:13px; color:var(--text-secondary); line-height:1.5; }
+
+        /* Video link */
+        .video-link { display:inline-flex; align-items:center; gap:6px; color:#ce93d8; font-size:12px; font-family:"JetBrains Mono",monospace; text-decoration:none; transition:all 0.2s; }
+        .video-link:hover { color:#e1bee7; text-decoration:underline; }
+
+        /* Modal */
+        .modal-overlay { position:fixed; inset:0; background:rgba(10,25,41,0.88); backdrop-filter:blur(6px); z-index:150; display:flex; align-items:center; justify-content:center; padding:20px; opacity:0; pointer-events:none; transition:opacity 0.3s ease; }
+        .modal-overlay.visible { opacity:1; pointer-events:all; }
+        .modal { background:var(--bg-secondary); border:1px solid var(--border); border-radius:var(--radius-lg); padding:36px; max-width:400px; width:100%; box-shadow:var(--shadow-lg); text-align:center; transform:scale(0.95); transition:transform 0.3s cubic-bezier(0.16,1,0.3,1); }
+        .modal-overlay.visible .modal { transform:scale(1); }
+        .modal-icon  { font-size:40px; margin-bottom:16px; }
+        .modal-title { font-size:20px; font-weight:700; color:var(--text-primary); margin-bottom:8px; }
+        .modal-sub   { font-size:14px; color:var(--text-secondary); margin-bottom:28px; line-height:1.6; }
+        .modal-btns  { display:flex; gap:12px; }
+        .modal-cancel  { flex:1; background:var(--bg-tertiary); border:1px solid var(--border); color:var(--text-secondary); padding:12px; border-radius:var(--radius-sm); font-size:14px; font-weight:600; cursor:pointer; transition:all 0.2s; }
+        .modal-cancel:hover { border-color:var(--border-hover); color:var(--text-primary); }
+        .modal-confirm { flex:1; background:var(--red); border:none; color:white; padding:12px; border-radius:var(--radius-sm); font-size:14px; font-weight:600; cursor:pointer; transition:opacity 0.2s; }
+        .modal-confirm:hover { opacity:0.85; }
+
+        /* Empty / Loading */
+        .empty-state { text-align:center; padding:60px 20px; background:var(--bg-secondary); border:1px solid var(--border); border-radius:var(--radius-lg); }
+        .empty-icon  { font-size:50px; margin-bottom:14px; }
+        .empty-title { font-size:20px; font-weight:600; color:var(--text-primary); margin-bottom:8px; }
+        .empty-sub   { font-size:14px; color:var(--text-secondary); }
+        .loading-state { text-align:center; padding:60px; color:var(--text-secondary); }
+        .loading-spinner { width:36px; height:36px; border:3px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 16px; }
+
+        /* Toast */
+        .toast { position:fixed; bottom:32px; left:50%; transform:translateX(-50%) translateY(100px); background:var(--bg-tertiary); border:1px solid rgba(76,175,80,0.4); border-radius:var(--radius-md); padding:14px 22px; display:flex; align-items:center; gap:10px; font-size:14px; font-weight:500; color:var(--text-primary); box-shadow:var(--shadow-lg); z-index:300; transition:transform 0.5s cubic-bezier(0.16,1,0.3,1); white-space:nowrap; }
+        .toast.show  { transform:translateX(-50%) translateY(0); }
+        .toast.error { border-color:rgba(244,67,54,0.4); }
+
+        /* Particles */
+        .particles { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; overflow:hidden; }
+        .particle { position:absolute; width:3px; height:3px; background:var(--accent); border-radius:50%; opacity:0; animation:float-particle 15s infinite; box-shadow:0 0 10px var(--accent); }
+        @keyframes float-particle { 0%{transform:translateY(100vh) translateX(0);opacity:0} 10%{opacity:0.5} 90%{opacity:0.5} 100%{transform:translateY(-100px) translateX(100px);opacity:0} }
+        .particle:nth-child(1){left:10%;animation-delay:0s}.particle:nth-child(2){left:25%;animation-delay:3s}.particle:nth-child(3){left:40%;animation-delay:6s}.particle:nth-child(4){left:60%;animation-delay:9s}.particle:nth-child(5){left:75%;animation-delay:12s}.particle:nth-child(6){left:90%;animation-delay:2s}
+
+        .footer { text-align:center; margin-top:60px; padding-top:32px; border-top:1px solid var(--border); }
+        .footer-text { font-size:14px; color:var(--text-tertiary); line-height:1.6; }
+        .footer-text a { color:var(--accent); text-decoration:none; }
+
+        @media(max-width:768px) {
+            body { padding:28px 14px; }
+            h1   { font-size:32px; }
+            .logo { width:80px; height:80px; }
+            .stats-bar { grid-template-columns:1fr 1fr; }
+            .card-actions { flex-wrap:wrap; }
+        }
+    </style>
+</head>
+<body>
+    <div class="particles"><div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div></div>
+
+    <!-- Lock -->
+    <div id="lockScreen">
+        <div class="lock-card">
+            <span class="lock-icon">🔐</span>
+            <div class="lock-title">Admin Access</div>
+            <div class="lock-subtitle">Enter the admin password to manage issues</div>
+            <input type="password" class="lock-input" id="lockInput" placeholder="••••" maxlength="20" onkeydown="if(event.key==='Enter') attemptUnlock()" />
+            <div class="lock-error" id="lockError"></div>
+            <button class="lock-btn" onclick="attemptUnlock()">Unlock Panel</button>
+        </div>
+    </div>
+
+    <!-- Delete confirm -->
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal">
+            <div class="modal-icon">🗑️</div>
+            <div class="modal-title">Delete Issue?</div>
+            <div class="modal-sub" id="deleteSub">This will permanently remove the issue and all its comments. This cannot be undone.</div>
+            <div class="modal-btns">
+                <button class="modal-cancel" onclick="closeModal('deleteModal')">Cancel</button>
+                <button class="modal-confirm" id="deleteConfirmBtn">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" id="mainContent" style="display:none">
+        <div class="header">
+            <div class="logo-container">
+                <a href="https://infinitysmp.github.io/" class="logo">
+                    <img src="https://infinitysmp.github.io/logo.png" alt="Infinity SMP" />
+                </a>
+            </div>
+            <div class="header-row">
+                <span class="admin-badge">🛡️ Admin Panel</span>
+                <button class="signout-link" onclick="lockPanel()">🔒 Lock</button>
+            </div>
+            <a href="index.html" class="back-link">← Back to Issue Tracker</a>
+            <h1>Issue Manager</h1>
+            <p class="header-subtitle">Review, triage, and update the status of world issues</p>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-card s-issue"><div class="stat-value" id="statIssue">—</div><div class="stat-label">🔴 Issue</div></div>
+            <div class="stat-card s-known"><div class="stat-value" id="statKnown">—</div><div class="stat-label">🟠 Known</div></div>
+            <div class="stat-card s-fixing"><div class="stat-value" id="statFixing">—</div><div class="stat-label">🔵 Fixing</div></div>
+            <div class="stat-card s-fixed"><div class="stat-value" id="statFixed">—</div><div class="stat-label">🟢 Fixed</div></div>
+        </div>
+
+        <div class="controls">
+            <input type="text" class="search-input" id="searchInput" placeholder="🔍  Search issues..." oninput="applyFilters()" />
+            <button class="ctrl-btn" onclick="renderIssues(getFiltered())">🔄 Refresh</button>
+        </div>
+
+        <div class="filter-chips">
+            <div class="filter-chip active" data-f="all"    onclick="setFilter('all')">All</div>
+            <div class="filter-chip fi"     data-f="issue"  onclick="setFilter('issue')">🔴 Issue</div>
+            <div class="filter-chip fk"     data-f="known"  onclick="setFilter('known')">🟠 Known</div>
+            <div class="filter-chip fx"     data-f="fixing" onclick="setFilter('fixing')">🔵 Fixing</div>
+            <div class="filter-chip fd"     data-f="fixed"  onclick="setFilter('fixed')">🟢 Fixed</div>
+        </div>
+
+        <div class="issue-list" id="issueList">
+            <div class="loading-state"><div class="loading-spinner"></div><div>Loading issues...</div></div>
+        </div>
+
+        <div class="footer"><p class="footer-text">Infinity SMP Admin · <a href="https://discord.gg/3FbYYN4cQS">Discord</a></p></div>
+    </div>
+
+    <div class="toast" id="toast"><span id="toastIcon">✅</span>&nbsp;<span id="toastMsg"></span></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, get, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const FC = { apiKey:"AIzaSyBgV9PoUFut3FPc0iChFNm2-h6-Uc5z6s0", authDomain:"infinity-service-b2f10.firebaseapp.com", databaseURL:"https://infinity-service-b2f10-default-rtdb.firebaseio.com", projectId:"infinity-service-b2f10", storageBucket:"infinity-service-b2f10.firebasestorage.app", messagingSenderId:"805770674259", appId:"1:805770674259:web:bcc520979e6772fda5c6a6" };
+        const app = initializeApp(FC);
+        const db  = getDatabase(app);
+
+        let allIssues    = [];
+        let activeFilter = "all";
+        let pendingDeleteFn = null;
+        const expandedDesc     = new Set();
+        const expandedComments = new Set();
+
+        // ── Helpers ──
+        function esc(s) { return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+        function fmtDate(ts) { return ts ? new Date(ts).toLocaleString("en-AU",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"}) : "Unknown"; }
+        function timeAgo(ts) {
+            if (!ts) return "";
+            const s = Math.floor((Date.now()-ts)/1000);
+            if (s < 60)    return "just now";
+            if (s < 3600)  return `${Math.floor(s/60)}m ago`;
+            if (s < 86400) return `${Math.floor(s/3600)}h ago`;
+            return fmtDate(ts);
+        }
+        function countSameVotes(issue) { return issue.sameVotes ? Object.keys(issue.sameVotes).length : 0; }
+        function countComments(issue)  { return issue.comments  ? Object.keys(issue.comments).length  : 0; }
+
+        // ── Toast ──
+        function showToast(msg, err=false) {
+            const t = document.getElementById("toast");
+            document.getElementById("toastIcon").textContent = err ? "❌" : "✅";
+            document.getElementById("toastMsg").textContent  = msg;
+            t.className = "toast" + (err?" error":"") + " show";
+            setTimeout(() => { t.className = "toast" + (err?" error":""); }, 4000);
+        }
+
+        // ── Auth ──
+        window.attemptUnlock = async function() {
+            const input = document.getElementById("lockInput").value;
+            const errEl = document.getElementById("lockError");
+            errEl.textContent = "Checking…";
+            let pw = "0000";
+            try { const s = await get(ref(db,"admin/password")); pw = String(s.val() ?? "0000"); } catch {}
+            if (input === pw) {
+                errEl.textContent = "";
+                const ls = document.getElementById("lockScreen");
+                ls.classList.add("hidden"); setTimeout(() => ls.style.display = "none", 400);
+                document.getElementById("mainContent").style.display = "block";
+                startListener();
+            } else {
+                errEl.textContent = "Incorrect password.";
+                const li = document.getElementById("lockInput");
+                li.classList.add("error"); li.value = "";
+                setTimeout(() => li.classList.remove("error"), 500);
+            }
+        };
+
+        window.lockPanel = function() {
+            const ls = document.getElementById("lockScreen");
+            ls.style.display = "flex"; ls.classList.remove("hidden");
+            document.getElementById("lockInput").value = "";
+            document.getElementById("lockError").textContent = "";
+            document.getElementById("mainContent").style.display = "none";
+        };
+
+        // ── Firebase ──
+        function startListener() {
+            onValue(ref(db,"worldIssues"), snap => {
+                const data = snap.val();
+                allIssues = data
+                    ? Object.entries(data).filter(([k]) => k !== "_placeholder")
+                        .map(([k,v]) => ({key:k,...v}))
+                        .sort((a,b) => (b.createdAt||0) - (a.createdAt||0))
+                    : [];
+                updateStats(); renderIssues(getFiltered());
+            });
+        }
+
+        function updateStats() {
+            const c = {issue:0, known:0, fixing:0, fixed:0};
+            allIssues.forEach(i => { if (c[i.status] !== undefined) c[i.status]++; });
+            document.getElementById("statIssue").textContent  = c.issue;
+            document.getElementById("statKnown").textContent  = c.known;
+            document.getElementById("statFixing").textContent = c.fixing;
+            document.getElementById("statFixed").textContent  = c.fixed;
+        }
+
+        window.setFilter = function(f) {
+            activeFilter = f;
+            document.querySelectorAll(".filter-chip").forEach(c => {
+                const isActive = c.dataset.f === f;
+                c.classList.toggle("active", isActive);
+            });
+            renderIssues(getFiltered());
+        };
+
+        window.applyFilters = function() { renderIssues(getFiltered()); };
+
+        function getFiltered() {
+            const q = (document.getElementById("searchInput")?.value || "").toLowerCase();
+            return allIssues.filter(i => {
+                const mf = activeFilter === "all" || i.status === activeFilter;
+                const ms = !q || (i.title||"").toLowerCase().includes(q) || (i.description||"").toLowerCase().includes(q) || (i.username||"").toLowerCase().includes(q);
+                return mf && ms;
+            });
+        }
+
+        const STATUS_LABELS = { issue:"🔴 Issue", known:"🟠 Known", fixing:"🔵 Fixing", fixed:"🟢 Fixed" };
+
+        window.renderIssues = function(list) {
+            const el = document.getElementById("issueList");
+            if (!list.length) {
+                el.innerHTML = `<div class="empty-state"><div class="empty-icon">✨</div><div class="empty-title">No issues here</div><div class="empty-sub">Nothing matching your filter.</div></div>`;
+                return;
+            }
+            el.innerHTML = list.map((issue, i) => {
+                const s    = issue.status || "issue";
+                const sc   = countSameVotes(issue);
+                const cc   = countComments(issue);
+                const comments = issue.comments
+                    ? Object.entries(issue.comments).sort((a,b) => (a[1].createdAt||0)-(b[1].createdAt||0))
+                    : [];
+                const descOpen     = expandedDesc.has(issue.key);
+                const commentsOpen = expandedComments.has(issue.key);
+
+                const statusBtns = ["issue","known","fixing","fixed"].map(sv =>
+                    `<button class="status-btn sb-${sv} ${s===sv?"active":""}" onclick="setIssueStatus('${esc(issue.key)}','${sv}')" ${s===sv?"disabled":""}>
+                        ${STATUS_LABELS[sv]}
+                    </button>`
+                ).join("");
+
+                const commentsHtml = comments.length ? comments.map(([ck, c]) => `
+                    <div class="comment-item-admin">
+                        <div class="comment-top">
+                            <div class="comment-avatar"><img src="https://mc-heads.net/avatar/${encodeURIComponent(c.username||"Steve")}/24" onerror="this.style.display='none'" /></div>
+                            <span class="comment-user">${esc(c.username)}</span>
+                            <span class="comment-time">${timeAgo(c.createdAt)}</span>
+                        </div>
+                        <div class="comment-text-body">${esc(c.text)}</div>
+                    </div>`).join("") : `<div style="font-size:13px;color:var(--text-tertiary);padding:10px 0;font-style:italic">No comments yet.</div>`;
+
+                return `<div class="admin-issue-card status-${esc(s)}" style="animation-delay:${i*0.04}s" id="card-${esc(issue.key)}">
+                    <div class="card-main">
+                        <div class="card-top">
+                            <div class="card-info">
+                                <div class="card-title">${esc(issue.title)}</div>
+                                <div class="card-desc">${esc(issue.description)}</div>
+                                ${issue.description && issue.description.length > 120 ? `<button class="expand-btn" onclick="toggleDesc('${esc(issue.key)}')" id="expandDescBtn-${esc(issue.key)}">${descOpen?"▲ Hide":"▼ Show full"}</button>` : ""}
+                                <div class="full-desc ${descOpen?"open":""}" id="fullDesc-${esc(issue.key)}">${esc(issue.description)}</div>
+                            </div>
+                            <div class="card-badges">
+                                <span class="status-badge ${esc(s)}">${STATUS_LABELS[s]}</span>
+                                ${issue.videoUrl ? `<a href="${esc(issue.videoUrl)}" target="_blank" class="has-video-badge">🎬 Video</a>` : ""}
+                            </div>
+                        </div>
+                        <div class="card-meta">
+                            <span>👤 ${esc(issue.username)}</span>
+                            <span>🕒 ${fmtDate(issue.createdAt)}</span>
+                            ${issue.videoUrl ? `<a href="${esc(issue.videoUrl)}" target="_blank" class="video-link">🎬 Watch footage ↗</a>` : ""}
+                        </div>
+                        <div class="card-actions">
+                            <span class="status-action-label">Set status:</span>
+                            ${statusBtns}
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="card-counts">
+                            <span class="count-pill orange">🙋 ${sc} same issue</span>
+                            <span class="count-pill blue">💬 ${cc} comment${cc===1?"":"s"}</span>
+                            ${cc > 0 ? `<button class="expand-btn" onclick="toggleComments('${esc(issue.key)}')" id="commentsToggle-${esc(issue.key)}">${commentsOpen?"▲ Hide comments":"▼ View comments"}</button>` : ""}
+                        </div>
+                        <button class="delete-btn" onclick="promptDelete('${esc(issue.key)}','${esc(issue.title)}')">🗑️ Delete</button>
+                    </div>
+                    <div class="comments-wrap ${commentsOpen?"open":""}" id="commentsWrap-${esc(issue.key)}">
+                        ${commentsHtml}
+                    </div>
+                </div>`;
+            }).join("");
+        };
+
+        window.toggleDesc = function(key) {
+            if (expandedDesc.has(key)) expandedDesc.delete(key); else expandedDesc.add(key);
+            const el = document.getElementById(`fullDesc-${key}`);
+            const btn = document.getElementById(`expandDescBtn-${key}`);
+            if (el) el.classList.toggle("open", expandedDesc.has(key));
+            if (btn) btn.textContent = expandedDesc.has(key) ? "▲ Hide" : "▼ Show full";
+        };
+
+        window.toggleComments = function(key) {
+            if (expandedComments.has(key)) expandedComments.delete(key); else expandedComments.add(key);
+            const el  = document.getElementById(`commentsWrap-${key}`);
+            const btn = document.getElementById(`commentsToggle-${key}`);
+            if (el)  el.classList.toggle("open", expandedComments.has(key));
+            if (btn) btn.textContent = expandedComments.has(key) ? "▲ Hide comments" : "▼ View comments";
+        };
+
+        // ── Status update ──
+        window.setIssueStatus = async function(key, status) {
+            try {
+                await update(ref(db, `worldIssues/${key}`), { status });
+                showToast(`Status updated to ${STATUS_LABELS[status]} ✓`);
+            } catch(e) { showToast("Failed to update status.", true); }
+        };
+
+        // ── Delete ──
+        window.promptDelete = function(key, title) {
+            document.getElementById("deleteSub").textContent = `Delete "${title}"? All comments will also be removed. This cannot be undone.`;
+            pendingDeleteFn = () => remove(ref(db, `worldIssues/${key}`));
+            document.getElementById("deleteModal").classList.add("visible");
+        };
+
+        document.getElementById("deleteConfirmBtn").addEventListener("click", async () => {
+            if (!pendingDeleteFn) return;
+            try { await pendingDeleteFn(); showToast("Issue deleted."); }
+            catch { showToast("Delete failed.", true); }
+            closeModal("deleteModal"); pendingDeleteFn = null;
+        });
+
+        // ── Modals ──
+        window.closeModal = function(id) { document.getElementById(id).classList.remove("visible"); };
+        document.getElementById("deleteModal").addEventListener("click", e => { if (e.target === e.currentTarget) closeModal("deleteModal"); });
+    </script>
+</body>
+</html>
