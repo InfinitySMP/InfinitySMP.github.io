@@ -1,0 +1,1676 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://infinitysmp.github.io/tools/pack-merger" />
+  <meta property="og:title" content="Infinity | Resource Pack Merger" />
+  <meta property="og:description" content="Merge resource packs together to keep your resources in one unified folder!" />
+  <meta property="og:image" content="https://infinitysmp.github.io/logo.png" />
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Infinity | Resource Pack Merger</title>
+  <link rel="icon" type="image/png" href="https://infinitysmp.github.io/logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
+    body {
+      overflow-x: hidden;
+    }
+
+    body::-webkit-scrollbar,
+    html::-webkit-scrollbar {
+      display: none;
+    }
+
+    body,
+    html {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    :root {
+      --bg-primary: #0a1929;
+      --bg-secondary: #0d2137;
+      --bg-tertiary: #132f4c;
+      --text-primary: #e3f2fd;
+      --text-secondary: #90caf9;
+      --text-tertiary: #64b5f6;
+      --accent: #2196f3;
+      --accent-hover: #42a5f5;
+      --accent-dark: #1976d2;
+      --border: rgba(33, 150, 243, 0.15);
+      --border-hover: rgba(33, 150, 243, 0.3);
+      --shadow-sm: 0 2px 8px rgba(33, 150, 243, 0.1);
+      --shadow-md: 0 4px 20px rgba(33, 150, 243, 0.15);
+      --shadow-lg: 0 12px 48px rgba(33, 150, 243, 0.25);
+      --shadow-glow: 0 0 40px rgba(33, 150, 243, 0.2);
+      --radius-sm: 10px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      padding: 40px 20px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      position: relative;
+      width: 100%;
+      max-width: 100vw;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at 30% 50%, rgba(33, 150, 243, 0.1) 0%, transparent 50%),
+                  radial-gradient(circle at 70% 50%, rgba(33, 150, 243, 0.05) 0%, transparent 50%);
+      animation: float 20s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      33% { transform: translate(30px, -30px) rotate(5deg); }
+      66% { transform: translate(-20px, 20px) rotate(-5deg); }
+    }
+
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .particle {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      background: var(--accent);
+      border-radius: 50%;
+      opacity: 0;
+      animation: float-particle 15s infinite;
+      box-shadow: 0 0 10px var(--accent);
+    }
+
+    @keyframes float-particle {
+      0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+      10% { opacity: 0.5; }
+      90% { opacity: 0.5; }
+      100% { transform: translateY(-100px) translateX(100px); opacity: 0; }
+    }
+
+    .particle:nth-child(1) { left: 10%; animation-delay: 0s; }
+    .particle:nth-child(2) { left: 25%; animation-delay: 3s; }
+    .particle:nth-child(3) { left: 40%; animation-delay: 6s; }
+    .particle:nth-child(4) { left: 60%; animation-delay: 9s; }
+    .particle:nth-child(5) { left: 75%; animation-delay: 12s; }
+    .particle:nth-child(6) { left: 90%; animation-delay: 2s; }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      z-index: 1;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .logo-container {
+      margin-bottom: 24px;
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    .logo {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      box-shadow: var(--shadow-glow), var(--shadow-lg);
+      background: var(--bg-secondary);
+      border: 2px solid var(--border);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .logo:hover {
+      transform: scale(1.05) translateY(-5px);
+      box-shadow: 0 0 60px rgba(33, 150, 243, 0.4), var(--shadow-lg);
+      border-color: var(--accent);
+    }
+
+    .logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    h1 {
+      font-size: 48px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: fadeIn 0.6s ease-out 0.2s backwards;
+    }
+
+    h2 {
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 32px 0 16px 0;
+      letter-spacing: -0.01em;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .subtitle {
+      font-size: 18px;
+      color: var(--text-secondary);
+      font-weight: 400;
+      margin-bottom: 32px;
+      animation: fadeIn 0.6s ease-out 0.3s backwards;
+    }
+
+    .main-card {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-lg);
+      padding: 40px;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border);
+      margin-bottom: 24px;
+      animation: fadeInUp 0.6s ease-out 0.4s backwards;
+    }
+
+    .warning-box {
+      background: rgba(255, 152, 0, 0.1);
+      border: 2px solid rgba(255, 152, 0, 0.3);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      margin-bottom: 32px;
+      animation: fadeIn 0.6s ease-out 0.5s backwards;
+    }
+
+    .warning-box h3 {
+      color: #ffa726;
+      font-size: 20px;
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+
+    .warning-box p {
+      color: var(--text-secondary);
+      font-size: 15px;
+      line-height: 1.6;
+      margin-bottom: 8px;
+    }
+
+    .warning-box p:last-child {
+      margin-bottom: 0;
+    }
+
+    .section {
+      margin-bottom: 32px;
+    }
+
+    .section-title {
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+      letter-spacing: -0.01em;
+    }
+
+    .description {
+      color: var(--text-secondary);
+      font-size: 16px;
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+
+    .file-input-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      color: var(--text-primary);
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    input[type="file"] {
+      width: 100%;
+      padding: 12px 16px;
+      background: var(--bg-tertiary);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      font-size: 15px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    input[type="file"]:hover {
+      border-color: var(--border-hover);
+      background: var(--bg-primary);
+    }
+
+    input[type="file"]::file-selector-button {
+      padding: 8px 16px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+      border: none;
+      border-radius: var(--radius-sm);
+      color: white;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-right: 12px;
+    }
+
+    input[type="file"]::file-selector-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+    }
+
+    .button-group {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin: 32px 0;
+    }
+
+    button {
+      padding: 14px 28px;
+      font-size: 16px;
+      font-weight: 500;
+      border: none;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: var(--shadow-sm);
+      white-space: nowrap;
+    }
+
+    button:not(:disabled) {
+      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+      color: white;
+    }
+
+    button:not(:disabled):hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    button:not(:disabled):active {
+      transform: translateY(0);
+    }
+
+    button:disabled {
+      background: var(--bg-tertiary);
+      color: var(--text-tertiary);
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
+    #compareBtn {
+      background: linear-gradient(135deg, #4caf50, #66bb6a);
+      grid-column: span 2;
+    }
+
+    #mergeBtn {
+      background: linear-gradient(135deg, #2196f3, #42a5f5);
+    }
+
+    #autoMergeBtn {
+      background: linear-gradient(135deg, #9c27b0, #ba68c8);
+    }
+
+    #analyzeBtn {
+      background: linear-gradient(135deg, #ff9800, #ffb74d);
+    }
+
+    #status {
+      padding: 16px 20px;
+      border-radius: var(--radius-md);
+      border-left: 4px solid var(--accent);
+      background: rgba(33, 150, 243, 0.1);
+      color: var(--text-primary);
+      font-size: 15px;
+      margin-bottom: 24px;
+      animation: slideIn 0.3s ease;
+      display: none;
+    }
+
+    #status:not(:empty) {
+      display: block;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-10px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .error-status {
+      background: rgba(244, 67, 54, 0.1) !important;
+      border-left-color: #f44336 !important;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      background: var(--bg-tertiary);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    th {
+      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+      color: white;
+      padding: 16px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:nth-child(even) {
+      background: rgba(33, 150, 243, 0.03);
+    }
+
+    .conflict {
+      background: rgba(255, 152, 0, 0.1) !important;
+    }
+
+    .conflict td {
+      color: var(--text-primary);
+    }
+
+    input[type="radio"] {
+      cursor: pointer;
+      margin-right: 4px;
+      accent-color: var(--accent);
+    }
+
+    .issue-card {
+      background: var(--bg-tertiary);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      margin-bottom: 16px;
+      border-left: 4px solid var(--accent);
+    }
+
+    .issue-error {
+      border-left-color: #f44336;
+      background: rgba(244, 67, 54, 0.08);
+    }
+
+    .issue-warning {
+      border-left-color: #ff9800;
+      background: rgba(255, 152, 0, 0.08);
+    }
+
+    .issue-fixed {
+      border-left-color: #4caf50;
+      background: rgba(76, 175, 80, 0.08);
+    }
+
+    .issue-info {
+      border-left-color: #2196f3;
+      background: rgba(33, 150, 243, 0.08);
+    }
+
+    .issue-title {
+      font-weight: 600;
+      font-size: 16px;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .issue-file {
+      color: var(--text-tertiary);
+      font-size: 13px;
+      font-family: 'Courier New', monospace;
+      margin-bottom: 12px;
+      word-break: break-all;
+    }
+
+    .issue-description {
+      color: var(--text-secondary);
+      font-size: 15px;
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+
+    .issue-fix {
+      background: var(--bg-primary);
+      padding: 12px 16px;
+      border-radius: var(--radius-sm);
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      color: var(--text-tertiary);
+      margin-top: 12px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 24px 16px;
+      }
+
+      h1 {
+        font-size: 36px;
+      }
+
+      .main-card {
+        padding: 24px;
+      }
+
+      .button-group {
+        grid-template-columns: 1fr;
+      }
+
+      #compareBtn {
+        grid-column: span 1;
+      }
+
+      table {
+        font-size: 13px;
+      }
+
+      th, td {
+        padding: 10px 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="particles">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+  </div>
+
+  <div class="container">
+    <div class="header">
+      <div class="logo-container">
+        <a href="https://infinitysmp.github.io/tools" class="logo">
+          <img src="https://infinitysmp.github.io/addon.png" alt="Infinity SMP" />
+        </a>
+      </div>
+      <h1>Resource Pack Merger</h1>
+      <p class="subtitle">Merge resource packs together to keep your resources in one unified folder!</p>
+    </div>
+
+    <div class="main-card">
+      <div class="warning-box">
+        <h3>⚠️ Important: Resource Packs Only</h3>
+        <p>This tool is designed for merging <strong>Resource Packs (.mcpack)</strong> only.</p>
+        <p><strong>.mcaddon files cannot be merged</strong> because they contain multiple pack types (resource packs + behavior packs) with complex interdependencies that cannot be safely combined automatically.</p>
+        <p>If you need to combine .mcaddon files, you must manually extract them and merge each component pack separately.</p>
+      </div>
+
+      <div class="section">
+        <p class="description">Choose two .mcpack/.zip resource pack files to merge. This runs entirely in your browser; no files are uploaded to a server.</p>
+
+        <div class="file-input-group">
+          <label for="fileA">Resource Pack A:</label>
+          <input id="fileA" type="file" accept=".mcpack,.zip" />
+        </div>
+
+        <div class="file-input-group">
+          <label for="fileB">Resource Pack B:</label>
+          <input id="fileB" type="file" accept=".mcpack,.zip" />
+        </div>
+
+        <div class="button-group">
+          <button id="compareBtn">Load and Compare</button>
+          <button id="mergeBtn" disabled>Merge &amp; Download</button>
+          <button id="autoMergeBtn" disabled>🤖 AI Auto-Merge</button>
+          <button id="analyzeBtn" disabled>🔍 AI Analyze &amp; Fix</button>
+        </div>
+
+        <div id="status" role="status" aria-live="polite"></div>
+      </div>
+
+      <div id="aiResults"></div>
+
+      <div id="summary"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.7.1/dist/jszip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+  <script>
+    // Simple in-browser resource pack merger.
+    // - Reads two ZIP-like packs (.mcpack only)
+    // - Shows conflicts
+    // - Lets user choose winners per conflict (default: A)
+    // - Merges files and offers download as merged pack
+
+    const fileAEl = document.getElementById('fileA');
+    const fileBEl = document.getElementById('fileB');
+    const compareBtn = document.getElementById('compareBtn');
+    const mergeBtn = document.getElementById('mergeBtn');
+    const autoMergeBtn = document.getElementById('autoMergeBtn');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const status = document.getElementById('status');
+    const summary = document.getElementById('summary');
+    const aiResults = document.getElementById('aiResults');
+
+    let zipA, zipB;
+    let map = new Map(); // path -> {a: fileobj or null, b: fileobj or null}
+    let choices = {}; // path -> 'a'|'b'|'keepboth'
+    let manifestA = null;
+    let manifestB = null;
+
+    function setStatus(text, isError = false){ 
+      status.textContent = text; 
+      if(isError){
+        status.classList.add('error-status');
+      } else {
+        status.classList.remove('error-status');
+      }
+    }
+
+    function readZip(file){
+      const reader = new FileReader();
+      return new Promise((resolve,reject)=>{
+        reader.onload = async (e)=>{
+          try{
+            const data = e.target.result;
+            const z = await JSZip.loadAsync(data);
+            resolve(z);
+          }catch(err){reject(err);}
+        };
+        reader.onerror = reject;
+        reader.readAsArrayBuffer(file);
+      });
+    }
+
+    // Fixed: proper path normalization
+    function pathNormalize(p){ return p.replace(/\\/g,'/'); }
+
+    // Check if this is an .mcaddon (contains behavior_packs/ and/or resource_packs/ folders)
+    function isAddonStructure(zipObj){
+      let hasBehaviorPacks = false;
+      let hasResourcePacks = false;
+      zipObj.forEach((relativePath, file)=>{
+        const p = pathNormalize(relativePath).toLowerCase();
+        if(p.startsWith('behavior_packs/')) hasBehaviorPacks = true;
+        if(p.startsWith('resource_packs/')) hasResourcePacks = true;
+      });
+      return hasBehaviorPacks || hasResourcePacks;
+    }
+
+    // Get pack type from manifest (resources, data, skin_pack, world_template)
+    async function getPackType(zipObj){
+      try {
+        // First try root manifest
+        let manifestFile = zipObj.file('manifest.json');
+        if(manifestFile){
+          const manifestText = await manifestFile.async('string');
+          const manifest = JSON.parse(manifestText);
+          
+          if(manifest.modules && Array.isArray(manifest.modules)){
+            for(const mod of manifest.modules){
+              if(mod.type) return mod.type;
+            }
+          }
+        }
+        
+        // If no root manifest, this might be an mcaddon - check subfolders
+        const types = new Set();
+        const promises = [];
+        
+        zipObj.forEach((relativePath, file)=>{
+          if(relativePath.endsWith('manifest.json') && !file.dir){
+            promises.push(
+              file.async('string').then(text => {
+                try {
+                  const manifest = JSON.parse(text);
+                  if(manifest.modules && Array.isArray(manifest.modules)){
+                    manifest.modules.forEach(mod => {
+                      if(mod.type) types.add(mod.type);
+                    });
+                  }
+                } catch(e){}
+              }).catch(()=>{})
+            );
+          }
+        });
+        
+        await Promise.all(promises);
+        
+        // Return comma-separated if multiple types found (mcaddon)
+        if(types.size > 0){
+          return Array.from(types).join(',');
+        }
+        
+        return 'unknown';
+      } catch(e){
+        console.error('Error getting pack type:', e);
+        return 'unknown';
+      }
+    }
+
+    // Parse version from manifest
+    function parseVersion(versionArray){
+      if(!Array.isArray(versionArray) || versionArray.length < 3) return null;
+      return {
+        major: versionArray[0] || 0,
+        minor: versionArray[1] || 0,
+        patch: versionArray[2] || 0,
+        toString: function(){ return `${this.major}.${this.minor}.${this.patch}`; }
+      };
+    }
+
+    // Check version compatibility
+    function checkVersionCompatibility(verA, verB){
+      if(!verA || !verB) return { compatible: true, warning: null };
+      
+      const majorDiff = Math.abs(verA.major - verB.major);
+      const minorDiff = Math.abs(verA.minor - verB.minor);
+      const patchDiff = Math.abs(verA.patch - verB.patch);
+      
+      // Major version difference is critical
+      if(majorDiff > 0){
+        return {
+          compatible: false,
+          warning: `Major version mismatch: ${verA.toString()} vs ${verB.toString()}. This combination may be VERY UNSTABLE or not work at all.`
+        };
+      }
+      
+      // Minor version difference beyond 5 is concerning
+      if(minorDiff > 5){
+        return {
+          compatible: false,
+          warning: `Significant version difference: ${verA.toString()} vs ${verB.toString()}. This combination may be VERY UNSTABLE.`
+        };
+      }
+      
+      // Large patch difference is a warning
+      if(minorDiff > 2 || patchDiff > 50){
+        return {
+          compatible: true,
+          warning: `Version difference detected: ${verA.toString()} vs ${verB.toString()}. This may cause minor compatibility issues.`
+        };
+      }
+      
+      return { compatible: true, warning: null };
+    }
+
+    // AI Auto-merge logic
+    async function aiAutoMerge(){
+      if(map.size === 0){
+        alert('Please load and compare packs first!');
+        return;
+      }
+      
+      setStatus('🤖 AI analyzing conflicts and making intelligent decisions...');
+      
+      let decisions = 0;
+      
+      for(const [path, obj] of map.entries()){
+        if(!obj.a || !obj.b) continue; // No conflict if only in one pack
+        
+        // Check if files are identical
+        const same = await compareFiles(obj.a, obj.b);
+        if(same){
+          choices[path] = 'a'; // Doesn't matter, they're the same
+          continue;
+        }
+        
+        decisions++;
+        
+        // AI Decision Logic
+        const decision = await makeAiDecision(path, obj.a, obj.b);
+        choices[path] = decision;
+        
+        // Update UI
+        const sanitizedPath = path.replace(/[^a-zA-Z0-9]/g,'_');
+        const radioToCheck = document.querySelector(`input[name="choice-${sanitizedPath}"][value="${decision}"]`);
+        if(radioToCheck) radioToCheck.checked = true;
+      }
+      
+      setStatus(`🤖 AI Auto-merge complete! Made ${decisions} intelligent decisions. Review and click "Merge & Download" when ready.`);
+    }
+
+    // AI decision making for conflicts
+    async function makeAiDecision(path, fileA, fileB){
+      const filename = path.split('/').pop().toLowerCase();
+      const ext = filename.split('.').pop();
+      
+      // Rule 1: Prefer newer files based on size (larger often means more content)
+      const sizeA = fileA._data?.uncompressedSize || 0;
+      const sizeB = fileB._data?.uncompressedSize || 0;
+      
+      // Rule 2: JSON files - try to merge
+      if(ext === 'json'){
+        try {
+          const contentA = await fileA.async('string');
+          const contentB = await fileB.async('string');
+          const jsonA = JSON.parse(contentA);
+          const jsonB = JSON.parse(contentB);
+          
+          // If both are objects, prefer the one with more keys
+          if(typeof jsonA === 'object' && typeof jsonB === 'object' && !Array.isArray(jsonA) && !Array.isArray(jsonB)){
+            const keysA = Object.keys(jsonA).length;
+            const keysB = Object.keys(jsonB).length;
+            
+            if(keysA > keysB) return 'a';
+            if(keysB > keysA) return 'b';
+          }
+          
+          // If arrays, prefer longer array
+          if(Array.isArray(jsonA) && Array.isArray(jsonB)){
+            if(jsonA.length > jsonB.length) return 'a';
+            if(jsonB.length > jsonA.length) return 'b';
+          }
+        } catch(e){
+          // If JSON parsing fails, fall through to other rules
+        }
+      }
+      
+      // Rule 3: manifest.json - always prefer A and let merge function handle it
+      if(filename === 'manifest.json'){
+        return 'a';
+      }
+      
+      // Rule 4: Images/textures - prefer larger file (higher quality)
+      if(['png', 'jpg', 'jpeg', 'tga', 'webp'].includes(ext)){
+        if(sizeA > sizeB * 1.1) return 'a'; // 10% threshold
+        if(sizeB > sizeA * 1.1) return 'b';
+        return 'keepboth'; // Similar sizes, keep both
+      }
+      
+      // Rule 5: Models/animations - prefer larger (more detailed)
+      if(['json', 'geo', 'animation'].includes(ext) && (filename.includes('model') || filename.includes('anim'))){
+        if(sizeA > sizeB) return 'a';
+        if(sizeB > sizeA) return 'b';
+      }
+      
+      // Rule 6: Language files - prefer larger (more translations)
+      if(path.includes('texts/') || filename.includes('lang') || filename.includes('.lang')){
+        if(sizeA > sizeB) return 'a';
+        if(sizeB > sizeA) return 'b';
+      }
+      
+      // Rule 7: Sound files - keep both (users might want both sounds)
+      if(['ogg', 'wav', 'mp3', 'fsb'].includes(ext)){
+        return 'keepboth';
+      }
+      
+      // Default: prefer larger file
+      if(sizeA > sizeB) return 'a';
+      if(sizeB > sizeA) return 'b';
+      
+      // If exactly same size, prefer A
+      return 'a';
+    }
+
+    // AI Code Analysis and Fixing
+    async function aiAnalyzeAndFix(){
+      if(map.size === 0){
+        alert('Please load and compare packs first!');
+        return;
+      }
+      
+      setStatus('🔍 AI analyzing code files for issues...');
+      aiResults.innerHTML = '<p style="color: var(--text-secondary);">Scanning files...</p>';
+      
+      const issues = [];
+      const fixes = [];
+      
+      // Analyze all files
+      for(const [path, obj] of map.entries()){
+        const file = obj.a || obj.b;
+        if(!file) continue;
+        
+        const ext = path.split('.').pop().toLowerCase();
+        
+        // Only analyze code files
+        if(['json'].includes(ext)){
+          try {
+            const content = await file.async('string');
+            const fileIssues = await analyzeFile(path, content, ext);
+            
+            for(const issue of fileIssues){
+              issues.push(issue);
+              
+              // Try to fix the issue
+              if(issue.fixable){
+                const fix = await attemptFix(path, content, issue);
+                if(fix){
+                  fixes.push(fix);
+                  issue.fixed = true;
+                  issue.fixedContent = fix.content;
+                }
+              }
+            }
+          } catch(e){
+            console.error('Error analyzing', path, e);
+          }
+        }
+      }
+      
+      // Display results
+      displayAnalysisResults(issues, fixes);
+      
+      // Apply fixes to the map
+      if(fixes.length > 0){
+        for(const fix of fixes){
+          const entry = map.get(fix.path);
+          if(entry){
+            // Store fixed content for later use
+            if(!window._fixedFiles) window._fixedFiles = new Map();
+            window._fixedFiles.set(fix.path, fix.content);
+          }
+        }
+      }
+      
+      setStatus(`🔍 Analysis complete! Found ${issues.length} issues, fixed ${fixes.length} automatically.`);
+    }
+
+    async function analyzeFile(path, content, ext){
+      const issues = [];
+      const filename = path.split('/').pop();
+      
+      if(ext === 'json'){
+        // Check for JSON syntax errors
+        try {
+          JSON.parse(content);
+        } catch(e){
+          issues.push({
+            type: 'error',
+            file: path,
+            title: 'JSON Syntax Error',
+            description: `Invalid JSON: ${e.message}`,
+            fixable: true,
+            fixType: 'json-syntax'
+          });
+        }
+        
+        // Check for common JSON issues
+        if(content.includes(',]') || content.includes(',}')){
+          issues.push({
+            type: 'warning',
+            file: path,
+            title: 'Trailing Comma',
+            description: 'JSON contains trailing commas which may cause parsing errors',
+            fixable: true,
+            fixType: 'trailing-comma'
+          });
+        }
+        
+        // Check manifest.json specific issues
+        if(filename === 'manifest.json'){
+          try {
+            const manifest = JSON.parse(content);
+            
+            if(!manifest.format_version){
+              issues.push({
+                type: 'error',
+                file: path,
+                title: 'Missing format_version',
+                description: 'Manifest is missing required format_version field',
+                fixable: true,
+                fixType: 'add-format-version'
+              });
+            }
+            
+            if(!manifest.header || !manifest.header.uuid){
+              issues.push({
+                type: 'error',
+                file: path,
+                title: 'Missing UUID',
+                description: 'Manifest header is missing required UUID',
+                fixable: true,
+                fixType: 'add-uuid'
+              });
+            }
+            
+            if(!manifest.modules || manifest.modules.length === 0){
+              issues.push({
+                type: 'error',
+                file: path,
+                title: 'Missing Modules',
+                description: 'Manifest must have at least one module',
+                fixable: false
+              });
+            }
+            
+            // Check for duplicate UUIDs
+            const uuids = [];
+            if(manifest.header && manifest.header.uuid) uuids.push(manifest.header.uuid);
+            if(manifest.modules){
+              manifest.modules.forEach(m => {
+                if(m.uuid) uuids.push(m.uuid);
+              });
+            }
+            const duplicates = uuids.filter((item, index) => uuids.indexOf(item) !== index);
+            if(duplicates.length > 0){
+              issues.push({
+                type: 'error',
+                file: path,
+                title: 'Duplicate UUIDs',
+                description: `Found duplicate UUIDs: ${duplicates.join(', ')}`,
+                fixable: true,
+                fixType: 'fix-duplicate-uuid'
+              });
+            }
+          } catch(e){}
+        }
+        
+        // Check for incorrect texture/model paths
+        if(content.includes('textures/') || content.includes('models/')){
+          const pathRegex = /"(textures|models)\/[^"]*"/g;
+          const paths = content.match(pathRegex);
+          if(paths){
+            for(const p of paths){
+              if(p.includes('\\\\')){
+                issues.push({
+                  type: 'warning',
+                  file: path,
+                  title: 'Incorrect Path Format',
+                  description: 'Paths should use forward slashes (/), not backslashes (\\\\)',
+                  fixable: true,
+                  fixType: 'fix-path-slashes'
+                });
+                break;
+              }
+            }
+          }
+        }
+      }
+      
+      return issues;
+    }
+
+    async function attemptFix(path, content, issue){
+      let fixedContent = content;
+      let fixDescription = '';
+      
+      try {
+        switch(issue.fixType){
+          case 'json-syntax':
+            // Try multiple fix strategies in order
+            const fixStrategies = [
+              // Strategy 1: Basic fixes
+              (text) => text
+                .replace(/,\s*([}\]])/g, '$1')  // Remove trailing commas
+                .replace(/,\s*}/g, '}')
+                .replace(/,\s*]/g, ']'),
+              
+              // Strategy 2: Quote fixes
+              (text) => text
+                .replace(/'/g, '"')              // Replace single quotes with double
+                .replace(/([{,]\s*)(\w+)(\s*:)/g, '$1"$2"$3'), // Add quotes to unquoted keys
+              
+              // Strategy 3: Value fixes
+              (text) => text
+                .replace(/:\s*undefined\b/g, ': null')  // Replace undefined with null
+                .replace(/:\s*True\b/g, ': true')       // Fix Python-style True
+                .replace(/:\s*False\b/g, ': false')     // Fix Python-style False
+                .replace(/:\s*None\b/g, ': null'),      // Fix Python-style None
+              
+              // Strategy 4: Comment removal
+              (text) => text
+                .replace(/\/\/[^\n]*/g, '')     // Remove single-line comments
+                .replace(/\/\*[\s\S]*?\*\//g, ''), // Remove multi-line comments
+              
+              // Strategy 5: Aggressive cleanup
+              (text) => {
+                // Remove everything after last valid closing bracket
+                const lines = text.split('\n');
+                let braceCount = 0;
+                let lastValidLine = -1;
+                
+                for(let i = 0; i < lines.length; i++){
+                  for(const char of lines[i]){
+                    if(char === '{' || char === '[') braceCount++;
+                    if(char === '}' || char === ']') braceCount--;
+                    if(braceCount === 0 && (char === '}' || char === ']')){
+                      lastValidLine = i;
+                    }
+                  }
+                }
+                
+                if(lastValidLine >= 0 && lastValidLine < lines.length - 1){
+                  return lines.slice(0, lastValidLine + 1).join('\n');
+                }
+                return text;
+              }
+            ];
+            
+            // Try each strategy independently first
+            for(let i = 0; i < fixStrategies.length; i++){
+              try {
+                const attempt = fixStrategies[i](content);
+                JSON.parse(attempt);
+                fixedContent = attempt;
+                fixDescription = `Fixed JSON syntax (strategy ${i + 1})`;
+                break;
+              } catch(e){
+                // Try next strategy
+              }
+            }
+            
+            // If no single strategy worked, try combining them
+            if(fixedContent === content){
+              fixedContent = content;
+              for(const strategy of fixStrategies){
+                fixedContent = strategy(fixedContent);
+              }
+              
+              try {
+                JSON.parse(fixedContent);
+                fixDescription = 'Fixed JSON syntax (combined strategies)';
+              } catch(e){
+                // Last resort: try to extract valid JSON structure
+                try {
+                  const lines = content.split('\n');
+                  let inString = false;
+                  let cleaned = [];
+                  
+                  for(let line of lines){
+                    // Remove comments
+                    if(!inString){
+                      line = line.replace(/\/\/.*$/, '');
+                    }
+                    
+                    // Track if we're in a string
+                    for(const char of line){
+                      if(char === '"' && (cleaned.length === 0 || cleaned[cleaned.length-1] !== '\\')){
+                        inString = !inString;
+                      }
+                    }
+                    
+                    if(line.trim()) cleaned.push(line);
+                  }
+                  
+                  fixedContent = cleaned.join('\n')
+                    .replace(/,\s*([}\]])/g, '$1')
+                    .replace(/([{,]\s*)(\w+)(\s*:)/g, '$1"$2"$3')
+                    .replace(/'/g, '"');
+                  
+                  JSON.parse(fixedContent);
+                  fixDescription = 'Fixed JSON syntax (deep cleaning)';
+                } catch(finalError){
+                  // Could not fix
+                  return null;
+                }
+              }
+            }
+            break;
+            
+          case 'trailing-comma':
+            // More aggressive trailing comma removal
+            fixedContent = content
+              .replace(/,(\s*[}\]])/g, '$1')
+              .replace(/,(\s*\n\s*[}\]])/g, '$1');
+            
+            try {
+              JSON.parse(fixedContent);
+              fixDescription = 'Removed trailing commas';
+            } catch(e){
+              // Try the full json-syntax fix
+              return attemptFix(path, content, {...issue, fixType: 'json-syntax'});
+            }
+            break;
+            
+          case 'add-format-version':
+            const manifest = JSON.parse(content);
+            manifest.format_version = 2;
+            fixedContent = JSON.stringify(manifest, null, 2);
+            fixDescription = 'Added format_version: 2';
+            break;
+            
+          case 'add-uuid':
+            const man = JSON.parse(content);
+            if(!man.header) man.header = {};
+            if(!man.header.uuid) man.header.uuid = uuidv4();
+            fixedContent = JSON.stringify(man, null, 2);
+            fixDescription = 'Added missing UUID to header';
+            break;
+            
+          case 'fix-duplicate-uuid':
+            const m = JSON.parse(content);
+            if(m.header && m.header.uuid) m.header.uuid = uuidv4();
+            if(m.modules){
+              m.modules.forEach(mod => {
+                if(mod.uuid) mod.uuid = uuidv4();
+              });
+            }
+            fixedContent = JSON.stringify(m, null, 2);
+            fixDescription = 'Regenerated all UUIDs to fix duplicates';
+            break;
+            
+          case 'fix-path-slashes':
+            fixedContent = content.replace(/\\\\/g, '/');
+            fixDescription = 'Fixed path separators to use forward slashes';
+            break;
+            
+          default:
+            return null;
+        }
+        
+        return {
+          path: path,
+          content: fixedContent,
+          description: fixDescription
+        };
+        
+      } catch(e){
+        console.error('Failed to fix', path, e);
+        // Mark this issue as unable to be fixed
+        issue.fixable = false;
+        issue.fixError = e.message;
+        return null;
+      }
+    }
+
+    function displayAnalysisResults(issues, fixes){
+      aiResults.innerHTML = '';
+      
+      if(issues.length === 0){
+        aiResults.innerHTML = '<h2>AI Analysis Results</h2><div class="issue-card issue-fixed"><div class="issue-title">✅ No Issues Found</div><div class="issue-description">All code files look good!</div></div>';
+        return;
+      }
+      
+      const fixed = issues.filter(i => i.fixed).length;
+      const cannotFix = issues.filter(i => !i.fixable && i.fixType).length;
+      
+      const resultsHeader = document.createElement('h2');
+      resultsHeader.textContent = 'AI Analysis Results';
+      aiResults.appendChild(resultsHeader);
+      
+      const summary = document.createElement('div');
+      summary.className = 'issue-card issue-info';
+      summary.innerHTML = `
+        <div class="issue-title">📊 Analysis Summary</div>
+        <div class="issue-description">
+          Total issues: ${issues.length}<br>
+          Fixed automatically: ${fixed}<br>
+          Could not auto-fix: ${cannotFix}<br>
+          Errors: ${issues.filter(i => i.type === 'error').length}<br>
+          Warnings: ${issues.filter(i => i.type === 'warning').length}<br>
+          Info: ${issues.filter(i => i.type === 'info').length}
+        </div>
+      `;
+      aiResults.appendChild(summary);
+      
+      for(const issue of issues){
+        const card = document.createElement('div');
+        card.className = `issue-card issue-${issue.fixed ? 'fixed' : issue.type}`;
+        
+        const icon = issue.fixed ? '✅' : (issue.type === 'error' ? '❌' : issue.type === 'warning' ? '⚠️' : 'ℹ️');
+        const statusText = issue.fixed ? ' (AUTO-FIXED)' : (issue.fixType && !issue.fixable ? ' (UNABLE TO AUTO-FIX)' : '');
+        
+        card.innerHTML = `
+          <div class="issue-title">${icon} ${issue.title}${statusText}</div>
+          <div class="issue-file">${issue.file}</div>
+          <div class="issue-description">${issue.description}</div>
+        `;
+        
+        if(issue.fixed){
+          const fix = fixes.find(f => f.path === issue.file);
+          if(fix){
+            const fixDiv = document.createElement('div');
+            fixDiv.className = 'issue-fix';
+            fixDiv.textContent = `Fix applied: ${fix.description}`;
+            card.appendChild(fixDiv);
+          }
+        } else if(issue.fixType && !issue.fixable){
+          const noFixDiv = document.createElement('div');
+          noFixDiv.className = 'issue-fix';
+          noFixDiv.style.backgroundColor = 'rgba(244, 67, 54, 0.15)';
+          noFixDiv.style.color = '#ff6b6b';
+          
+          let errorMsg = '❌ Unable to automatically fix this issue';
+          if(issue.fixError){
+            errorMsg += `\nReason: ${issue.fixError}`;
+          }
+          errorMsg += '\n\n💡 Suggestion: Manually check this file for:\n';
+          errorMsg += '  • Unquoted property names (should be "property": value)\n';
+          errorMsg += '  • Single quotes instead of double quotes\n';
+          errorMsg += '  • Missing commas between properties\n';
+          errorMsg += '  • Extra content after the closing brace\n';
+          errorMsg += '  • Comments (JSON doesn\'t support comments)';
+          
+          noFixDiv.style.whiteSpace = 'pre-wrap';
+          noFixDiv.textContent = errorMsg;
+          card.appendChild(noFixDiv);
+        } else if(!issue.fixable && !issue.fixType){
+          const noFixDiv = document.createElement('div');
+          noFixDiv.className = 'issue-fix';
+          noFixDiv.style.backgroundColor = 'rgba(244, 67, 54, 0.15)';
+          noFixDiv.textContent = '⚠️ This issue requires manual fixing';
+          card.appendChild(noFixDiv);
+        }
+        
+        aiResults.appendChild(card);
+      }
+    }
+
+    async function loadAndCompare(){
+      if(!fileAEl.files[0] || !fileBEl.files[0]){ 
+        alert('Select both resource packs.'); 
+        return; 
+      }
+      
+      setStatus('Loading packs...');
+      
+      try {
+        zipA = await readZip(fileAEl.files[0]);
+        zipB = await readZip(fileBEl.files[0]);
+      } catch(err) {
+        setStatus('Error loading files: ' + err.message, true);
+        return;
+      }
+      
+      setStatus('Analyzing pack types...');
+
+      // Detect if these are .mcaddon files - REJECT THEM
+      const isAddonA = isAddonStructure(zipA);
+      const isAddonB = isAddonStructure(zipB);
+
+      if(isAddonA || isAddonB){
+        const whichPack = isAddonA && isAddonB ? 'Both files are' : (isAddonA ? 'Pack A is an' : 'Pack B is an');
+        setStatus(`❌ ERROR: ${whichPack} .mcaddon file. This tool only supports Resource Pack (.mcpack) merging. .mcaddon files contain multiple pack types with complex interdependencies that cannot be safely merged automatically. Please extract the .mcaddon and merge each component separately.`, true);
+        mergeBtn.disabled = true;
+        autoMergeBtn.disabled = true;
+        analyzeBtn.disabled = true;
+        return;
+      }
+
+      // Get pack types
+      const typeA = await getPackType(zipA);
+      const typeB = await getPackType(zipB);
+
+      // Verify both are resource packs
+      if(typeA !== 'resources' && typeA !== 'unknown'){
+        setStatus(`❌ ERROR: Pack A is not a resource pack (detected type: ${typeA}). This tool only supports resource pack merging.`, true);
+        mergeBtn.disabled = true;
+        autoMergeBtn.disabled = true;
+        analyzeBtn.disabled = true;
+        return;
+      }
+
+      if(typeB !== 'resources' && typeB !== 'unknown'){
+        setStatus(`❌ ERROR: Pack B is not a resource pack (detected type: ${typeB}). This tool only supports resource pack merging.`, true);
+        mergeBtn.disabled = true;
+        autoMergeBtn.disabled = true;
+        analyzeBtn.disabled = true;
+        return;
+      }
+
+      // Load manifests for version checking
+      try {
+        const manifestFileA = zipA.file('manifest.json');
+        const manifestFileB = zipB.file('manifest.json');
+        
+        if(manifestFileA) manifestA = JSON.parse(await manifestFileA.async('string'));
+        if(manifestFileB) manifestB = JSON.parse(await manifestFileB.async('string'));
+      } catch(e) {
+        console.warn('Could not load manifests:', e);
+      }
+
+      // Check version compatibility
+      let versionWarning = null;
+      if(manifestA && manifestB){
+        const verA = parseVersion(manifestA.header?.min_engine_version || manifestA.header?.version);
+        const verB = parseVersion(manifestB.header?.min_engine_version || manifestB.header?.version);
+        
+        const versionCheck = checkVersionCompatibility(verA, verB);
+        if(!versionCheck.compatible){
+          const proceed = confirm(`⚠️ WARNING: ${versionCheck.warning}\n\nDo you want to proceed anyway? The merged pack may not work properly.`);
+          if(!proceed){
+            setStatus('Merge cancelled due to version incompatibility.');
+            return;
+          }
+          versionWarning = versionCheck.warning;
+        } else if(versionCheck.warning){
+          versionWarning = versionCheck.warning;
+        }
+      }
+
+      setStatus('Scanning files...');
+
+      map = new Map();
+      
+      const addEntries = (zipObj, label) => {
+        zipObj.forEach((relativePath, file)=>{
+          if(file.dir) return; // Skip directories
+          let p = pathNormalize(relativePath);
+          
+          if(!map.has(p)) map.set(p,{a:null,b:null});
+          const entry = map.get(p);
+          entry[label] = file; // JSZip file object
+        });
+      };
+
+      addEntries(zipA, 'a');
+      addEntries(zipB, 'b');
+
+      // Build summary and conflict list
+      summary.innerHTML = '';
+      
+      const summaryHeader = document.createElement('h2');
+      summaryHeader.textContent = 'Conflicts / Summary';
+      summary.appendChild(summaryHeader);
+      
+      // Show version warning if exists
+      if(versionWarning){
+        const warning = document.createElement('div');
+        warning.style.cssText = 'background-color: rgba(255, 152, 0, 0.15); border: 2px solid #ff9800; padding: 15px; margin: 10px 0; border-radius: 10px; font-weight: bold; color: #ffa726;';
+        warning.innerHTML = `⚠️ ${versionWarning}`;
+        summary.appendChild(warning);
+      }
+      
+      const table = document.createElement('table');
+      const hdr = document.createElement('tr');
+      hdr.innerHTML = '<th>Path</th><th>In A</th><th>In B</th><th>Choice</th>';
+      table.appendChild(hdr);
+
+      let conflicts = 0, onlyA=0, onlyB=0, bothSame=0;
+
+      const rowsFragment = document.createDocumentFragment();
+      const entries = Array.from(map.entries()).sort((a,b) => a[0].localeCompare(b[0]));
+      
+      for(const [p, obj] of entries){
+        const inA = !!obj.a;
+        const inB = !!obj.b;
+        const tr = document.createElement('tr');
+        const tdPath = document.createElement('td'); tdPath.textContent = p;
+        const tdA = document.createElement('td'); tdA.textContent = inA ? '✓' : '';
+        const tdB = document.createElement('td'); tdB.textContent = inB ? '✓' : '';
+        const tdChoice = document.createElement('td');
+
+        if(inA && inB){
+          // compare content quickly
+          const same = await compareFiles(obj.a, obj.b);
+          if(same){ 
+            bothSame++; 
+            choices[p] = 'a'; 
+            tdChoice.textContent = 'Same';
+          }
+          else { 
+            conflicts++; 
+            choices[p] = 'a';
+            tr.classList.add('conflict');
+
+            const radioA = createRadio(p,'a',true);
+            const radioB = createRadio(p,'b',false);
+            const radioBoth = createRadio(p,'keepboth',false);
+            tdChoice.appendChild(radioA); tdChoice.appendChild(document.createTextNode(' A '));
+            tdChoice.appendChild(radioB); tdChoice.appendChild(document.createTextNode(' B '));
+            tdChoice.appendChild(radioBoth); tdChoice.appendChild(document.createTextNode(' Both'));
+          }
+        } else if(inA){ onlyA++; choices[p] = 'a'; tdChoice.textContent = 'A'; }
+        else { onlyB++; choices[p] = 'b'; tdChoice.textContent = 'B'; }
+
+        tr.appendChild(tdPath); tr.appendChild(tdA); tr.appendChild(tdB); tr.appendChild(tdChoice);
+        rowsFragment.appendChild(tr);
+      }
+
+      table.appendChild(rowsFragment);
+      summary.appendChild(table);
+      
+      setStatus(`Scan complete — ${map.size} files. Conflicts: ${conflicts}. Only A: ${onlyA}, Only B: ${onlyB}, Same: ${bothSame}`);
+      mergeBtn.disabled = false;
+      autoMergeBtn.disabled = false;
+      analyzeBtn.disabled = false;
+    }
+
+    function createRadio(path, val, checked){
+      const input = document.createElement('input');
+      input.type = 'radio';
+      input.name = 'choice-'+path.replace(/[^a-zA-Z0-9]/g,'_');
+      input.value = val;
+      input.checked = checked;
+      input.addEventListener('change', ()=>{ choices[path] = val; });
+      return input;
+    }
+
+    async function compareFiles(fileObjA, fileObjB){
+      try{
+        // Compare sizes then content
+        const aBuf = await fileObjA.async('uint8array');
+        const bBuf = await fileObjB.async('uint8array');
+        if(aBuf.length !== bBuf.length) return false;
+        for(let i=0;i<aBuf.length;i++) if(aBuf[i] !== bBuf[i]) return false;
+        return true;
+      }catch(e){ 
+        console.error('Error comparing files:', e);
+        return false; 
+      }
+    }
+
+    function uuidv4(){
+      // simple RFC4122 v4 generator
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{
+        const r = (Math.random()*16)|0, v = c==='x'?r:(r&0x3|0x8);
+        return v.toString(16);
+      });
+    }
+
+    async function mergeAndDownload(){
+      setStatus('Building merged resource pack...');
+      const outZip = new JSZip();
+
+      // copy files according to choices
+      for(const [p,obj] of map.entries()){
+        const choice = choices[p] || (obj.a? 'a' : 'b');
+        try {
+          // Check if we have a fixed version of this file
+          const fixedContent = window._fixedFiles && window._fixedFiles.get(p);
+          
+          if(fixedContent){
+            // Use the AI-fixed version
+            outZip.file(p, fixedContent);
+          } else if(choice === 'keepboth'){
+            if(obj.a) outZip.file(p, await obj.a.async('arraybuffer'));
+            if(obj.b) outZip.file(appendSuffix(p, '-B'), await obj.b.async('arraybuffer'));
+          } else if(choice === 'a'){
+            if(obj.a) outZip.file(p, await obj.a.async('arraybuffer'));
+            else if(obj.b) outZip.file(p, await obj.b.async('arraybuffer'));
+          } else {
+            if(obj.b) outZip.file(p, await obj.b.async('arraybuffer'));
+            else if(obj.a) outZip.file(p, await obj.a.async('arraybuffer'));
+          }
+        } catch(e) {
+          console.error('Error processing file:', p, e);
+        }
+      }
+
+      // Handle manifest.json merging
+      await mergeManifests(outZip);
+
+      const blob = await outZip.generateAsync({type:'blob'});
+      
+      // Determine output filename
+      const nameA = fileAEl.files[0] ? fileAEl.files[0].name.replace(/\.(mcpack|zip)$/i,'') : 'packA';
+      const nameB = fileBEl.files[0] ? fileBEl.files[0].name.replace(/\.(mcpack|zip)$/i,'') : 'packB';
+      
+      const outName = `${nameA}-${nameB}-merged.mcpack`;
+      
+      saveAs(blob, outName);
+      
+      const fixedCount = window._fixedFiles ? window._fixedFiles.size : 0;
+      const fixMsg = fixedCount > 0 ? ` (includes ${fixedCount} AI-fixed files)` : '';
+      setStatus('Download started: ' + outName + fixMsg);
+    }
+
+    async function mergeManifests(outZip){
+      // Find manifest.json at root
+      const manPath = 'manifest.json';
+      const entry = map.get(manPath);
+      if(!entry) return;
+
+      try{
+        const aMan = entry.a ? await entry.a.async('string') : null;
+        const bMan = entry.b ? await entry.b.async('string') : null;
+        
+        if(aMan && bMan && choices[manPath] !== 'keepboth'){
+          const aObj = JSON.parse(aMan);
+          const bObj = JSON.parse(bMan);
+          const out = JSON.parse(JSON.stringify(aObj)); // deep clone from A
+          
+          // merge header name and new uuid
+          out.header = out.header || {};
+          const aName = (aObj.header && aObj.header.name) || 'PackA';
+          const bName = (bObj.header && bObj.header.name) || 'PackB';
+          out.header.name = `${aName} + ${bName} (merged)`;
+          out.header.uuid = uuidv4();
+          
+          // Update module UUIDs to avoid conflicts
+          if(out.modules && Array.isArray(out.modules)){
+            out.modules.forEach(m => {
+              if(m.uuid) m.uuid = uuidv4();
+            });
+          }
+          
+          // merge modules arrays (deduplicate by type)
+          const aMods = aObj.modules || [];
+          const bMods = bObj.modules || [];
+          const modsByType = new Map();
+          
+          for(const m of aMods){
+            const key = m.type || 'unknown';
+            if(!modsByType.has(key)) modsByType.set(key, {...m, uuid: uuidv4()});
+          }
+          for(const m of bMods){
+            const key = m.type || 'unknown';
+            if(!modsByType.has(key)) modsByType.set(key, {...m, uuid: uuidv4()});
+          }
+          
+          out.modules = Array.from(modsByType.values());
+          
+          // Merge dependencies if they exist
+          if(bObj.dependencies && Array.isArray(bObj.dependencies)){
+            out.dependencies = out.dependencies || [];
+            const depSet = new Set(out.dependencies.map(d => JSON.stringify(d)));
+            for(const dep of bObj.dependencies){
+              const depStr = JSON.stringify(dep);
+              if(!depSet.has(depStr)){
+                out.dependencies.push(dep);
+                depSet.add(depStr);
+              }
+            }
+          }
+          
+          outZip.file(manPath, JSON.stringify(out, null, 2));
+          console.log(`Merged manifest at ${manPath}`);
+        }
+      }catch(e){ 
+        console.warn('Could not merge manifest:', e);
+      }
+    }
+
+    function appendSuffix(path, suf){
+      const parts = path.split('/');
+      const last = parts.pop();
+      const dot = last.lastIndexOf('.');
+      const name = dot>=0 ? last.slice(0,dot) : last;
+      const ext = dot>=0 ? last.slice(dot) : '';
+      parts.push(name + suf + ext);
+      return parts.join('/');
+    }
+
+    compareBtn.addEventListener('click', ()=>{ 
+      mergeBtn.disabled = true; 
+      autoMergeBtn.disabled = true;
+      analyzeBtn.disabled = true;
+      summary.innerHTML = '';
+      aiResults.innerHTML = '';
+      window._fixedFiles = null; // Clear any previous fixes
+      loadAndCompare().catch(e=>{ 
+        setStatus('Error: ' + e.message, true); 
+        console.error(e); 
+      }); 
+    });
+    
+    autoMergeBtn.addEventListener('click', ()=>{
+      aiAutoMerge().catch(e=>{
+        setStatus('AI Auto-merge error: ' + e.message, true);
+        console.error(e);
+      });
+    });
+    
+    analyzeBtn.addEventListener('click', ()=>{
+      aiAnalyzeAndFix().catch(e=>{
+        setStatus('AI Analysis error: ' + e.message, true);
+        console.error(e);
+      });
+    });
+    
+    mergeBtn.addEventListener('click', ()=>{ 
+      mergeAndDownload().catch(e=>{ 
+        setStatus('Merge error: ' + e.message, true); 
+        console.error(e); 
+      }); 
+    });
+
+  </script>
+</body>
+</html>
