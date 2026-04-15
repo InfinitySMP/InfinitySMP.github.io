@@ -1,0 +1,992 @@
+<!doctype html>
+<html lang="en-AU">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Infinity | Admin — Opt-Out Viewer</title>
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Infinity SMP — Admin Panel" />
+        <meta property="og:image" content="https://infinitysmp.github.io/recall-images/eventhunt.png" />
+        <meta name="robots" content="noindex, nofollow" />
+        <link rel="icon" type="image/png" href="https://infinitysmp.github.io/recall-images/logo.png" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=SF+Pro+Display:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+        <style>
+            * { margin:0; padding:0; box-sizing:border-box; }
+            html { overflow-x:hidden; overflow-y:auto; }
+            body::-webkit-scrollbar, html::-webkit-scrollbar { display:none; }
+            body, html { -ms-overflow-style:none; scrollbar-width:none; }
+
+            :root {
+                --bg-primary: #0a1929; --bg-secondary: #0d2137; --bg-tertiary: #132f4c;
+                --text-primary: #e3f2fd; --text-secondary: #90caf9; --text-tertiary: #64b5f6;
+                --accent: #2196f3; --accent-hover: #42a5f5;
+                --border: rgba(33,150,243,0.15); --border-hover: rgba(33,150,243,0.3);
+                --shadow-md: 0 4px 20px rgba(33,150,243,0.15);
+                --shadow-lg: 0 12px 48px rgba(33,150,243,0.25);
+                --shadow-glow: 0 0 40px rgba(33,150,243,0.2);
+                --radius-sm: 10px; --radius-md: 14px; --radius-lg: 20px;
+                --green: #4caf50; --orange: #ff9800; --red: #f44336;
+            }
+
+            body { font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,sans-serif; background:var(--bg-primary); color:var(--text-primary); min-height:100vh; padding:40px 20px; line-height:1.5; -webkit-font-smoothing:antialiased; position:relative; max-width:100vw; }
+            body::before { content:""; position:fixed; top:-50%; left:-50%; width:200%; height:200%; background:radial-gradient(circle at 30% 50%,rgba(33,150,243,0.1) 0%,transparent 50%),radial-gradient(circle at 70% 50%,rgba(33,150,243,0.05) 0%,transparent 50%); animation:floatBg 20s ease-in-out infinite; pointer-events:none; }
+
+            @keyframes floatBg { 0%,100%{transform:translate(0,0) rotate(0deg)} 33%{transform:translate(30px,-30px) rotate(5deg)} 66%{transform:translate(-20px,20px) rotate(-5deg)} }
+            @keyframes fadeInUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+            @keyframes fadeIn   { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+            @keyframes spin     { to{transform:rotate(360deg)} }
+            @keyframes shake    { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-6px)} 80%{transform:translateX(6px)} }
+            @keyframes slideIn  { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+            @keyframes draftPulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+            /* ── Lock ── */
+            #lockScreen { position:fixed; inset:0; background:var(--bg-primary); z-index:200; display:flex; align-items:center; justify-content:center; padding:20px; transition:opacity 0.4s ease; }
+            #lockScreen.hidden { opacity:0; pointer-events:none; }
+            .lock-card { background:var(--bg-secondary); border:1px solid var(--border); border-radius:var(--radius-lg); padding:48px 40px; max-width:400px; width:100%; text-align:center; box-shadow:var(--shadow-lg); position:relative; overflow:hidden; animation:fadeInUp 0.6s cubic-bezier(0.16,1,0.3,1); }
+            .lock-card::before { content:""; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--accent),var(--accent-hover)); }
+            .lock-icon { font-size:48px; margin-bottom:20px; display:block; }
+            .lock-title { font-size:24px; font-weight:700; margin-bottom:8px; background:linear-gradient(135deg,var(--text-primary) 0%,var(--accent) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+            .lock-subtitle { font-size:14px; color:var(--text-secondary); margin-bottom:32px; }
+            .lock-input { width:100%; background:var(--bg-primary); border:1px solid var(--border); border-radius:var(--radius-sm); padding:14px 16px; color:var(--text-primary); font-size:24px; font-family:"JetBrains Mono",monospace; text-align:center; letter-spacing:0.3em; outline:none; transition:all 0.3s ease; margin-bottom:8px; }
+            .lock-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(33,150,243,0.12); }
+            .lock-input.error { border-color:rgba(244,67,54,0.5); animation:shake 0.4s ease; }
+            .lock-error { font-size:13px; color:var(--red); margin-bottom:16px; min-height:20px; }
+            .lock-btn { width:100%; background:linear-gradient(135deg,var(--accent),var(--accent-hover)); color:white; border:none; padding:14px 24px; border-radius:var(--radius-md); font-size:15px; font-weight:600; cursor:pointer; transition:all 0.3s ease; box-shadow:0 4px 16px rgba(33,150,243,0.3); }
+            .lock-btn:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(33,150,243,0.5); }
+            .lock-draft-hint { margin-top:16px; font-size:12px; color:var(--orange); display:none; }
+
+            /* ── Main ── */
+            .container { width:100%; max-width:1000px; margin:0 auto; animation:fadeInUp 0.8s cubic-bezier(0.16,1,0.3,1); position:relative; z-index:1; }
+            .header { text-align:center; margin-bottom:40px; }
+            .logo-container { margin-bottom:32px; }
+            .logo { width:96px; height:96px; margin:0 auto; border-radius:24px; display:flex; align-items:center; justify-content:center; overflow:hidden; box-shadow:var(--shadow-glow),var(--shadow-lg); background:var(--bg-secondary); border:2px solid var(--border); transition:all 0.4s cubic-bezier(0.16,1,0.3,1); text-decoration:none; }
+            .logo:hover { transform:scale(1.05) translateY(-5px); border-color:var(--accent); }
+            .logo img { width:100%; height:100%; object-fit:cover; }
+            .back-link { display:inline-flex; align-items:center; gap:8px; color:var(--text-secondary); text-decoration:none; font-size:14px; margin-bottom:24px; transition:all 0.3s ease; font-weight:500; }
+            .back-link:hover { color:var(--accent); gap:12px; }
+            .back-arrow { transition:transform 0.3s ease; }
+            .back-link:hover .back-arrow { transform:translateX(-4px); }
+            .header-row { display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:16px; flex-wrap:wrap; }
+            .admin-badge { display:inline-flex; align-items:center; gap:6px; padding:4px 12px; background:rgba(33,150,243,0.1); border:1px solid var(--border); border-radius:20px; font-size:12px; font-weight:600; color:var(--text-tertiary); font-family:"JetBrains Mono",monospace; text-transform:uppercase; letter-spacing:0.04em; }
+            .signout-link { display:inline-flex; align-items:center; gap:6px; color:var(--text-tertiary); font-size:13px; cursor:pointer; border:none; background:none; font-family:inherit; transition:color 0.2s; }
+            .signout-link:hover { color:var(--red); }
+            h1 { font-size:48px; font-weight:700; letter-spacing:-0.03em; margin-bottom:12px; background:linear-gradient(135deg,var(--text-primary) 0%,var(--accent) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+            .header-subtitle { font-size:16px; color:var(--text-secondary); }
+
+            /* ── Tabs ── */
+            .tab-bar { display:flex; gap:4px; background:var(--bg-secondary); border:1px solid var(--border); border-radius:var(--radius-md); padding:6px; margin-bottom:32px; }
+            .tab { flex:1; padding:12px 16px; border:none; background:none; color:var(--text-secondary); font-size:14px; font-weight:600; cursor:pointer; border-radius:var(--radius-sm); transition:all 0.25s ease; display:flex; align-items:center; justify-content:center; gap:8px; }
+            .tab:hover { color:var(--text-primary); background:var(--bg-tertiary); }
+            .tab.active { background:linear-gradient(135deg,var(--accent),var(--accent-hover)); color:white; box-shadow:0 4px 12px rgba(33,150,243,0.3); }
+            .tab-badge { display:inline-flex; align-items:center; justify-content:center; min-width:20px; height:20px; padding:0 6px; background:rgba(255,255,255,0.2); border-radius:10px; font-size:11px; font-weight:700; }
+            .tab:not(.active) .tab-badge { background:rgba(33,150,243,0.15); color:var(--accent); }
+            .tab-panel { display:none; }
+            .tab-panel.active { display:block; animation:fadeIn 0.3s ease; }
+
+            /* ── Stats ── */
+            .stats-bar { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:28px; }
+            .stat-card { background:var(--bg-secondary); border:1px solid var(--border); border-radius:var(--radius-md); padding:20px; text-align:center; transition:all 0.3s ease; }
+            .stat-card:hover { border-color:var(--border-hover); transform:translateY(-2px); box-shadow:var(--shadow-md); }
+            .stat-value { font-size:32px; font-weight:700; color:var(--text-primary); font-family:"JetBrains Mono",monospace; }
+            .stat-label { font-size:12px; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:0.08em; font-weight:600; margin-top:4px; }
+
+            /* ── Controls ── */
+            .controls { display:flex; gap:12px; margin-bottom:20px; flex-wrap:wrap; align-items:center; }
+            .search-input { flex:1; min-width:200px; background:var(--bg-secondary); border:1px solid var(--border); border-radius:var(--radius-sm); padding:10px 14px; color:var(--text-primary); font-size:14px; font-family:inherit; outline:none; transition:all 0.3s ease; }
+            .search-input::placeholder { color:rgba(100,181,246,0.35); }
+            .search-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(33,150,243,0.12); }
+            .filter-chips { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
+            .filter-chip { padding:6px 14px; border-radius:20px; background:var(--bg-secondary); border:1px solid var(--border); color:var(--text-secondary); font-size:13px; font-weight:500; cursor:pointer; transition:all 0.2s ease; white-space:nowrap; }
+            .filter-chip:hover { border-color:var(--border-hover); color:var(--text-primary); }
+            .filter-chip.active { background:rgba(33,150,243,0.12); border-color:var(--accent); color:var(--accent); }
+            .ctrl-btn { background:var(--bg-secondary); border:1px solid var(--border); color:var(--text-secondary); padding:10px 18px; border-radius:var(--radius-sm); font-size:14px; font-weight:500; cursor:pointer; transition:all 0.3s ease; white-space:nowrap; }
+            .ctrl-btn:hover { border-color:var(--border-hover); color:var(--text-primary); background:var(--bg-tertiary); }
+            .ctrl-btn.primary { background:linear-gradient(135deg,var(--accent),var(--accent-hover)); border-color:transparent; color:white; box-shadow:0 4px 12px rgba(33,150,243,0.3); }
+            .ctrl-btn.primary:hover { transform:translateY(-1px); }
+            .ctrl-btn.danger { border-color:rgba(244,67,54,0.3); color:var(--red); }
+            .ctrl-btn.danger:hover { background:rgba(244,67,54,0.1); border-color:rgba(244,67,54,0.5); }
+
+            /* ── Opt-out list ── */
+            .optout-list { display:grid; gap:14px; }
+            .optout-card { background:var(--bg-secondary); border:1px solid var(--border); border-radius:var(--radius-lg); padding:22px 26px; display:flex; align-items:flex-start; gap:18px; transition:all 0.35s cubic-bezier(0.16,1,0.3,1); position:relative; overflow:hidden; animation:slideIn 0.35s ease-out backwards; }
+            .optout-card::before { content:""; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--accent),var(--accent-hover)); transform:scaleX(0); transform-origin:left; transition:transform 0.4s cubic-bezier(0.16,1,0.3,1); }
+            .optout-card:hover::before { transform:scaleX(1); }
+            .optout-card:hover { transform:translateY(-3px); box-shadow:var(--shadow-lg); border-color:var(--border-hover); }
+            .player-avatar { width:50px; height:50px; border-radius:12px; overflow:hidden; flex-shrink:0; background:var(--bg-tertiary); border:1px solid var(--border); }
+            .player-avatar img { width:100%; height:100%; object-fit:cover; }
+            .optout-content { flex:1; min-width:0; }
+            .optout-top { display:flex; align-items:center; gap:10px; margin-bottom:8px; flex-wrap:wrap; }
+            .player-name { font-size:17px; font-weight:600; color:var(--text-primary); font-family:"JetBrains Mono",monospace; }
+            .event-tag { display:inline-flex; align-items:center; gap:5px; padding:3px 10px; background:rgba(33,150,243,0.1); border:1px solid rgba(33,150,243,0.2); border-radius:20px; font-size:12px; color:var(--text-tertiary); font-weight:500; }
+            .optout-reason { font-size:14px; color:var(--text-secondary); line-height:1.6; margin-bottom:10px; padding:10px 14px; background:var(--bg-primary); border-radius:var(--radius-sm); border-left:3px solid var(--border); }
+            .optout-meta { font-size:12px; color:var(--text-tertiary); font-family:"JetBrains Mono",monospace; }
+            .delete-btn { background:none; border:1px solid transparent; color:rgba(244,67,54,0.4); font-size:16px; cursor:pointer; padding:8px; border-radius:var(--radius-sm); transition:all 0.2s; flex-shrink:0; }
+            .delete-btn:hover { color:var(--red); background:rgba(244,67,54,0.1); border-color:rgba(244,67,54,0.3); }
+
+            /* ── Empty / loading ── */
+            .empty-state { text-align:center; padding:70px 20px; background:var(--bg-secondary); border:1px solid var(--border); border-radius:var(--radius-lg); }
+            .empty-icon { font-size:52px; margin-bottom:14px; }
+            .empty-title { font-size:20px; font-weight:600; color:var(--text-primary); margin-bottom:8px; }
+            .empty-sub { font-size:14px; color:var(--text-secondary); }
+            .loading-state { text-align:center; padding:60px; color:var(--text-secondary); }
+            .loading-spinner { width:36px; height:36px; border:3px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 16px; }
+
+            /* ── Create event card ── */
+            .create-event-card { background:var(--bg-secondary); border:1px solid var(--border); border-radius:var(--radius-lg); padding:32px; margin-bottom:28px; position:relative; overflow:hidden; }
+            .create-event-card::before { content:""; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--accent),var(--accent-hover)); }
+
+            /* Title row with draft indicator */
+            .create-event-title-row { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:20px; flex-wrap:wrap; }
+            .create-event-title { font-size:18px; font-weight:600; color:var(--text-primary); }
+            .draft-status { display:none; align-items:center; gap:6px; font-size:12px; font-family:"JetBrains Mono",monospace; padding:4px 10px; border-radius:20px; border:1px solid; transition:all 0.4s ease; }
+            .draft-status.saving { display:inline-flex; color:var(--orange); border-color:rgba(255,152,0,0.3); background:rgba(255,152,0,0.08); animation:draftPulse 1.2s ease-in-out infinite; }
+            .draft-status.saved  { display:inline-flex; color:var(--green);  border-color:rgba(76,175,80,0.3);  background:rgba(76,175,80,0.08); animation:none; opacity:1; }
+            .draft-status.fading { display:inline-flex; opacity:0; }
+            .draft-dot { width:6px; height:6px; border-radius:50%; background:currentColor; flex-shrink:0; }
+
+            /* Draft restore banner */
+            .draft-banner { display:none; align-items:flex-start; gap:12px; padding:14px 16px; background:rgba(255,152,0,0.07); border:1px solid rgba(255,152,0,0.25); border-radius:var(--radius-sm); margin-bottom:20px; animation:fadeIn 0.3s ease; }
+            .draft-banner.show { display:flex; }
+            .draft-banner-icon { font-size:18px; flex-shrink:0; margin-top:1px; }
+            .draft-banner-body { flex:1; min-width:0; }
+            .draft-banner-title { font-size:13px; font-weight:600; color:var(--orange); margin-bottom:2px; }
+            .draft-banner-meta  { font-size:11px; color:rgba(255,152,0,0.6); font-family:"JetBrains Mono",monospace; }
+            .draft-banner-btns  { display:flex; gap:8px; flex-shrink:0; align-self:center; }
+            .draft-banner-btn { padding:6px 14px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s; border:1px solid; font-family:inherit; }
+            .draft-banner-btn.restore { background:rgba(255,152,0,0.15); border-color:rgba(255,152,0,0.4); color:var(--orange); }
+            .draft-banner-btn.restore:hover { background:rgba(255,152,0,0.25); }
+            .draft-banner-btn.discard { background:none; border-color:rgba(255,152,0,0.2); color:rgba(255,152,0,0.55); }
+            .draft-banner-btn.discard:hover { border-color:rgba(255,152,0,0.4); color:var(--orange); }
+
+            .create-form { display:grid; gap:20px; }
+            .form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+            .form-row-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
+
+            .form-field label { display:block; font-size:12px; font-weight:600; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px; font-family:"JetBrains Mono",monospace; }
+            .form-field input, .form-field textarea, .form-field select { width:100%; background:var(--bg-primary); border:1px solid var(--border); border-radius:var(--radius-sm); padding:12px 14px; color:var(--text-primary); font-size:14px; font-family:inherit; outline:none; transition:all 0.3s ease; resize:none; }
+            .form-field input::placeholder, .form-field textarea::placeholder { color:rgba(100,181,246,0.35); }
+            .form-field input:focus, .form-field textarea:focus, .form-field select:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(33,150,243,0.12); background:var(--bg-secondary); }
+            .form-field input[type="datetime-local"] { color-scheme:dark; }
+            .form-field .field-hint { font-size:11px; color:var(--text-tertiary); margin-top:6px; }
+
+            .icon-preview-wrap { display:flex; gap:12px; align-items:flex-start; }
+            .icon-preview-wrap .form-field { flex:1; }
+            .icon-preview-box { width:52px; height:52px; border-radius:12px; overflow:hidden; background:var(--bg-tertiary); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0; margin-top:28px; }
+            .icon-preview-box img { width:100%; height:100%; object-fit:cover; }
+
+            /* ── Rich markdown editor ── */
+            .md-editor { border:1px solid var(--border); border-radius:var(--radius-md); overflow:hidden; transition:border-color 0.3s ease; }
+            .md-editor:focus-within { border-color:var(--accent); box-shadow:0 0 0 3px rgba(33,150,243,0.12); }
+            .md-toolbar { display:flex; align-items:center; gap:2px; padding:8px 10px; background:var(--bg-tertiary); border-bottom:1px solid var(--border); flex-wrap:wrap; }
+            .md-btn { background:none; border:1px solid transparent; color:var(--text-secondary); font-size:13px; font-weight:600; cursor:pointer; padding:5px 9px; border-radius:6px; transition:all 0.2s ease; font-family:"JetBrains Mono",monospace; line-height:1; }
+            .md-btn:hover { background:var(--bg-secondary); border-color:var(--border); color:var(--text-primary); }
+            .md-sep { width:1px; height:18px; background:var(--border); margin:0 4px; flex-shrink:0; }
+            .md-tabs { display:flex; gap:0; margin-left:auto; }
+            .md-tab { background:none; border:1px solid var(--border); color:var(--text-tertiary); font-size:12px; font-weight:600; cursor:pointer; padding:4px 12px; transition:all 0.2s; font-family:inherit; }
+            .md-tab:first-child { border-radius:6px 0 0 6px; }
+            .md-tab:last-child  { border-radius:0 6px 6px 0; border-left:none; }
+            .md-tab.active { background:var(--accent); border-color:var(--accent); color:white; }
+            .md-textarea { width:100%; background:var(--bg-primary); border:none; padding:14px 16px; color:var(--text-primary); font-size:14px; font-family:"JetBrains Mono",monospace; line-height:1.7; outline:none; resize:vertical; min-height:220px; }
+            .md-preview { display:none; padding:14px 16px; min-height:220px; background:var(--bg-primary); font-size:14px; line-height:1.7; color:var(--text-secondary); }
+            .md-preview.visible { display:block; }
+            .md-textarea.hidden { display:none; }
+            .md-preview h1 { font-size:22px; font-weight:700; color:var(--text-primary); margin:16px 0 8px; border-bottom:1px solid var(--border); padding-bottom:6px; }
+            .md-preview h2 { font-size:18px; font-weight:600; color:var(--text-primary); margin:14px 0 6px; }
+            .md-preview h3 { font-size:15px; font-weight:600; color:var(--text-secondary); margin:12px 0 4px; }
+            .md-preview strong { color:var(--text-primary); font-weight:700; }
+            .md-preview em { font-style:italic; }
+            .md-preview ul, .md-preview ol { padding-left:20px; margin:8px 0; }
+            .md-preview li { margin:3px 0; }
+            .md-preview blockquote { border-left:3px solid var(--accent); padding:8px 14px; background:rgba(33,150,243,0.06); border-radius:0 6px 6px 0; margin:8px 0; }
+            .md-preview code { background:var(--bg-tertiary); padding:2px 6px; border-radius:4px; font-family:"JetBrains Mono",monospace; font-size:12px; color:var(--text-tertiary); }
+            .md-preview hr { border:none; border-top:1px solid var(--border); margin:12px 0; }
+            .md-preview p { margin:6px 0; }
+            .md-char-count { text-align:right; font-size:11px; color:var(--text-tertiary); font-family:"JetBrains Mono",monospace; padding:4px 10px 6px; background:var(--bg-tertiary); border-top:1px solid var(--border); }
+
+            /* ── Schedule section ── */
+            .section-divider { display:flex; align-items:center; gap:12px; margin:4px 0; }
+            .section-divider-label { font-size:12px; font-weight:600; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:0.08em; font-family:"JetBrains Mono",monospace; white-space:nowrap; }
+            .section-divider-line { flex:1; height:1px; background:var(--border); }
+
+            /* ── Create btn row ── */
+            .create-btn-row { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
+            .create-btn-row-left { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+            .toggle-wrap-inline { display:flex; align-items:center; gap:10px; }
+            .toggle { position:relative; width:44px; height:24px; flex-shrink:0; cursor:pointer; }
+            .toggle input { opacity:0; width:0; height:0; position:absolute; }
+            .toggle-track { position:absolute; inset:0; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:12px; transition:all 0.3s ease; }
+            .toggle input:checked ~ .toggle-track { background:rgba(33,150,243,0.3); border-color:var(--accent); }
+            .toggle-thumb { position:absolute; top:3px; left:3px; width:16px; height:16px; border-radius:50%; background:var(--text-tertiary); transition:all 0.3s cubic-bezier(0.16,1,0.3,1); }
+            .toggle input:checked ~ .toggle-thumb { transform:translateX(20px); background:var(--accent); }
+            .create-btn { background:linear-gradient(135deg,var(--accent),var(--accent-hover)); color:white; border:none; padding:14px 28px; border-radius:var(--radius-md); font-size:14px; font-weight:600; cursor:pointer; transition:all 0.3s cubic-bezier(0.16,1,0.3,1); box-shadow:0 4px 12px rgba(33,150,243,0.3); display:flex; align-items:center; gap:8px; }
+            .create-btn:hover { transform:translateY(-2px); box-shadow:0 8px 20px rgba(33,150,243,0.4); }
+            .create-btn:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+
+            /* ── Event list cards ── */
+            .events-list { display:grid; gap:12px; }
+            .event-card { background:var(--bg-secondary); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden; transition:all 0.3s ease; animation:slideIn 0.3s ease-out backwards; }
+            .event-card:hover { border-color:var(--border-hover); box-shadow:var(--shadow-md); }
+            .event-card-main { display:flex; align-items:stretch; }
+            .event-card-thumb { width:88px; flex-shrink:0; background:var(--bg-tertiary); display:flex; align-items:center; justify-content:center; font-size:36px; overflow:hidden; }
+            .event-card-thumb img { width:100%; height:100%; object-fit:cover; transition:transform 0.4s ease; }
+            .event-card:hover .event-card-thumb img { transform:scale(1.06); }
+            .event-card-body { flex:1; min-width:0; padding:16px 18px; }
+            .event-card-name { font-size:16px; font-weight:600; color:var(--text-primary); margin-bottom:3px; }
+            .event-card-desc { font-size:13px; color:var(--text-secondary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+            .event-card-schedule { font-size:12px; color:var(--text-tertiary); font-family:"JetBrains Mono",monospace; margin-top:5px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+            .sched-badge { display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:600; }
+            .sched-badge.upcoming { background:rgba(255,152,0,0.12); border:1px solid rgba(255,152,0,0.3); color:var(--orange); }
+            .sched-badge.live     { background:rgba(76,175,80,0.12);  border:1px solid rgba(76,175,80,0.3);  color:var(--green); }
+            .sched-badge.ended    { background:rgba(158,158,158,0.1); border:1px solid rgba(158,158,158,0.2); color:#9e9e9e; }
+            .event-card-actions { display:flex; align-items:center; gap:10px; flex-shrink:0; padding:0 16px; }
+            .event-optout-count { display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border-radius:20px; background:rgba(33,150,243,0.1); border:1px solid rgba(33,150,243,0.2); font-size:12px; color:var(--text-tertiary); font-weight:600; white-space:nowrap; }
+            .active-pill { padding:3px 10px; border-radius:20px; font-size:12px; font-weight:600; white-space:nowrap; }
+            .active-pill.on  { background:rgba(76,175,80,0.15); color:var(--green); border:1px solid rgba(76,175,80,0.3); }
+            .active-pill.off { background:rgba(158,158,158,0.1); color:#9e9e9e; border:1px solid rgba(158,158,158,0.2); }
+            .icon-btn { width:34px; height:34px; border-radius:var(--radius-sm); border:1px solid transparent; background:none; display:flex; align-items:center; justify-content:center; font-size:15px; cursor:pointer; transition:all 0.2s; }
+            .icon-btn.del { color:rgba(244,67,54,0.4); }
+            .icon-btn.del:hover { color:var(--red); background:rgba(244,67,54,0.1); border-color:rgba(244,67,54,0.3); }
+            .events-empty { text-align:center; padding:48px 20px; background:var(--bg-secondary); border:1px solid var(--border); border-radius:var(--radius-lg); }
+            .events-empty-icon { font-size:44px; margin-bottom:12px; }
+            .events-empty-title { font-size:18px; font-weight:600; color:var(--text-primary); margin-bottom:6px; }
+            .events-empty-sub { font-size:14px; color:var(--text-secondary); }
+
+            /* ── Modal ── */
+            .modal-overlay { position:fixed; inset:0; background:rgba(10,25,41,0.85); backdrop-filter:blur(4px); z-index:150; display:flex; align-items:center; justify-content:center; padding:20px; opacity:0; pointer-events:none; transition:opacity 0.3s ease; }
+            .modal-overlay.visible { opacity:1; pointer-events:all; }
+            .modal { background:var(--bg-secondary); border:1px solid var(--border); border-radius:var(--radius-lg); padding:36px; max-width:400px; width:100%; box-shadow:var(--shadow-lg); text-align:center; transform:scale(0.95); transition:transform 0.3s cubic-bezier(0.16,1,0.3,1); }
+            .modal-overlay.visible .modal { transform:scale(1); }
+            .modal-icon { font-size:40px; margin-bottom:16px; }
+            .modal-title { font-size:20px; font-weight:700; color:var(--text-primary); margin-bottom:8px; }
+            .modal-sub { font-size:14px; color:var(--text-secondary); margin-bottom:28px; line-height:1.6; }
+            .modal-btns { display:flex; gap:12px; }
+            .modal-cancel { flex:1; background:var(--bg-tertiary); border:1px solid var(--border); color:var(--text-secondary); padding:12px; border-radius:var(--radius-sm); font-size:14px; font-weight:600; cursor:pointer; transition:all 0.2s; }
+            .modal-cancel:hover { border-color:var(--border-hover); color:var(--text-primary); }
+            .modal-confirm { flex:1; background:var(--red); border:none; color:white; padding:12px; border-radius:var(--radius-sm); font-size:14px; font-weight:600; cursor:pointer; transition:opacity 0.2s; }
+            .modal-confirm:hover { opacity:0.85; }
+
+            /* Toast */
+            .toast { position:fixed; bottom:32px; left:50%; transform:translateX(-50%) translateY(100px); background:var(--bg-tertiary); border:1px solid rgba(76,175,80,0.4); border-radius:var(--radius-md); padding:14px 22px; display:flex; align-items:center; gap:10px; font-size:14px; font-weight:500; color:var(--text-primary); box-shadow:var(--shadow-lg); z-index:300; transition:transform 0.5s cubic-bezier(0.16,1,0.3,1); white-space:nowrap; }
+            .toast.show { transform:translateX(-50%) translateY(0); }
+            .toast.error { border-color:rgba(244,67,54,0.4); }
+            .toast-icon { font-size:18px; }
+
+            .footer { text-align:center; margin-top:60px; padding-top:32px; border-top:1px solid var(--border); }
+            .footer-text { font-size:14px; color:var(--text-tertiary); line-height:1.6; }
+            .footer-text a { color:var(--accent); text-decoration:none; }
+
+            .particles { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; overflow:hidden; }
+            .particle { position:absolute; width:3px; height:3px; background:var(--accent); border-radius:50%; opacity:0; animation:float-particle 15s infinite; box-shadow:0 0 10px var(--accent); }
+            @keyframes float-particle { 0%{transform:translateY(100vh) translateX(0);opacity:0} 10%{opacity:0.5} 90%{opacity:0.5} 100%{transform:translateY(-100px) translateX(100px);opacity:0} }
+            .particle:nth-child(1){left:10%;animation-delay:0s}.particle:nth-child(2){left:25%;animation-delay:3s}.particle:nth-child(3){left:40%;animation-delay:6s}.particle:nth-child(4){left:60%;animation-delay:9s}.particle:nth-child(5){left:75%;animation-delay:12s}.particle:nth-child(6){left:90%;animation-delay:2s}
+
+            @media(max-width:768px){
+                body{padding:32px 16px} h1{font-size:32px} .logo{width:80px;height:80px}
+                .stats-bar{grid-template-columns:1fr 1fr} .stats-bar .stat-card:last-child{grid-column:span 2}
+                .controls{flex-direction:column} .search-input{min-width:0}
+                .form-row,.form-row-3{grid-template-columns:1fr}
+                .event-card-main{flex-wrap:wrap}
+                .event-card-thumb{width:100%;height:72px}
+                .event-card-actions{width:100%;justify-content:flex-end;padding:0 16px 16px}
+                .tab span{display:none}
+                .create-event-title-row{flex-direction:column;align-items:flex-start}
+                .draft-banner{flex-wrap:wrap}
+            }
+        </style>
+    </head>
+    <body>
+        <div class="particles"><div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div></div>
+
+        <!-- Lock -->
+        <div id="lockScreen">
+            <div class="lock-card">
+                <span class="lock-icon">🔐</span>
+                <div class="lock-title">Admin Access</div>
+                <div class="lock-subtitle">Enter the admin password to continue</div>
+                <input type="password" class="lock-input" id="lockInput" placeholder="••••" maxlength="20" onkeydown="if(event.key==='Enter') attemptUnlock()" />
+                <div class="lock-error" id="lockError"></div>
+                <button class="lock-btn" onclick="attemptUnlock()">Unlock Panel</button>
+                <div class="lock-draft-hint" id="lockDraftHint">📝 You have a saved event draft</div>
+            </div>
+        </div>
+
+        <!-- Delete confirm modal -->
+        <div class="modal-overlay" id="deleteModal">
+            <div class="modal">
+                <div class="modal-icon">🗑️</div>
+                <div class="modal-title">Delete?</div>
+                <div class="modal-sub" id="deleteSub">This action cannot be undone.</div>
+                <div class="modal-btns">
+                    <button class="modal-cancel" onclick="closeModal('deleteModal')">Cancel</button>
+                    <button class="modal-confirm" id="deleteConfirmBtn">Delete</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Clear form confirm modal -->
+        <div class="modal-overlay" id="clearFormModal">
+            <div class="modal">
+                <div class="modal-icon">🗑️</div>
+                <div class="modal-title">Clear form?</div>
+                <div class="modal-sub">All fields will be wiped and the saved draft will be deleted. This can't be undone.</div>
+                <div class="modal-btns">
+                    <button class="modal-cancel" onclick="closeModal('clearFormModal')">Cancel</button>
+                    <button class="modal-confirm" onclick="clearFormConfirmed()">Yes, clear it</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="container" id="mainContent" style="display:none">
+            <div class="header">
+                <div class="logo-container">
+                    <a href="https://infinitysmp.github.io/" class="logo">
+                        <img src="https://infinitysmp.github.io/logo.png" alt="Infinity SMP" />
+                    </a>
+                </div>
+                <div class="header-row">
+                    <span class="admin-badge">🛡️ Admin Panel</span>
+                    <button class="signout-link" onclick="lockPanel()">🔒 Lock</button>
+                </div>
+                <a href="https://infinitysmp.github.io/" class="back-link"><span class="back-arrow">←</span> Back to Home</a>
+                <h1>Opt-Out Manager</h1>
+                <p class="header-subtitle">Create events and review player opt-out requests</p>
+            </div>
+
+            <div class="tab-bar">
+                <button class="tab active" id="tab-optouts" onclick="switchTab('optouts')">📋 <span>Opt-Out Requests</span> <span class="tab-badge" id="tabBadgeOptouts">0</span></button>
+                <button class="tab" id="tab-events"  onclick="switchTab('events')">🎯 <span>Manage Events</span> <span class="tab-badge" id="tabBadgeEvents">0</span></button>
+            </div>
+
+            <!-- ── Opt-Outs tab ── -->
+            <div class="tab-panel active" id="panel-optouts">
+                <div class="stats-bar">
+                    <div class="stat-card"><div class="stat-value" id="statTotal">—</div><div class="stat-label">Total Opt-Outs</div></div>
+                    <div class="stat-card"><div class="stat-value" id="statUnique">—</div><div class="stat-label">Unique Players</div></div>
+                    <div class="stat-card"><div class="stat-value" id="statEvents">—</div><div class="stat-label">Events w/ Opt-Outs</div></div>
+                </div>
+                <div class="controls">
+                    <input type="text" class="search-input" id="searchInput" placeholder="🔍  Search username, reason, or event..." oninput="filterOptouts()" />
+                    <button class="ctrl-btn primary" onclick="renderOptouts()">🔄 Refresh</button>
+                    <button class="ctrl-btn danger"   onclick="promptClearAll()">🗑️ Clear All</button>
+                </div>
+                <div class="filter-chips" id="filterChips"></div>
+                <div class="optout-list" id="optoutList"><div class="loading-state"><div class="loading-spinner"></div><div>Loading...</div></div></div>
+            </div>
+
+            <!-- ── Events tab ── -->
+            <div class="tab-panel" id="panel-events">
+                <div class="create-event-card">
+
+                    <!-- Title + draft indicator -->
+                    <div class="create-event-title-row">
+                        <div class="create-event-title">➕ Create New Event</div>
+                        <div class="draft-status" id="draftStatus">
+                            <div class="draft-dot"></div>
+                            <span id="draftStatusText">Saving…</span>
+                        </div>
+                    </div>
+
+                    <!-- Draft restore banner -->
+                    <div class="draft-banner" id="draftBanner">
+                        <div class="draft-banner-icon">📝</div>
+                        <div class="draft-banner-body">
+                            <div class="draft-banner-title">Unsaved draft found</div>
+                            <div class="draft-banner-meta" id="draftBannerMeta"></div>
+                        </div>
+                        <div class="draft-banner-btns">
+                            <button class="draft-banner-btn restore" onclick="restoreDraft()">↩ Restore</button>
+                            <button class="draft-banner-btn discard" onclick="discardDraft()">Discard</button>
+                        </div>
+                    </div>
+
+                    <div class="create-form">
+
+                        <div class="form-row">
+                            <div class="form-field">
+                                <label for="newEventName">Event Name *</label>
+                                <input type="text" id="newEventName" placeholder="e.g. The Hunt" maxlength="80" />
+                            </div>
+                            <div class="form-field">
+                                <label for="newEventDesc">Short Description</label>
+                                <input type="text" id="newEventDesc" placeholder="One-line summary shown on cards..." maxlength="120" />
+                            </div>
+                        </div>
+
+                        <div class="icon-preview-wrap">
+                            <div class="form-field">
+                                <label for="newEventIcon">Icon — Image URL or Emoji</label>
+                                <input type="text" id="newEventIcon" placeholder="https://… or 🎯" oninput="previewIcon()" />
+                                <div class="field-hint">Paste a full image URL or type an emoji.</div>
+                            </div>
+                            <div class="icon-preview-box" id="iconPreview">🎯</div>
+                        </div>
+
+                        <div class="section-divider">
+                            <span class="section-divider-label">📅 Schedule</span>
+                            <div class="section-divider-line"></div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-field">
+                                <label for="newEventStart">Start Date &amp; Time</label>
+                                <input type="datetime-local" id="newEventStart" />
+                                <div class="field-hint">Leave blank if not scheduled yet.</div>
+                            </div>
+                            <div class="form-field">
+                                <label for="newEventEnd">End Date &amp; Time</label>
+                                <input type="datetime-local" id="newEventEnd" />
+                                <div class="field-hint">Leave blank for open-ended events.</div>
+                            </div>
+                        </div>
+
+                        <div class="section-divider">
+                            <span class="section-divider-label">📝 Full Description</span>
+                            <div class="section-divider-line"></div>
+                        </div>
+
+                        <div class="form-field">
+                            <label>Long Description (Markdown supported)</label>
+                            <div class="md-editor" id="mdEditor">
+                                <div class="md-toolbar">
+                                    <button type="button" class="md-btn" onclick="mdFmt('# ','',true)"  title="Heading 1">H1</button>
+                                    <button type="button" class="md-btn" onclick="mdFmt('## ','',true)" title="Heading 2">H2</button>
+                                    <button type="button" class="md-btn" onclick="mdFmt('### ','',true)" title="Heading 3">H3</button>
+                                    <div class="md-sep"></div>
+                                    <button type="button" class="md-btn" onclick="mdFmt('**','**')" title="Bold"><b>B</b></button>
+                                    <button type="button" class="md-btn" onclick="mdFmt('*','*')"   title="Italic"><i>I</i></button>
+                                    <button type="button" class="md-btn" onclick="mdFmt('`','`')"   title="Code">` `</button>
+                                    <div class="md-sep"></div>
+                                    <button type="button" class="md-btn" onclick="mdFmt('- ','',true)"  title="Bullet">• List</button>
+                                    <button type="button" class="md-btn" onclick="mdFmt('> ','',true)"  title="Quote">❝</button>
+                                    <button type="button" class="md-btn" onclick="mdInsertHr()"         title="Divider">─</button>
+                                    <div class="md-tabs" style="margin-left:auto">
+                                        <button type="button" class="md-tab active" id="mdTabWrite" onclick="mdSwitchTab('write')">Write</button>
+                                        <button type="button" class="md-tab"        id="mdTabPrev"  onclick="mdSwitchTab('preview')">Preview</button>
+                                    </div>
+                                </div>
+                                <textarea class="md-textarea" id="newEventLongDesc" placeholder="Write a detailed event description here...&#10;&#10;## Rules&#10;- First rule...&#10;&#10;## Rewards&#10;- Top prize..." oninput="mdUpdateCount()"></textarea>
+                                <div class="md-preview" id="mdPreviewPane"></div>
+                                <div class="md-char-count" id="mdCharCount">0 chars</div>
+                            </div>
+                        </div>
+
+                        <div class="create-btn-row">
+                            <div class="create-btn-row-left">
+                                <div class="toggle-wrap-inline">
+                                    <label class="toggle">
+                                        <input type="checkbox" id="newEventActive" checked />
+                                        <div class="toggle-track"></div>
+                                        <div class="toggle-thumb"></div>
+                                    </label>
+                                    <span style="font-size:13px;color:var(--text-secondary);">Active immediately</span>
+                                </div>
+                                <button class="ctrl-btn danger" onclick="promptClearForm()" style="padding:8px 14px;font-size:13px;">🗑️ Clear form</button>
+                            </div>
+                            <button class="create-btn" id="createBtn" onclick="submitNewEvent()">
+                                <span>✨</span> Create Event
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="events-list" id="eventsList">
+                    <div class="loading-state"><div class="loading-spinner"></div><div>Loading events...</div></div>
+                </div>
+            </div>
+
+            <div class="footer"><p class="footer-text">Infinity SMP Admin Panel<br /><a href="https://discord.gg/3FbYYN4cQS">Discord</a></p></div>
+        </div>
+
+        <div class="toast" id="toast"><span class="toast-icon" id="toastIcon">✅</span><span id="toastMsg"></span></div>
+
+        <script type="module">
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+            import { getDatabase, ref, get, push, remove, update, onValue, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+            const firebaseConfig = { apiKey:"AIzaSyBgV9PoUFut3FPc0iChFNm2-h6-Uc5z6s0", authDomain:"infinity-service-b2f10.firebaseapp.com", databaseURL:"https://infinity-service-b2f10-default-rtdb.firebaseio.com", projectId:"infinity-service-b2f10", storageBucket:"infinity-service-b2f10.firebasestorage.app", messagingSenderId:"805770674259", appId:"1:805770674259:web:bcc520979e6772fda5c6a6" };
+            const app = initializeApp(firebaseConfig);
+            const db  = getDatabase(app);
+
+            let allOptouts = [], allEvents = [], activeFilter = "all", pendingDeleteFn = null;
+
+            // ─────────────────────────────────────────────────────
+            //  DRAFT SYSTEM
+            // ─────────────────────────────────────────────────────
+            const DRAFT_KEY = "infinitySMP_adminEventDraft_v1";
+            let draftSaveTimer = null;
+            let draftFadeTimer = null;
+
+            function draftGetFields() {
+                return {
+                    name:      document.getElementById("newEventName").value,
+                    desc:      document.getElementById("newEventDesc").value,
+                    icon:      document.getElementById("newEventIcon").value,
+                    longDesc:  document.getElementById("newEventLongDesc").value,
+                    startDate: document.getElementById("newEventStart").value,
+                    endDate:   document.getElementById("newEventEnd").value,
+                    active:    document.getElementById("newEventActive").checked,
+                    savedAt:   Date.now()
+                };
+            }
+
+            function draftIsEmpty(d) {
+                return !(d.name || d.desc || d.longDesc || d.icon);
+            }
+
+            function draftSave() {
+                const d = draftGetFields();
+                if (draftIsEmpty(d)) { localStorage.removeItem(DRAFT_KEY); draftHideStatus(); return; }
+                localStorage.setItem(DRAFT_KEY, JSON.stringify(d));
+                draftShowStatus("saved");
+            }
+
+            function draftScheduleSave() {
+                draftShowStatus("saving");
+                clearTimeout(draftSaveTimer);
+                draftSaveTimer = setTimeout(draftSave, 900);
+            }
+
+            function draftShowStatus(state) {
+                clearTimeout(draftFadeTimer);
+                const el   = document.getElementById("draftStatus");
+                const text = document.getElementById("draftStatusText");
+                el.className = "draft-status " + state;
+                text.textContent = state === "saving" ? "Saving draft…" : "Draft saved";
+                if (state === "saved") {
+                    // Fade out after 3s
+                    draftFadeTimer = setTimeout(() => {
+                        el.className = "draft-status fading";
+                        setTimeout(() => { el.className = "draft-status"; }, 500);
+                    }, 3000);
+                }
+            }
+
+            function draftHideStatus() {
+                clearTimeout(draftFadeTimer);
+                document.getElementById("draftStatus").className = "draft-status";
+            }
+
+            function draftAttachListeners() {
+                const inputIds = ["newEventName","newEventDesc","newEventIcon","newEventLongDesc","newEventStart","newEventEnd"];
+                inputIds.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.addEventListener("input", draftScheduleSave);
+                });
+                document.getElementById("newEventActive").addEventListener("change", draftScheduleSave);
+            }
+
+            function draftCheckOnLoad() {
+                // Show a hint on the lock screen if a draft exists
+                try {
+                    const raw = localStorage.getItem(DRAFT_KEY);
+                    if (raw) {
+                        const d = JSON.parse(raw);
+                        if (!draftIsEmpty(d)) {
+                            document.getElementById("lockDraftHint").style.display = "block";
+                        }
+                    }
+                } catch {}
+            }
+
+            function draftShowBanner() {
+                try {
+                    const raw = localStorage.getItem(DRAFT_KEY);
+                    if (!raw) return;
+                    const d = JSON.parse(raw);
+                    if (draftIsEmpty(d)) { localStorage.removeItem(DRAFT_KEY); return; }
+                    const meta = document.getElementById("draftBannerMeta");
+                    const label = d.name ? `"${d.name}"` : "untitled event";
+                    const ago   = d.savedAt ? formatTimeAgo(d.savedAt) : "";
+                    meta.textContent = `${label}${ago ? " · saved " + ago : ""}`;
+                    document.getElementById("draftBanner").classList.add("show");
+                } catch {}
+            }
+
+            window.restoreDraft = function() {
+                try {
+                    const raw = localStorage.getItem(DRAFT_KEY);
+                    if (!raw) return;
+                    const d = JSON.parse(raw);
+                    document.getElementById("newEventName").value     = d.name      || "";
+                    document.getElementById("newEventDesc").value     = d.desc      || "";
+                    document.getElementById("newEventIcon").value     = d.icon      || "";
+                    document.getElementById("newEventLongDesc").value = d.longDesc  || "";
+                    document.getElementById("newEventStart").value    = d.startDate || "";
+                    document.getElementById("newEventEnd").value      = d.endDate   || "";
+                    document.getElementById("newEventActive").checked = d.active !== false;
+                    previewIcon(); mdUpdateCount();
+                    document.getElementById("draftBanner").classList.remove("show");
+                    draftShowStatus("saved");
+                    showToast("Draft restored ✓");
+                } catch { showToast("Could not restore draft.", true); }
+            };
+
+            window.discardDraft = function() {
+                localStorage.removeItem(DRAFT_KEY);
+                document.getElementById("draftBanner").classList.remove("show");
+                draftHideStatus();
+                showToast("Draft discarded.");
+            };
+
+            window.promptClearForm = function() { openModal("clearFormModal"); };
+            window.clearFormConfirmed = function() {
+                closeModal("clearFormModal");
+                resetForm();
+                showToast("Form cleared.");
+            };
+
+            function resetForm() {
+                ["newEventName","newEventDesc","newEventIcon","newEventLongDesc"].forEach(id => document.getElementById(id).value = "");
+                document.getElementById("newEventStart").value = "";
+                document.getElementById("newEventEnd").value   = "";
+                document.getElementById("newEventActive").checked = true;
+                document.getElementById("iconPreview").innerHTML = "🎯";
+                document.getElementById("mdCharCount").textContent = "0 chars";
+                mdSwitchTab("write");
+                localStorage.removeItem(DRAFT_KEY);
+                draftHideStatus();
+                document.getElementById("draftBanner").classList.remove("show");
+            }
+
+            function formatTimeAgo(ts) {
+                const secs = Math.floor((Date.now() - ts) / 1000);
+                if (secs < 60)    return "just now";
+                if (secs < 3600)  return `${Math.floor(secs/60)}m ago`;
+                if (secs < 86400) return `${Math.floor(secs/3600)}h ago`;
+                return new Date(ts).toLocaleDateString("en-AU",{day:"numeric",month:"short"});
+            }
+
+            // ─────────────────────────────────────────────────────
+            //  HELPERS
+            // ─────────────────────────────────────────────────────
+            function esc(s) { return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;"); }
+            function isImg(s) { return s && (s.startsWith("http") || s.startsWith("/") || s.startsWith(".")); }
+
+            function fmtDateShort(iso) {
+                if (!iso) return null;
+                return new Date(iso).toLocaleString("en-AU",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"});
+            }
+
+            function schedStatus(startIso, endIso) {
+                const now = Date.now();
+                const start = startIso ? new Date(startIso).getTime() : null;
+                const end   = endIso   ? new Date(endIso).getTime()   : null;
+                if (start && now < start) return "upcoming";
+                if (end   && now > end)   return "ended";
+                if (start) return "live";
+                return null;
+            }
+
+            // ─────────────────────────────────────────────────────
+            //  MARKDOWN RENDERER
+            // ─────────────────────────────────────────────────────
+            function renderMarkdown(raw) {
+                if (!raw) return "<em style='color:var(--text-tertiary)'>No description yet.</em>";
+                const lines = raw.split("\n");
+                let html = "", inUl = false, inOl = false;
+                for (let line of lines) {
+                    if (inUl && !line.match(/^- /))    { html += "</ul>"; inUl = false; }
+                    if (inOl && !line.match(/^\d+\. /)) { html += "</ol>"; inOl = false; }
+                    if      (line.startsWith("### ")) html += `<h3>${inlineEsc(line.slice(4))}</h3>`;
+                    else if (line.startsWith("## "))  html += `<h2>${inlineEsc(line.slice(3))}</h2>`;
+                    else if (line.startsWith("# "))   html += `<h1>${inlineEsc(line.slice(2))}</h1>`;
+                    else if (line.startsWith("> "))   html += `<blockquote>${inlineEsc(line.slice(2))}</blockquote>`;
+                    else if (line.startsWith("---") || line.startsWith("***")) html += "<hr>";
+                    else if (line.match(/^- /))  { if (!inUl) { html += "<ul>"; inUl=true; } html += `<li>${inlineEsc(line.slice(2))}</li>`; }
+                    else if (line.match(/^\d+\. /)) { if (!inOl) { html += "<ol>"; inOl=true; } html += `<li>${inlineEsc(line.replace(/^\d+\. /,""))}</li>`; }
+                    else if (line.trim() === "") html += "<br>";
+                    else html += `<p>${inlineEsc(line)}</p>`;
+                }
+                if (inUl) html += "</ul>";
+                if (inOl) html += "</ol>";
+                return html;
+            }
+
+            function inlineEsc(s) {
+                return esc(s)
+                    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+                    .replace(/\*(.+?)\*/g, "<em>$1</em>")
+                    .replace(/`(.+?)`/g, "<code>$1</code>");
+            }
+
+            // ─────────────────────────────────────────────────────
+            //  MARKDOWN EDITOR
+            // ─────────────────────────────────────────────────────
+            window.mdFmt = function(before, after, linePrefix=false) {
+                const ta = document.getElementById("newEventLongDesc");
+                const start = ta.selectionStart, end = ta.selectionEnd;
+                const sel   = ta.value.substring(start, end);
+                let insert;
+                if (linePrefix) { insert = sel ? sel.split("\n").map(l => before + l).join("\n") : before; }
+                else { insert = before + (sel || "text") + after; }
+                ta.setRangeText(insert, start, end, "end");
+                ta.focus(); mdUpdateCount(); draftScheduleSave();
+            };
+
+            window.mdInsertHr = function() {
+                const ta = document.getElementById("newEventLongDesc");
+                const pos = ta.selectionStart;
+                ta.setRangeText("\n---\n", pos, pos, "end");
+                ta.focus(); mdUpdateCount(); draftScheduleSave();
+            };
+
+            window.mdSwitchTab = function(tab) {
+                const ta   = document.getElementById("newEventLongDesc");
+                const prev = document.getElementById("mdPreviewPane");
+                document.getElementById("mdTabWrite").classList.toggle("active", tab === "write");
+                document.getElementById("mdTabPrev").classList.toggle("active",  tab === "preview");
+                if (tab === "preview") {
+                    prev.innerHTML = renderMarkdown(ta.value);
+                    prev.classList.add("visible"); ta.classList.add("hidden");
+                } else {
+                    prev.classList.remove("visible"); ta.classList.remove("hidden"); ta.focus();
+                }
+            };
+
+            window.mdUpdateCount = function() {
+                const len = (document.getElementById("newEventLongDesc")?.value || "").length;
+                document.getElementById("mdCharCount").textContent = `${len} char${len !== 1 ? "s" : ""}`;
+            };
+
+            // ─────────────────────────────────────────────────────
+            //  ICON PREVIEW
+            // ─────────────────────────────────────────────────────
+            window.previewIcon = function() {
+                const val = document.getElementById("newEventIcon").value.trim();
+                const box = document.getElementById("iconPreview");
+                box.innerHTML = isImg(val) ? `<img src="${esc(val)}" onerror="this.parentElement.textContent='❌'" />` : (val || "🎯");
+            };
+
+            // ─────────────────────────────────────────────────────
+            //  AUTH
+            // ─────────────────────────────────────────────────────
+            window.attemptUnlock = async function() {
+                const input = document.getElementById("lockInput").value;
+                const errEl = document.getElementById("lockError");
+                errEl.textContent = "Checking...";
+                let pw = "0000";
+                try { const s = await get(ref(db,"admin/password")); pw = String(s.val() ?? "0000"); } catch {}
+                if (input === pw) {
+                    errEl.textContent = "";
+                    const ls = document.getElementById("lockScreen");
+                    ls.classList.add("hidden"); setTimeout(() => ls.style.display = "none", 400);
+                    document.getElementById("mainContent").style.display = "block";
+                    startListeners();
+                    draftAttachListeners();
+                    setTimeout(draftShowBanner, 500); // small delay so panel is visible first
+                } else {
+                    errEl.textContent = "Incorrect password.";
+                    const li = document.getElementById("lockInput");
+                    li.classList.add("error"); li.value = "";
+                    setTimeout(() => li.classList.remove("error"), 500);
+                }
+            };
+
+            window.lockPanel = function() {
+                // Flush any pending draft save immediately
+                clearTimeout(draftSaveTimer);
+                draftSave();
+                const ls = document.getElementById("lockScreen");
+                ls.style.display = "flex"; ls.classList.remove("hidden");
+                document.getElementById("lockInput").value = "";
+                document.getElementById("lockError").textContent = "";
+                document.getElementById("mainContent").style.display = "none";
+            };
+
+            // ─────────────────────────────────────────────────────
+            //  FIREBASE LISTENERS
+            // ─────────────────────────────────────────────────────
+            function startListeners() {
+                onValue(ref(db,"events/optouts"), snap => {
+                    const data = snap.val();
+                    allOptouts = data ? Object.entries(data).filter(([k]) => k !== "_placeholder").map(([k,v]) => ({key:k,...v})).sort((a,b) => (b.submittedAt||0)-(a.submittedAt||0)) : [];
+                    updateOptoutStats(); renderFilterChips(); renderOptouts();
+                });
+                onValue(ref(db,"events/list"), snap => {
+                    const data = snap.val();
+                    allEvents = data ? Object.entries(data).filter(([k]) => k !== "_placeholder").map(([k,v]) => ({key:k,...v})).sort((a,b) => (b.createdAt||0)-(a.createdAt||0)) : [];
+                    document.getElementById("tabBadgeEvents").textContent = allEvents.length;
+                    renderEventsList();
+                });
+            }
+
+            window.switchTab = function(tab) {
+                document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+                document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+                document.getElementById(`tab-${tab}`).classList.add("active");
+                document.getElementById(`panel-${tab}`).classList.add("active");
+            };
+
+            // ─────────────────────────────────────────────────────
+            //  STATS
+            // ─────────────────────────────────────────────────────
+            function updateOptoutStats() {
+                document.getElementById("statTotal").textContent  = allOptouts.length;
+                document.getElementById("statUnique").textContent = new Set(allOptouts.map(e => e.username?.toLowerCase())).size;
+                document.getElementById("statEvents").textContent = new Set(allOptouts.map(e => e.eventKey||e.event)).size;
+                document.getElementById("tabBadgeOptouts").textContent = allOptouts.length;
+            }
+
+            function renderFilterChips() {
+                const seen = new Map();
+                allOptouts.forEach(e => { const k = e.eventKey||e.event; if (k && !seen.has(k)) seen.set(k, e.event||k); });
+                document.getElementById("filterChips").innerHTML = [
+                    `<div class="filter-chip ${activeFilter==='all'?'active':''}" onclick="setFilter('all')">All (${allOptouts.length})</div>`,
+                    ...[...seen.entries()].map(([k,name]) => {
+                        const cnt = allOptouts.filter(o => (o.eventKey||o.event) === k).length;
+                        return `<div class="filter-chip ${activeFilter===k?'active':''}" onclick="setFilter('${esc(k)}')">${esc(name)} (${cnt})</div>`;
+                    })
+                ].join("");
+            }
+
+            window.setFilter     = function(key) { activeFilter = key; renderFilterChips(); renderOptouts(); };
+            window.filterOptouts = function() { renderOptouts(); };
+
+            window.renderOptouts = function() {
+                const q    = (document.getElementById("searchInput")?.value || "").toLowerCase();
+                const list = allOptouts.filter(e => {
+                    const mf = activeFilter === "all" || (e.eventKey||e.event) === activeFilter;
+                    const ms = !q || (e.username||"").toLowerCase().includes(q) || (e.reason||"").toLowerCase().includes(q) || (e.event||"").toLowerCase().includes(q);
+                    return mf && ms;
+                });
+                const el = document.getElementById("optoutList");
+                if (!list.length) { el.innerHTML = `<div class="empty-state"><div class="empty-icon">🎉</div><div class="empty-title">No opt-outs found</div><div class="empty-sub">All players are in — or adjust your search.</div></div>`; return; }
+                el.innerHTML = list.map((e, i) => {
+                    const name = e.username || "Unknown";
+                    const date = e.submittedAt ? new Date(e.submittedAt).toLocaleString("en-AU",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"}) : "Unknown";
+                    return `<div class="optout-card" style="animation-delay:${i*0.04}s">
+                        <div class="player-avatar"><img src="https://mc-heads.net/avatar/${encodeURIComponent(name)}/50" alt="${esc(name)}" onerror="this.style.display='none'" /></div>
+                        <div class="optout-content">
+                            <div class="optout-top"><span class="player-name">${esc(name)}</span><span class="event-tag">🎯 ${esc(e.event||"Unknown")}</span></div>
+                            <div class="optout-reason">${esc(e.reason||"No reason provided.")}</div>
+                            <div class="optout-meta">📅 ${date}</div>
+                        </div>
+                        <button class="delete-btn" onclick="promptDeleteOptout('${esc(e.key)}','${esc(name)}')">🗑️</button>
+                    </div>`;
+                }).join("");
+            };
+
+            // ─────────────────────────────────────────────────────
+            //  EVENTS LIST
+            // ─────────────────────────────────────────────────────
+            function renderEventsList() {
+                const el = document.getElementById("eventsList");
+                if (!allEvents.length) { el.innerHTML = `<div class="events-empty"><div class="events-empty-icon">📭</div><div class="events-empty-title">No events yet</div><div class="events-empty-sub">Create your first event above.</div></div>`; return; }
+                el.innerHTML = allEvents.map((ev, i) => {
+                    const cnt  = allOptouts.filter(o => o.eventKey === ev.key).length;
+                    const date = ev.createdAt ? new Date(ev.createdAt).toLocaleDateString("en-AU",{day:"numeric",month:"short",year:"numeric"}) : "";
+                    const thumbHTML = isImg(ev.icon) ? `<img src="${esc(ev.icon)}" alt="${esc(ev.name)}" onerror="this.parentElement.textContent='🎯'" />` : (ev.icon || "🎯");
+                    const status = schedStatus(ev.startDate, ev.endDate);
+                    const statusBadge = status === "upcoming" ? `<span class="sched-badge upcoming">⏳ Upcoming</span>` : status === "live" ? `<span class="sched-badge live">● Live now</span>` : status === "ended" ? `<span class="sched-badge ended">✓ Ended</span>` : "";
+                    const schedLine = (ev.startDate || ev.endDate) ? `
+                        <div class="event-card-schedule">
+                            ${statusBadge}
+                            ${ev.startDate ? `🗓 ${fmtDateShort(ev.startDate)}` : ""}
+                            ${ev.startDate && ev.endDate ? "→" : ""}
+                            ${ev.endDate   ? fmtDateShort(ev.endDate) : ""}
+                        </div>` : "";
+                    return `<div class="event-card" style="animation-delay:${i*0.05}s">
+                        <div class="event-card-main">
+                            <div class="event-card-thumb">${thumbHTML}</div>
+                            <div class="event-card-body">
+                                <div class="event-card-name">${esc(ev.name)}</div>
+                                ${ev.description ? `<div class="event-card-desc">${esc(ev.description)}</div>` : ""}
+                                ${schedLine}
+                                <div class="event-card-schedule" style="margin-top:2px;color:var(--text-tertiary);font-size:11px">${date ? `Created ${date}` : ""}</div>
+                            </div>
+                            <div class="event-card-actions">
+                                <span class="event-optout-count">👥 ${cnt} opt-out${cnt===1?"":"s"}</span>
+                                <span class="active-pill ${ev.active?"on":"off"}">${ev.active?"● Active":"○ Inactive"}</span>
+                                <label class="toggle">
+                                    <input type="checkbox" ${ev.active?"checked":""} onchange="toggleEvent('${esc(ev.key)}',this.checked)" />
+                                    <div class="toggle-track"></div>
+                                    <div class="toggle-thumb"></div>
+                                </label>
+                                <button class="icon-btn del" onclick="promptDeleteEvent('${esc(ev.key)}','${esc(ev.name)}')">🗑️</button>
+                            </div>
+                        </div>
+                    </div>`;
+                }).join("");
+            }
+
+            // ─────────────────────────────────────────────────────
+            //  CREATE EVENT
+            // ─────────────────────────────────────────────────────
+            window.submitNewEvent = async function() {
+                const name      = document.getElementById("newEventName").value.trim();
+                const desc      = document.getElementById("newEventDesc").value.trim();
+                const icon      = document.getElementById("newEventIcon").value.trim() || "🎯";
+                const longDesc  = document.getElementById("newEventLongDesc").value.trim();
+                const startDate = document.getElementById("newEventStart").value || null;
+                const endDate   = document.getElementById("newEventEnd").value   || null;
+                const active    = document.getElementById("newEventActive").checked;
+
+                if (!name) { showToast("Please enter an event name.", true); return; }
+
+                const btn = document.getElementById("createBtn");
+                btn.disabled = true; btn.textContent = "Creating...";
+                try {
+                    await push(ref(db,"events/list"), { name, description:desc, longDescription:longDesc, icon, startDate, endDate, active, createdAt:serverTimestamp() });
+                    resetForm();
+                    showToast(`Event "${name}" created!`);
+                } catch(err) { console.error(err); showToast("Failed to create event.", true); }
+                finally { btn.disabled = false; btn.innerHTML = "<span>✨</span> Create Event"; }
+            };
+
+            window.toggleEvent = async function(key, active) {
+                try { await update(ref(db,`events/list/${key}`), { active }); showToast(active ? "Event activated." : "Event deactivated."); }
+                catch { showToast("Failed to update event.", true); }
+            };
+
+            // ─────────────────────────────────────────────────────
+            //  DELETE / MODALS
+            // ─────────────────────────────────────────────────────
+            window.promptDeleteOptout = function(key, name) {
+                document.getElementById("deleteSub").textContent = `Remove ${name}'s opt-out entry? This cannot be undone.`;
+                pendingDeleteFn = () => remove(ref(db,`events/optouts/${key}`));
+                openModal("deleteModal");
+            };
+            window.promptDeleteEvent = function(key, name) {
+                document.getElementById("deleteSub").textContent = `Delete "${name}"? Opt-out entries will remain but the event will be removed from the player form.`;
+                pendingDeleteFn = () => remove(ref(db,`events/list/${key}`));
+                openModal("deleteModal");
+            };
+            window.promptClearAll = function() {
+                document.getElementById("deleteSub").textContent = `Permanently delete all ${allOptouts.length} opt-out entries? This cannot be undone.`;
+                pendingDeleteFn = () => remove(ref(db,"events/optouts"));
+                openModal("deleteModal");
+            };
+
+            document.getElementById("deleteConfirmBtn").addEventListener("click", async () => {
+                if (!pendingDeleteFn) return;
+                try { await pendingDeleteFn(); } catch { showToast("Delete failed.", true); }
+                closeModal("deleteModal"); pendingDeleteFn = null;
+            });
+
+            function openModal(id)           { document.getElementById(id).classList.add("visible"); }
+            window.closeModal = function(id) { document.getElementById(id).classList.remove("visible"); }
+            document.getElementById("deleteModal").addEventListener("click",    e => { if (e.target===e.currentTarget) closeModal("deleteModal"); });
+            document.getElementById("clearFormModal").addEventListener("click", e => { if (e.target===e.currentTarget) closeModal("clearFormModal"); });
+
+            function showToast(msg, isError = false) {
+                const t = document.getElementById("toast");
+                document.getElementById("toastMsg").textContent  = msg;
+                document.getElementById("toastIcon").textContent = isError ? "❌" : "✅";
+                t.className = "toast" + (isError ? " error" : "") + " show";
+                setTimeout(() => { t.className = "toast" + (isError ? " error" : ""); }, 4000);
+            }
+
+            // Save draft on page close / navigate away
+            window.addEventListener("beforeunload", () => { clearTimeout(draftSaveTimer); draftSave(); });
+
+            // Check for draft hint on lock screen immediately
+            draftCheckOnLoad();
+
+            window._renderMarkdown = renderMarkdown;
+        </script>
+    </body>
+</html>
