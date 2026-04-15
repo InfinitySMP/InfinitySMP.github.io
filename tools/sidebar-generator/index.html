@@ -1,0 +1,764 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Bedrock Sidebar Generator</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=SF+Pro+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <style>
+    /* ─── Reset ─────────────────────────────────────────────────── */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { overflow-x: hidden; overflow-y: auto; }
+    body { overflow-x: hidden; }
+    body::-webkit-scrollbar, html::-webkit-scrollbar { display: none; }
+    body, html { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* ─── Design Tokens ──────────────────────────────────────────── */
+    :root {
+      --bg-primary: #0a1929;
+      --bg-secondary: #0d2137;
+      --bg-tertiary: #132f4c;
+      --text-primary: #e3f2fd;
+      --text-secondary: #90caf9;
+      --text-tertiary: #64b5f6;
+      --accent: #2196f3;
+      --accent-hover: #42a5f5;
+      --accent-dark: #1976d2;
+      --success: #4caf50;
+      --warning: #ff9800;
+      --danger: #f44336;
+      --border: rgba(33, 150, 243, 0.15);
+      --border-hover: rgba(33, 150, 243, 0.3);
+      --shadow-sm: 0 2px 8px rgba(33, 150, 243, 0.1);
+      --shadow-md: 0 4px 20px rgba(33, 150, 243, 0.15);
+      --shadow-lg: 0 12px 48px rgba(33, 150, 243, 0.25);
+      --shadow-glow: 0 0 40px rgba(33, 150, 243, 0.2);
+      --radius-sm: 10px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+    }
+
+    /* ─── Base ───────────────────────────────────────────────────── */
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      position: relative;
+      width: 100%;
+      max-width: 100vw;
+    }
+
+    /* ─── Animated Background ────────────────────────────────────── */
+    body::before {
+      content: "";
+      position: fixed;
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: radial-gradient(circle at 30% 50%, rgba(33, 150, 243, 0.1) 0%, transparent 50%),
+                  radial-gradient(circle at 70% 50%, rgba(33, 150, 243, 0.05) 0%, transparent 50%);
+      animation: float 20s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ─── Floating Particles ─────────────────────────────────────── */
+    .particles {
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none; z-index: 0; overflow: hidden;
+    }
+    .particle {
+      position: absolute;
+      width: 3px; height: 3px;
+      background: var(--accent);
+      border-radius: 50%; opacity: 0;
+      animation: float-particle 15s infinite;
+      box-shadow: 0 0 10px var(--accent);
+    }
+    .particle:nth-child(1) { left: 10%; animation-delay: 0s; }
+    .particle:nth-child(2) { left: 25%; animation-delay: 3s; }
+    .particle:nth-child(3) { left: 40%; animation-delay: 6s; }
+    .particle:nth-child(4) { left: 60%; animation-delay: 9s; }
+    .particle:nth-child(5) { left: 75%; animation-delay: 12s; }
+    .particle:nth-child(6) { left: 90%; animation-delay: 2s; }
+
+    /* ─── Animations ─────────────────────────────────────────────── */
+    @keyframes float {
+      0%, 100% { transform: translate(0,0) rotate(0deg); }
+      33% { transform: translate(30px,-30px) rotate(5deg); }
+      66% { transform: translate(-20px,20px) rotate(-5deg); }
+    }
+    @keyframes float-particle {
+      0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+      10% { opacity: 0.5; }
+      90% { opacity: 0.5; }
+      100% { transform: translateY(-100px) translateX(100px); opacity: 0; }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.8; }
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ─── Layout ─────────────────────────────────────────────────── */
+    .container {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      position: relative;
+      z-index: 1;
+      animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* ─── Header ─────────────────────────────────────────────────── */
+    .header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .header-icon {
+      width: 72px; height: 72px;
+      margin: 0 auto 24px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      background: var(--bg-secondary);
+      border: 2px solid var(--border);
+      box-shadow: var(--shadow-glow), var(--shadow-lg);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      animation: fadeIn 0.6s ease-out;
+    }
+    .header-icon:hover {
+      transform: scale(1.05) translateY(-5px);
+      box-shadow: 0 0 60px rgba(33, 150, 243, 0.4), var(--shadow-lg);
+      border-color: var(--accent);
+    }
+
+    h1 {
+      font-size: 42px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: fadeIn 0.6s ease-out 0.2s backwards;
+    }
+
+    .subtitle {
+      font-size: 16px;
+      color: var(--text-secondary);
+      font-weight: 400;
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.6;
+      animation: fadeIn 0.6s ease-out 0.3s backwards;
+    }
+
+    /* ─── Panel / Card ───────────────────────────────────────────── */
+    .mc-panel {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 28px 32px;
+      box-shadow: var(--shadow-md);
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .mc-panel::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-hover));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .mc-panel:hover::before { transform: scaleX(1); }
+    .mc-panel:hover {
+      border-color: var(--border-hover);
+      box-shadow: var(--shadow-lg);
+    }
+    .mc-panel:nth-child(1) { animation: fadeInUp 0.6s ease-out 0.4s backwards; }
+    .mc-panel:nth-child(2) { animation: fadeInUp 0.6s ease-out 0.5s backwards; }
+    .mc-panel:nth-child(3) { animation: fadeInUp 0.6s ease-out 0.6s backwards; }
+    .mc-panel:nth-child(4) { animation: fadeInUp 0.6s ease-out 0.7s backwards; }
+    .mc-panel:nth-child(5) { animation: fadeInUp 0.6s ease-out 0.8s backwards; }
+    .mc-panel:nth-child(6) { animation: fadeInUp 0.6s ease-out 0.9s backwards; }
+    .mc-panel:nth-child(7) { animation: fadeInUp 0.6s ease-out 1.0s backwards; }
+
+    .panel-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .panel-label::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ─── Notice ─────────────────────────────────────────────────── */
+    .notice {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 16px 18px;
+      border-radius: var(--radius-sm);
+      background: rgba(33, 150, 243, 0.08);
+      border: 1px solid rgba(33, 150, 243, 0.25);
+    }
+    .notice-icon {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: rgba(33, 150, 243, 0.2);
+      border: 1px solid rgba(33, 150, 243, 0.4);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+    .notice p { font-size: 14px; line-height: 1.6; color: var(--text-secondary); }
+    .notice strong { color: var(--text-primary); }
+    .notice code {
+      background: var(--bg-tertiary);
+      color: var(--accent);
+      padding: 2px 6px;
+      border-radius: 5px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 12px;
+      border: 1px solid var(--border);
+    }
+
+    /* ─── Form Grid ──────────────────────────────────────────────── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
+    }
+    .form-grid.two { grid-template-columns: 1fr 1fr; }
+    .form-grid.one { grid-template-columns: 1fr; }
+    .field.full { grid-column: 1 / -1; }
+
+    .field label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    input[type="text"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 11px 14px;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text-primary);
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      outline: none;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.15);
+    }
+    input:hover, select:hover, textarea:hover {
+      border-color: var(--border-hover);
+    }
+    textarea { resize: vertical; font-family: "JetBrains Mono", monospace; font-size: 13px; }
+    select { cursor: pointer; }
+    select option { background: var(--bg-tertiary); color: var(--text-primary); }
+
+    .field-hint {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      margin-top: 6px;
+    }
+    .field-hint code {
+      background: var(--bg-tertiary);
+      color: var(--accent);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11px;
+      border: 1px solid var(--border);
+    }
+
+    /* ─── Buttons ────────────────────────────────────────────────── */
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      border: none;
+      outline: none;
+      font-family: inherit;
+      text-transform: uppercase;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+      color: white;
+      box-shadow: 0 4px 16px rgba(33, 150, 243, 0.35);
+      flex: 1;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(33, 150, 243, 0.5);
+    }
+    .btn-primary:active { transform: translateY(0); }
+
+    .btn-download {
+      background: var(--bg-tertiary);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+      flex: 1;
+    }
+    .btn-download:not(:disabled):hover {
+      background: rgba(76, 175, 80, 0.2);
+      color: #4caf50;
+      border-color: rgba(76, 175, 80, 0.4);
+      transform: translateY(-2px);
+    }
+    .btn-download:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    #status {
+      font-size: 13px;
+      color: var(--success);
+      min-height: 18px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+
+    /* ─── Output Block ───────────────────────────────────────────── */
+    .output-block {
+      position: relative;
+    }
+    .output-block textarea {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 12px;
+      line-height: 1.7;
+      color: var(--text-secondary);
+      background: var(--bg-primary);
+      border-color: var(--border);
+      padding-right: 80px;
+    }
+    .output-block textarea:read-only { cursor: default; }
+    .copy-btn {
+      position: absolute;
+      top: 10px; right: 10px;
+      padding: 6px 14px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      background: var(--bg-tertiary);
+      color: var(--text-tertiary);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s ease;
+    }
+    .copy-btn:hover {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+    .copy-btn.copied {
+      background: var(--success);
+      color: white;
+      border-color: var(--success);
+    }
+
+    /* ─── Preview ────────────────────────────────────────────────── */
+    #previewWrap {
+      min-height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sidebar-preview {
+      background: #1a1a2e;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--radius-sm);
+      padding: 14px 18px;
+      min-width: 240px;
+      font-family: "JetBrains Mono", monospace;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    }
+
+    .preview-title {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      letter-spacing: 0.02em;
+    }
+
+    .preview-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      padding: 3px 0;
+      gap: 20px;
+    }
+
+    .preview-value {
+      color: rgba(255,255,255,0.5);
+      font-size: 11px;
+    }
+
+    /* ─── Footer ─────────────────────────────────────────────────── */
+    .footer {
+      text-align: center;
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      animation: fadeIn 0.6s ease-out 1.0s backwards;
+    }
+    .footer-text {
+      font-size: 13px;
+      color: var(--text-tertiary);
+      line-height: 1.6;
+    }
+
+    /* ─── Responsive ─────────────────────────────────────────────── */
+    @media (max-width: 700px) {
+      h1 { font-size: 28px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .btn-row { flex-direction: column; }
+      .mc-panel { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="particles">
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+</div>
+
+<div class="container">
+
+  <div class="header">
+    <div class="header-icon">⚔</div>
+    <h1>Bedrock Sidebar Generator</h1>
+    <p class="subtitle">Generate scoreboard sidebar packs and export as <code style="background:rgba(33,150,243,0.12);color:var(--accent);padding:2px 8px;border-radius:5px;font-family:'JetBrains Mono',monospace;font-size:14px;border:1px solid var(--border)">.mcpack</code></p>
+  </div>
+
+  <!-- EXPERIMENT NOTICE -->
+  <div class="mc-panel">
+    <div class="panel-label">⚠ Info</div>
+    <div class="notice">
+      <div class="notice-icon">ℹ</div>
+      <p>
+        <strong>No experimental features required.</strong><br>
+        This pack uses only standard <code>/scoreboard</code> commands and a tick function,
+        which are fully stable in all listed versions (1.21.93+). Enable
+        <strong>Beta APIs</strong> only if you add custom scripting later. You can also use the 
+          <a href=https://infinitysmp.github.io/tools/text-editor/>Raw Text generator</a> on our website to generate a nice scoreboard!</p>
+    </div>
+  </div>
+
+  <!-- CONFIG -->
+  <div class="mc-panel">
+    <div class="panel-label">Pack Config</div>
+    <div class="form-grid">
+      <div class="field">
+        <label>Pack Name</label>
+        <input id="packName" type="text" value="My Sidebar">
+      </div>
+      <div class="field">
+        <label>Pack Description</label>
+        <input id="packDesc" type="text" value="Scoreboard sidebar display" />
+      </div>
+      <div class="field">
+        <label>Target Version</label>
+        <select id="version">
+          <option>1.21.93</option>
+          <option>1.21.100</option>
+          <option>1.21.120</option>
+          <option>1.21.131</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="mc-panel">
+    <div class="panel-label">Sidebar Settings</div>
+    <div class="form-grid two">
+      <div class="field">
+        <label>Sidebar Title <span style="color:var(--text-tertiary);font-size:10px;text-transform:none;letter-spacing:0">(§ codes ok)</span></label>
+        <input id="title" type="text" value="§aServer Stats" />
+      </div>
+      <div class="field">
+        <label>Sidebar Objective Name</label>
+        <input id="sidebarObj" type="text" value="sidebar" />
+      </div>
+      <div class="field full">
+        <label>Sidebar Lines</label>
+        <textarea id="lines" rows="6" placeholder="Label | objective&#10;§eMoney: | money&#10;§bKills: | kills">§eMoney: | money
+§bKills: | kills
+§cDeaths: | deaths</textarea>
+        <div class="field-hint">Format: <code>Pretty Label | realObjective</code> — one per line</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GENERATE BUTTONS -->
+  <div class="mc-panel">
+    <div class="panel-label">Generate</div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="generate()">▶ Generate</button>
+      <button class="btn btn-download" id="dlBtn" disabled onclick="downloadMcpack()">⬇ Export .mcpack</button>
+    </div>
+    <div id="status"></div>
+  </div>
+
+  <!-- OUTPUTS -->
+  <div class="mc-panel">
+    <div class="panel-label">Setup Commands <span style="font-weight:400;color:var(--text-tertiary);letter-spacing:0;text-transform:none">— run once</span></div>
+    <div class="output-block">
+      <textarea id="setup" rows="10" readonly></textarea>
+      <button class="copy-btn" onclick="copyTA('setup', this)">Copy</button>
+    </div>
+  </div>
+
+  <div class="mc-panel">
+    <div class="panel-label">Update Commands <span style="font-weight:400;color:var(--text-tertiary);letter-spacing:0;text-transform:none">— run each tick</span></div>
+    <div class="output-block">
+      <textarea id="update" rows="6" readonly></textarea>
+      <button class="copy-btn" onclick="copyTA('update', this)">Copy</button>
+    </div>
+  </div>
+
+  <!-- PREVIEW -->
+  <div class="mc-panel">
+    <div class="panel-label">Preview</div>
+    <div id="previewWrap">
+      <p style="color:var(--text-tertiary);font-size:13px;letter-spacing:0.03em">Generate to see preview</p>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p class="footer-text">Bedrock Sidebar Generator — Uses only standard <code style="background:var(--bg-tertiary);color:var(--accent);padding:1px 6px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:12px;border:1px solid var(--border)">/scoreboard</code> commands. No experimental features needed.</p>
+  </div>
+
+</div>
+
+<script>
+let lastSetup = "";
+let lastUpdate = "";
+let lastMeta = {};
+
+function generate() {
+  const version    = document.getElementById("version").value;
+  const title      = document.getElementById("title").value.trim();
+  const sidebarObj = document.getElementById("sidebarObj").value.trim();
+  const rawLines   = document.getElementById("lines").value.split("\n");
+
+  const setup  = [];
+  const update = [];
+  const previewLines = [];
+
+  setup.push(`# Target version: ${version}`);
+  setup.push(`# ── Run these once on world load ──`);
+  setup.push(`scoreboard objectives add ${sidebarObj} dummy "${title}"`);
+  setup.push(`scoreboard objectives setdisplay sidebar ${sidebarObj}`);
+  setup.push("");
+
+  let score = rawLines.filter(l => l.includes("|")).length * 10;
+
+  rawLines.forEach(line => {
+    if (!line.includes("|")) return;
+    const [label, obj] = line.split("|").map(s => s.trim());
+    setup.push(`scoreboard objectives add ${obj} dummy`);
+    setup.push(`scoreboard players set "${label}" ${sidebarObj} ${score}`);
+    update.push(`scoreboard players operation "${label}" ${sidebarObj} = @s ${obj}`);
+    previewLines.push({ label, score });
+    score -= 10;
+  });
+
+  lastSetup  = setup.join("\n");
+  lastUpdate = update.join("\n");
+  lastMeta   = {
+    version, title, sidebarObj,
+    packName: document.getElementById("packName").value.trim(),
+    packDesc: document.getElementById("packDesc").value.trim()
+  };
+
+  document.getElementById("setup").value  = lastSetup;
+  document.getElementById("update").value = lastUpdate;
+
+  const wrap = document.getElementById("previewWrap");
+  const colors = {
+    "§0":"#000","§1":"#00a","§2":"#0a0","§3":"#0aa","§4":"#a00",
+    "§5":"#a0a","§6":"#fa0","§7":"#aaa","§8":"#555","§9":"#55f",
+    "§a":"#5f5","§b":"#5ff","§c":"#f55","§d":"#f5f","§e":"#ff5",
+    "§f":"#fff","§l":"bold","§r":"reset"
+  };
+
+  function mcColor(str) {
+    const parts = [];
+    const re = /§[0-9a-fA-FlLrRoOkK]|[^§]+/g;
+    let cur = "#e3f2fd"; let bold = false;
+    let m;
+    while ((m = re.exec(str)) !== null) {
+      const tok = m[0];
+      if (tok.startsWith("§")) {
+        const c = colors[tok.toLowerCase()];
+        if (c === "bold") bold = true;
+        else if (c === "reset") { cur = "#e3f2fd"; bold = false; }
+        else if (c) { cur = c; bold = false; }
+      } else {
+        parts.push(`<span style="color:${cur};${bold?'font-weight:bold':''}">${tok.replace(/</g,'&lt;')}</span>`);
+      }
+    }
+    return parts.join("");
+  }
+
+  let html = `<div class="sidebar-preview">`;
+  html += `<div class="preview-title">${mcColor(title)}</div>`;
+  previewLines.sort((a,b) => b.score - a.score).forEach(({label}) => {
+    html += `<div class="preview-line"><span>${mcColor(label)}</span><span class="preview-value">0</span></div>`;
+  });
+  html += `</div>`;
+  wrap.innerHTML = html;
+
+  document.getElementById("dlBtn").disabled = false;
+  document.getElementById("status").textContent = "✔ Generated — ready to export .mcpack";
+  setTimeout(() => document.getElementById("status").textContent = "", 3500);
+}
+
+async function downloadMcpack() {
+  const { version, title, sidebarObj, packName, packDesc } = lastMeta;
+  const safeId = packName.toLowerCase().replace(/[^a-z0-9]/g, "_");
+
+  const uuid = () => "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => {
+    const r = Math.random() * 16 | 0;
+    return (c === "x" ? r : (r & 0x3 | 0x8)).toString(16);
+  });
+
+  const verArr = version.split(".").map(Number);
+
+  const manifest = {
+    format_version: 2,
+    header: {
+      name: packName, description: packDesc,
+      uuid: uuid(), version: [1,0,0], min_engine_version: verArr
+    },
+    modules: [{ type: "data", uuid: uuid(), version: [1,0,0] }]
+  };
+
+  const tickJson = { values: [`${safeId}/update`] };
+
+  const setupFunc = lastSetup
+    .split("\n")
+    .filter(l => !l.startsWith("#") && l.trim() !== "")
+    .join("\n");
+
+  const updateFunc = lastUpdate.trim() || "# No update commands";
+
+  const readmeFunc = `# ═══════════════════════════════════
+# ${packName}
+# Generated by Bedrock Sidebar Generator
+# ═══════════════════════════════════
+#
+# SETUP (run once in chat):
+#   /function ${safeId}/setup
+#
+# The update function runs automatically every tick via tick.json.
+#
+# NO EXPERIMENTAL FEATURES REQUIRED.
+# Standard /scoreboard commands only.
+#
+# Lines displayed:
+${lastUpdate.split("\n").map(l => "# " + l).join("\n")}`;
+
+  const zip = new JSZip();
+  const bp  = zip.folder("behavior_pack");
+  bp.file("manifest.json", JSON.stringify(manifest, null, 2));
+  const fn = bp.folder("functions");
+  const ns = fn.folder(safeId);
+  ns.file("setup.mcfunction",  setupFunc);
+  ns.file("update.mcfunction", updateFunc);
+  ns.file("readme.mcfunction", readmeFunc);
+  bp.folder("functions").file("tick.json", JSON.stringify(tickJson, null, 2));
+
+  const blob = await zip.generateAsync({ type: "blob", mimeType: "application/zip" });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement("a");
+  a.href = url; a.download = `${safeId}_sidebar.mcpack`; a.click();
+  URL.revokeObjectURL(url);
+
+  document.getElementById("status").textContent = `✔ Downloaded ${safeId}_sidebar.mcpack`;
+  setTimeout(() => document.getElementById("status").textContent = "", 4000);
+}
+
+function copyTA(id, btn) {
+  const el = document.getElementById(id);
+  navigator.clipboard.writeText(el.value).then(() => {
+    btn.textContent = "Copied!";
+    btn.classList.add("copied");
+    setTimeout(() => { btn.textContent = "Copy"; btn.classList.remove("copied"); }, 1500);
+  });
+}
+
+generate();
+</script>
+</body>
+</html>
